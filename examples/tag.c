@@ -5,12 +5,12 @@ void train_tag(char *cfgfile, char *weightfile, int clear)
     srand(time(0));
     float avg_loss = -1;
     char *base = basecfg(cfgfile);
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *backup_directory = "/home/piotr/backup/";
     printf("%s\n", base);
     network *net = load_network(cfgfile, weightfile, clear);
     printf("Learning Rate: %g, Momentum: %g, Decay: %g\n", net->learning_rate, net->momentum, net->decay);
     int imgs = 1024;
-    list *plist = get_paths("/home/pjreddie/tag/train.list");
+    list *plist = get_paths("/home/piotr/tag/train.list");
     char **paths = (char **)list_to_array(plist);
     printf("%d\n", plist->size);
     int N = plist->size;

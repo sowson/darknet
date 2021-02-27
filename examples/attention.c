@@ -67,11 +67,12 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
     for(i = 0; i < ngpus; ++i){
         srand(seed);
 #ifdef GPU
-        cuda_set_device(gpus[i]);
+        opencl_set_device(i);
 #endif
         nets[i] = load_network(cfgfile, weightfile, clear);
         nets[i]->learning_rate *= ngpus;
     }
+
     srand(time(0));
     network *net = nets[0];
 
@@ -166,7 +167,7 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
         if (ngpus == 1) {
             closs = train_network(net, best);
         } else {
-            closs = train_networks(nets, ngpus, best, 4);
+            closs = train_networks(nets, ngpus, best, 4, gpus, ngpus);
         }
         #endif
         for (i = 0; i < divs*divs; ++i) {
@@ -189,7 +190,7 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
         if (ngpus == 1) {
             aloss = train_network(net, resized);
         } else {
-            aloss = train_networks(nets, ngpus, resized, 4);
+            aloss = train_networks(nets, ngpus, resized, 4, gpus, ngpus);
         }
 #endif
         for(i = 0; i < divs*divs; ++i){
@@ -287,7 +288,7 @@ void validate_attention_single(char *datacfg, char *filename, char *weightfile)
         printf("\n");
         copy_cpu(classes, pred, 1, avgs, 1);
         top_k(pred + classes, divs*divs, divs*divs, inds);
-        show_image(crop, "crop");
+        show_image(crop, "crop", 0);
         for(j = 0; j < extra; ++j){
             int index = inds[j];
             int row = index / divs;
@@ -298,8 +299,7 @@ void validate_attention_single(char *datacfg, char *filename, char *weightfile)
             image tile = crop_image(crop, x, y, net->w, net->h);
             float *pred = network_predict(net, tile.data);
             axpy_cpu(classes, 1., pred, 1, avgs, 1);
-            show_image(tile, "tile");
-            //cvWaitKey(10);
+            show_image(tile, "tile", 10);
         }
         if(net->hierarchy) hierarchy_predictions(pred, net->outputs, net->hierarchy, 1, 1);
 
@@ -408,7 +408,8 @@ void predict_attention(char *datacfg, char *cfgfile, char *weightfile, char *fil
             strtok(input, "\n");
         }
         image im = load_image_color(input, 0, 0);
-        image r = letterbox_image(im, net->w, net->h);
+        int resize = im.w != net->w || im.h != net->h;
+        image r = resize ? letterbox_image(im, net->w, net->h) : im;
         //resize_network(&net, r.w, r.h);
         //printf("%d %d\n", r.w, r.h);
 

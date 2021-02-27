@@ -1,7 +1,7 @@
 #include "logistic_layer.h"
 #include "activations.h"
 #include "blas.h"
-#include "cuda.h"
+#include "opencl.h"
 
 #include <float.h>
 #include <math.h>
@@ -24,14 +24,15 @@ layer make_logistic_layer(int batch, int inputs)
 
     l.forward = forward_logistic_layer;
     l.backward = backward_logistic_layer;
-    #ifdef GPU
-    l.forward_gpu = forward_logistic_layer_gpu;
-    l.backward_gpu = backward_logistic_layer_gpu;
-
-    l.output_gpu = cuda_make_array(l.output, inputs*batch); 
-    l.loss_gpu = cuda_make_array(l.loss, inputs*batch); 
-    l.delta_gpu = cuda_make_array(l.delta, inputs*batch); 
-    #endif
+#ifdef GPU
+    if (gpu_index >= 0) {
+        l.forward_gpu = forward_logistic_layer_gpu;
+        l.backward_gpu = backward_logistic_layer_gpu;
+        l.output_gpu = opencl_make_array(l.output, inputs * batch);
+        l.loss_gpu = opencl_make_array(l.loss, inputs * batch);
+        l.delta_gpu = opencl_make_array(l.delta, inputs * batch);
+    }
+#endif
     return l;
 }
 
@@ -58,7 +59,7 @@ void forward_logistic_layer_gpu(const layer l, network net)
     activate_array_gpu(l.output_gpu, l.outputs*l.batch, LOGISTIC);
     if(net.truth){
         logistic_x_ent_gpu(l.batch*l.inputs, l.output_gpu, net.truth_gpu, l.delta_gpu, l.loss_gpu);
-        cuda_pull_array(l.loss_gpu, l.loss, l.batch*l.inputs);
+        opencl_pull_array(l.loss_gpu, l.loss, l.batch*l.inputs);
         l.cost[0] = sum_array(l.loss, l.batch*l.inputs);
     }
 }

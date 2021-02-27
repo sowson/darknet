@@ -9,13 +9,14 @@
 #include "box.h"
 #include "darknet.h"
 
-#ifndef __cplusplus
 #ifdef OPENCV
+#ifndef __cplusplus
 int fill_image_from_stream(CvCapture *cap, image im);
 image ipl_to_image(IplImage* src);
-void ipl_into_image(IplImage* src, image im);
-void flush_stream_buffer(CvCapture *cap, int n);
+image load_image_cv(char *filename, int channels);
 void show_image_cv(image p, const char *name, IplImage *disp);
+void blur_image_and_save_cv(image im, int num, int classes, detection *dets, float thresh, const char* fname);
+void save_image_jpg_cv(image p, const char *name);
 #endif
 #endif
 
@@ -43,7 +44,6 @@ void hsv_to_rgb(image im);
 void yuv_to_rgb(image im);
 void rgb_to_yuv(image im);
 
-
 image collapse_image_layers(image source, int border);
 image collapse_images_horz(image *ims, int n);
 image collapse_images_vert(image *ims, int n);
@@ -61,4 +61,3 @@ void copy_image_into(image src, image dest);
 image get_image_layer(image m, int l);
 
 #endif
-
