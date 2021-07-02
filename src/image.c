@@ -1,7 +1,7 @@
 #include "image.h"
 #include "utils.h"
 #include "blas.h"
-#include "cuda.h"
+#include "opencl.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -51,14 +51,14 @@ static float get_pixel(image m, int x, int y, int c)
 }
 static float get_pixel_extend(image m, int x, int y, int c)
 {
-    if(x < 0 || x >= m.w || y < 0 || y >= m.h) return 0;
+    if (x < 0 || x >= m.w || y < 0 || y >= m.h) return 0;
     /*
     if(x < 0) x = 0;
     if(x >= m.w) x = m.w-1;
     if(y < 0) y = 0;
     if(y >= m.h) y = m.h-1;
     */
-    if(c < 0 || c >= m.c) return 0;
+    if (c < 0 || c >= m.c) return 0;
     return get_pixel(m, x, y, c);
 }
 static void set_pixel(image m, int x, int y, int c, float val)
@@ -146,6 +146,32 @@ image get_label(image **characters, char *string, int size)
     return b;
 }
 
+image tile_images_y4(image a, image b, int dx)
+{
+    if(a.w == 0) return copy_image(b);
+    image c = make_image(a.w + b.w + dx, (a.h > b.h) ? a.h : b.h, (a.c > b.c) ? a.c : b.c);
+    fill_cpu(c.w*c.h*c.c, 1, c.data, 1);
+    embed_image(a, c, 0, 0);
+    composite_image(b, c, a.w + dx, 0);
+    return c;
+}
+
+image get_label_y4(image **characters, char *string, int size)
+{
+    if(size > 7) size = 7;
+    image label = make_empty_image(0,0,0);
+    while(*string){
+        image l = characters[size][(int)*string];
+        image n = tile_images_y4(label, l, -size - 1 + (size+1)/2);
+        free_image(label);
+        label = n;
+        ++string;
+    }
+    image b = border_image(label, label.h*.25);
+    free_image(label);
+    return b;
+}
+
 void draw_label(image a, int r, int c, image label, const float *rgb)
 {
     int w = label.w;
@@ -224,7 +250,7 @@ image **load_alphabet()
 {
     int i, j;
     const int nsize = 8;
-    image **alphabets = calloc(nsize, sizeof(image));
+    image **alphabets = calloc(nsize, sizeof(image*));
     for(j = 0; j < nsize; ++j){
         alphabets[j] = calloc(128, sizeof(image));
         for(i = 32; i < 127; ++i){
@@ -236,15 +262,17 @@ image **load_alphabet()
     return alphabets;
 }
 
-void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
+void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps)
 {
     int i,j;
+    char percent[32];
+    char lfps[32];
 
-    for(i = 0; i < num; ++i){
+    for(i = 0; i < num; ++i) {
         char labelstr[4096] = {0};
         int class = -1;
-        for(j = 0; j < classes; ++j){
-            if (dets[i].prob[j] > thresh){
+        for (j = 0; j < classes; ++j) {
+            if (dets[i].prob[j] > thresh) {
                 if (class < 0) {
                     strcat(labelstr, names[j]);
                     class = j;
@@ -252,33 +280,104 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
                 }
-                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                //TODO: CHANGE!!!
+                //printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                strcat(labelstr, " ");
+                gcvt(dets[i].prob[j] * 100, 5, percent);
+                strcat(labelstr, percent);
             }
         }
-        if(class >= 0){
-            int width = im.h * .006;
 
-            /*
-               if(0){
-               width = pow(prob, 1./2.)*10+1;
-               alphabet = 0;
-               }
-             */
+        if(class >= 0) {
+            int width = im.h * .002;
 
             //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
-            int offset = class*123457 % classes;
+            int offset = class * 123457 % classes;
+            float red = get_color(2, offset, classes);
+            float green = get_color(1, offset, classes);
+            float blue = get_color(0, offset, classes);
+            float rgb[3];
+
+            rgb[0] = red;
+            rgb[1] = green;
+            rgb[2] = blue;
+
+            box b = dets[i].bbox;
+
+            // printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
+
+            int left = (b.x - b.w / 2.) * im.w;
+            int right = (b.x + b.w / 2.) * im.w;
+            int top = (b.y - b.h / 2.) * im.h;
+            int bot = (b.y + b.h / 2.) * im.h;
+
+            if (left < 0) left = 0;
+            if (right > im.w - 1) right = im.w - 1;
+            if (top < 0) top = 0;
+            if (bot > im.h - 1) bot = im.h - 1;
+
+            draw_box_width(im, left, top, right, bot, width, red, green, blue);
+
+            if (alphabet) {
+                image label = get_label(alphabet, labelstr, (im.h * .002));
+                draw_label(im, top + width, left, label, rgb);
+                free_image(label);
+            }
+
+            if (dets[i].mask) {
+                image mask = float_to_image(14, 14, 1, dets[i].mask);
+                image resized_mask = resize_image(mask, b.w * im.w, b.h * im.h);
+                image tmask = threshold_image(resized_mask, .5);
+                embed_image(tmask, im, left, top);
+                free_image(mask);
+                free_image(resized_mask);
+                free_image(tmask);
+            }
+        }
+
+        int offset = 0;
+        float red = get_color(2, offset, classes);
+        float green = get_color(1, offset, classes);
+        float blue = get_color(0, offset, classes);
+    }
+
+    if (fps > 0) {
+        float lrgb[3];
+        lrgb[0] = 0;
+        lrgb[1] = 255;
+        lrgb[2] = 0;
+
+        image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h * .03));
+        draw_label(im, 0, 0, ilfps, lrgb);
+        free_image(ilfps);
+    }
+}
+
+void draw_detections_y4(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps)
+{
+    int i;
+
+    for(i = 0; i < num; ++i){
+        int class_id = max_index(dets[i].prob, classes);
+        float prob = dets[i].prob[class_id];
+        if(prob > thresh){
+            int width = im.h * .001;
+
+            if(1){
+                width = pow(prob, 1./2.)*10+1;
+                alphabet = 0;
+            }
+
+            int offset = class_id*123457 % classes;
             float red = get_color(2,offset,classes);
             float green = get_color(1,offset,classes);
             float blue = get_color(0,offset,classes);
             float rgb[3];
 
-            //width = prob*20+2;
-
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
             box b = dets[i].bbox;
-            //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
 
             int left  = (b.x-b.w/2.)*im.w;
             int right = (b.x+b.w/2.)*im.w;
@@ -289,27 +388,31 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
+            //printf("%s: %.0f%%", names[class_id], prob * 100);
+            //printf("\n");
 
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
-                image label = get_label(alphabet, labelstr, (im.h*.03));
+                char label_txt[512];
+                char percent[5];
+                strcat(label_txt, names[class_id]);
+                gcvt(prob * 100, 5, percent);
+                strcat(label_txt, " ");
+                strcat(label_txt, percent);
+                image label = get_label(alphabet, label_txt, (im.h*.03)/10);
                 draw_label(im, top + width, left, label, rgb);
-                free_image(label);
             }
-            if (dets[i].mask){
-                image mask = float_to_image(14, 14, 1, dets[i].mask);
-                image resized_mask = resize_image(mask, b.w*im.w, b.h*im.h);
-                image tmask = threshold_image(resized_mask, .5);
-                embed_image(tmask, im, left, top);
-                free_image(mask);
-                free_image(resized_mask);
-                free_image(tmask);
+            if (alphabet && i == 0 && fps != 0) {
+                char lfps[5];
+                image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h * .03)/10);
+                draw_label(im, 0, 0, ilfps, rgb);
+                free_image(ilfps);
             }
         }
     }
 }
 
-void transpose_image(image im)
+void transpose_image_y4(image im)
 {
     assert(im.w == im.h);
     int n, m;
@@ -362,7 +465,7 @@ void flip_image(image a)
     }
 }
 
-image image_distance(image a, image b)
+image image_distance_y4(image a, image b)
 {
     int i,j;
     image dist = make_image(a.w, a.h, 1);
@@ -534,164 +637,16 @@ void rgbgr_image(image im)
     }
 }
 
-#ifdef OPENCV
-void show_image_cv(image p, const char *name, IplImage *disp)
-{
-    int x,y,k;
-    if(p.c == 3) rgbgr_image(p);
-    //normalize_image(copy);
-
-    char buff[256];
-    //sprintf(buff, "%s (%d)", name, windows);
-    sprintf(buff, "%s", name);
-
-    int step = disp->widthStep;
-    cvNamedWindow(buff, CV_WINDOW_NORMAL); 
-    //cvMoveWindow(buff, 100*(windows%10) + 200*(windows/10), 100*(windows%10));
-    ++windows;
-    for(y = 0; y < p.h; ++y){
-        for(x = 0; x < p.w; ++x){
-            for(k= 0; k < p.c; ++k){
-                disp->imageData[y*step + x*p.c + k] = (unsigned char)(get_pixel(p,x,y,k)*255);
-            }
-        }
-    }
-    if(0){
-        int w = 448;
-        int h = w*p.h/p.w;
-        if(h > 1000){
-            h = 1000;
-            w = h*p.w/p.h;
-        }
-        IplImage *buffer = disp;
-        disp = cvCreateImage(cvSize(w, h), buffer->depth, buffer->nChannels);
-        cvResize(buffer, disp, CV_INTER_LINEAR);
-        cvReleaseImage(&buffer);
-    }
-    cvShowImage(buff, disp);
-}
-#endif
-
-void show_image(image p, const char *name)
+int show_image(image p, const char *name, int ms)
 {
 #ifdef OPENCV
-    IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
-    image copy = copy_image(p);
-    constrain_image(copy);
-    show_image_cv(copy, name, disp);
-    free_image(copy);
-    cvReleaseImage(&disp);
+    return cv_show_image(p, name, ms);
 #else
     fprintf(stderr, "Not compiled with OpenCV, saving to %s.png instead\n", name);
     save_image(p, name);
+    return 0;
 #endif
 }
-
-#ifdef OPENCV
-
-void ipl_into_image(IplImage* src, image im)
-{
-    unsigned char *data = (unsigned char *)src->imageData;
-    int h = src->height;
-    int w = src->width;
-    int c = src->nChannels;
-    int step = src->widthStep;
-    int i, j, k;
-
-    for(i = 0; i < h; ++i){
-        for(k= 0; k < c; ++k){
-            for(j = 0; j < w; ++j){
-                im.data[k*w*h + i*w + j] = data[i*step + j*c + k]/255.;
-            }
-        }
-    }
-}
-
-image ipl_to_image(IplImage* src)
-{
-    int h = src->height;
-    int w = src->width;
-    int c = src->nChannels;
-    image out = make_image(w, h, c);
-    ipl_into_image(src, out);
-    return out;
-}
-
-image load_image_cv(char *filename, int channels)
-{
-    IplImage* src = 0;
-    int flag = -1;
-    if (channels == 0) flag = -1;
-    else if (channels == 1) flag = 0;
-    else if (channels == 3) flag = 1;
-    else {
-        fprintf(stderr, "OpenCV can't force load with %d channels\n", channels);
-    }
-
-    if( (src = cvLoadImage(filename, flag)) == 0 )
-    {
-        fprintf(stderr, "Cannot load image \"%s\"\n", filename);
-        char buff[256];
-        sprintf(buff, "echo %s >> bad.list", filename);
-        system(buff);
-        return make_image(10,10,3);
-        //exit(0);
-    }
-    image out = ipl_to_image(src);
-    cvReleaseImage(&src);
-    rgbgr_image(out);
-    return out;
-}
-
-void flush_stream_buffer(CvCapture *cap, int n)
-{
-    int i;
-    for(i = 0; i < n; ++i) {
-        cvQueryFrame(cap);
-    }
-}
-
-image get_image_from_stream(CvCapture *cap)
-{
-    IplImage* src = cvQueryFrame(cap);
-    if (!src) return make_empty_image(0,0,0);
-    image im = ipl_to_image(src);
-    rgbgr_image(im);
-    return im;
-}
-
-int fill_image_from_stream(CvCapture *cap, image im)
-{
-    IplImage* src = cvQueryFrame(cap);
-    if (!src) return 0;
-    ipl_into_image(src, im);
-    rgbgr_image(im);
-    return 1;
-}
-
-void save_image_jpg(image p, const char *name)
-{
-    image copy = copy_image(p);
-    if(p.c == 3) rgbgr_image(copy);
-    int x,y,k;
-
-    char buff[256];
-    sprintf(buff, "%s.jpg", name);
-
-    IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
-    int step = disp->widthStep;
-    for(y = 0; y < p.h; ++y){
-        for(x = 0; x < p.w; ++x){
-            for(k= 0; k < p.c; ++k){
-                disp->imageData[y*step + x*p.c + k] = (unsigned char)(get_pixel(copy,x,y,k)*255);
-            }
-        }
-    }
-    cvSaveImage(buff, disp,0);
-    cvReleaseImage(&disp);
-    free_image(copy);
-}
-#endif
 
 void save_image_png(image im, const char *name)
 {
@@ -710,10 +665,35 @@ void save_image_png(image im, const char *name)
     if(!success) fprintf(stderr, "Failed to write image %s\n", buff);
 }
 
+void save_image_options(image im, const char *name, IMTYPE f, int quality)
+{
+    char buff[256];
+    //sprintf(buff, "%s (%d)", name, windows);
+    if(f == PNG)       sprintf(buff, "%s.png", name);
+    else if (f == BMP) sprintf(buff, "%s.bmp", name);
+    else if (f == TGA) sprintf(buff, "%s.tga", name);
+    else if (f == JPG) sprintf(buff, "%s.jpg", name);
+    else               sprintf(buff, "%s.png", name);
+    unsigned char *data = calloc(im.w*im.h*im.c, sizeof(char));
+    int i,k;
+    for(k = 0; k < im.c; ++k){
+        for(i = 0; i < im.w*im.h; ++i){
+            data[i*im.c+k] = (unsigned char) (255*im.data[i + k*im.w*im.h]);
+        }
+    }
+    int success = 0;
+    if(f == PNG)       success = stbi_write_png(buff, im.w, im.h, im.c, data, im.w*im.c);
+    else if (f == BMP) success = stbi_write_bmp(buff, im.w, im.h, im.c, data);
+    else if (f == TGA) success = stbi_write_tga(buff, im.w, im.h, im.c, data);
+    else if (f == JPG) success = stbi_write_jpg(buff, im.w, im.h, im.c, data, quality);
+    free(data);
+    if(!success) fprintf(stderr, "Failed to write image %s\n", buff);
+}
+
 void save_image(image im, const char *name)
 {
 #ifdef OPENCV
-    save_image_jpg(im, name);
+    save_image_jpg_cv(im, name);
 #else
     save_image_png(im, name);
 #endif
@@ -727,7 +707,7 @@ void show_image_layers(image p, char *name)
     for(i = 0; i < p.c; ++i){
         sprintf(buff, "%s - Layer %d", name, i);
         image layer = get_image_layer(p, i);
-        show_image(layer, buff);
+        show_image(layer, buff, 1);
         free_image(layer);
     }
 }
@@ -735,7 +715,7 @@ void show_image_layers(image p, char *name)
 void show_image_collapsed(image p, char *name)
 {
     image c = collapse_image_layers(p, 1);
-    show_image(c, name);
+    show_image(c, name, 1);
     free_image(c);
 }
 
@@ -935,7 +915,7 @@ void composite_3d(char *f1, char *f2, char *out, int delta)
         c.data[i] = a.data[i];
     }
 #ifdef OPENCV
-    save_image_jpg(c, out);
+    save_image_jpg_cv(c, out);
 #else
     save_image(c, out);
 #endif
@@ -1388,7 +1368,6 @@ image resize_image(image im, int w, int h)
     return resized;
 }
 
-
 void test_resize(char *filename)
 {
     image im = load_image(filename, 0,0, 3);
@@ -1406,16 +1385,16 @@ void test_resize(char *filename)
     distort_image(c4, .1, .66666, 1.5);
 
 
-    show_image(im,   "Original");
-    show_image(gray, "Gray");
-    show_image(c1, "C1");
-    show_image(c2, "C2");
-    show_image(c3, "C3");
-    show_image(c4, "C4");
+    show_image(im,   "Original", 1);
+    show_image(gray, "Gray", 1);
+    show_image(c1, "C1", 1);
+    show_image(c2, "C2", 1);
+    show_image(c3, "C3", 1);
+    show_image(c4, "C4", 1);
 #ifdef OPENCV
     while(1){
         image aug = random_augment_image(im, 0, .75, 320, 448, 320, 320);
-        show_image(aug, "aug");
+        show_image(aug, "aug", 1);
         free_image(aug);
 
 
@@ -1430,10 +1409,9 @@ void test_resize(char *filename)
         float dhue = rand_uniform(-hue, hue);
 
         distort_image(c, dhue, dsat, dexp);
-        show_image(c, "rand");
+        show_image(c, "rand", 1);
         printf("%f %f %f\n", dhue, dsat, dexp);
         free_image(c);
-        cvWaitKey(0);
     }
 #endif
 }
@@ -1585,7 +1563,7 @@ void show_image_normalized(image im, const char *name)
 {
     image c = copy_image(im);
     normalize_image(c);
-    show_image(c, name);
+    show_image(c, name, 1);
     free_image(c);
 }
 
@@ -1603,7 +1581,7 @@ void show_images(image *ims, int n, char *window)
      */
     normalize_image(m);
     save_image(m, window);
-    show_image(m, window);
+    show_image(m, window, 1);
     free_image(m);
 }
 

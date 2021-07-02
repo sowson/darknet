@@ -6,7 +6,10 @@
 
 extern void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 extern void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);
+
+extern void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir);
 extern void run_yolo(int argc, char **argv);
+extern void run_yolo4(int argc, char **argv);
 extern void run_detector(int argc, char **argv);
 extern void run_coco(int argc, char **argv);
 extern void run_captcha(int argc, char **argv);
@@ -14,6 +17,7 @@ extern void run_nightmare(int argc, char **argv);
 extern void run_classifier(int argc, char **argv);
 extern void run_regressor(int argc, char **argv);
 extern void run_segmenter(int argc, char **argv);
+extern void run_isegmenter(int argc, char **argv);
 extern void run_char_rnn(int argc, char **argv);
 extern void run_tag(int argc, char **argv);
 extern void run_cifar(int argc, char **argv);
@@ -395,9 +399,6 @@ void visualize(char *cfgfile, char *weightfile)
 {
     network *net = load_network(cfgfile, weightfile, 0);
     visualize_network(net);
-#ifdef OPENCV
-    cvWaitKey(0);
-#endif
 }
 
 int main(int argc, char **argv)
@@ -409,16 +410,37 @@ int main(int argc, char **argv)
         fprintf(stderr, "usage: %s <function>\n", argv[0]);
         return 0;
     }
-    gpu_index = find_int_arg(argc, argv, "-i", 0);
-    if(find_arg(argc, argv, "-nogpu")) {
+    int ngpus = 0;
+    int *gpus = 0;
+    if(read_arg(argc, argv, "-nogpu")) {
+        ngpus = 0;
         gpu_index = -1;
     }
+    else if(read_arg(argc, argv, "-i")) {
+        gpus = calloc(1, sizeof(int));
+        gpus[0] = find_int_arg(argc, argv, "-i", 0);
+        ngpus = 1;
+        gpu_index = 1;
+    }
+    else if(read_arg(argc, argv, "-gpus")) {
+        char *gpu_list = read_char_arg(argc, argv, "-gpus", *argv);
+        gpus = read_intlist(gpu_list, &ngpus, gpu_index);
+        gpu_index = ngpus;
+    }
+	else {
+        gpus = calloc(1, sizeof(int));
+        gpus[0] = 0;
+        ngpus = 1;
+        gpu_index = 1;
+	}
 
 #ifndef GPU
     gpu_index = -1;
 #else
-    if(gpu_index >= 0){
-        cuda_set_device(gpu_index);
+    if (gpu_index >= 0) {
+        gpusg = gpus;
+        ngpusg = ngpus;
+        opencl_init(gpus, ngpus);
     }
 #endif
 
@@ -426,6 +448,8 @@ int main(int argc, char **argv)
         average(argc, argv);
     } else if (0 == strcmp(argv[1], "yolo")){
         run_yolo(argc, argv);
+    } else if (0 == strcmp(argv[1], "yolo4")){
+        run_yolo4(argc, argv);
     } else if (0 == strcmp(argv[1], "super")){
         run_super(argc, argv);
     } else if (0 == strcmp(argv[1], "lsd")){
@@ -433,11 +457,17 @@ int main(int argc, char **argv)
     } else if (0 == strcmp(argv[1], "detector")){
         run_detector(argc, argv);
     } else if (0 == strcmp(argv[1], "detect")){
+        char *filename = (argc > 5) ? argv[5]: 0;
         float thresh = find_float_arg(argc, argv, "-thresh", .5);
-        char *filename = (argc > 4) ? argv[4]: 0;
         char *outfile = find_char_arg(argc, argv, "-out", 0);
         int fullscreen = find_arg(argc, argv, "-fullscreen");
-        test_detector("cfg/coco.data", argv[2], argv[3], filename, thresh, .5, outfile, fullscreen);
+        test_detector(argv[2], argv[3], argv[4], filename, thresh, .5, outfile, fullscreen);
+    } else if (0 == strcmp(argv[1], "ddetect")){
+        char *in_dir = (argc > 5) ? argv[5]: 0;
+        float thresh = find_float_arg(argc, argv, "-thresh", .5);
+        char *out_dir = find_char_arg(argc, argv, "-out", 0);
+        int fullscreen = find_arg(argc, argv, "-fullscreen");
+        test_ddetector(argv[2], argv[3], argv[4], in_dir, thresh, .5, out_dir);
     } else if (0 == strcmp(argv[1], "cifar")){
         run_cifar(argc, argv);
     } else if (0 == strcmp(argv[1], "go")){
@@ -452,6 +482,8 @@ int main(int argc, char **argv)
         run_classifier(argc, argv);
     } else if (0 == strcmp(argv[1], "regressor")){
         run_regressor(argc, argv);
+    } else if (0 == strcmp(argv[1], "isegmenter")){
+        run_isegmenter(argc, argv);
     } else if (0 == strcmp(argv[1], "segmenter")){
         run_segmenter(argc, argv);
     } else if (0 == strcmp(argv[1], "art")){
@@ -462,8 +494,6 @@ int main(int argc, char **argv)
         composite_3d(argv[2], argv[3], argv[4], (argc > 5) ? atof(argv[5]) : 0);
     } else if (0 == strcmp(argv[1], "test")){
         test_resize(argv[2]);
-    } else if (0 == strcmp(argv[1], "captcha")){
-        run_captcha(argc, argv);
     } else if (0 == strcmp(argv[1], "nightmare")){
         run_nightmare(argc, argv);
     } else if (0 == strcmp(argv[1], "rgbgr")){
@@ -501,6 +531,11 @@ int main(int argc, char **argv)
     } else {
         fprintf(stderr, "Not an option: %s\n", argv[1]);
     }
+#ifdef GPU
+    if (gpu_index >= 0) {
+        opencl_deinit(gpusg, ngpusg);
+    }
+    free(gpusg);
+#endif
     return 0;
 }
-

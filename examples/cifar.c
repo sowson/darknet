@@ -34,6 +34,12 @@ void train_cifar(char *cfgfile, char *weightfile)
             sprintf(buff, "%s/%s.backup",backup_directory,base);
             save_weights(net, buff);
         }
+#ifdef GPU_STATS
+        opencl_dump_mem_stat();
+#endif
+#ifdef BENCHMARK
+        break;
+#endif
     }
     char buff[256];
     sprintf(buff, "%s/%s.weights", backup_directory, base);

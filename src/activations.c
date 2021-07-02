@@ -16,6 +16,8 @@ char *get_activation_string(ACTIVATION a)
             return "relu";
         case ELU:
             return "elu";
+        case SELU:
+            return "selu";
         case RELIE:
             return "relie";
         case RAMP:
@@ -34,6 +36,8 @@ char *get_activation_string(ACTIVATION a)
             return "hardtan";
         case LHTAN:
             return "lhtan";
+		case MISH:
+            return "mish";
         default:
             break;
     }
@@ -43,9 +47,11 @@ char *get_activation_string(ACTIVATION a)
 ACTIVATION get_activation(char *s)
 {
     if (strcmp(s, "logistic")==0) return LOGISTIC;
+    if (strcmp(s, "mish") == 0) return MISH;
     if (strcmp(s, "loggy")==0) return LOGGY;
     if (strcmp(s, "relu")==0) return RELU;
     if (strcmp(s, "elu")==0) return ELU;
+    if (strcmp(s, "selu") == 0) return SELU;
     if (strcmp(s, "relie")==0) return RELIE;
     if (strcmp(s, "plse")==0) return PLSE;
     if (strcmp(s, "hardtan")==0) return HARDTAN;
@@ -72,6 +78,8 @@ float activate(float x, ACTIVATION a)
             return relu_activate(x);
         case ELU:
             return elu_activate(x);
+        case SELU:
+            return selu_activate(x);
         case RELIE:
             return relie_activate(x);
         case RAMP:
@@ -88,6 +96,10 @@ float activate(float x, ACTIVATION a)
             return hardtan_activate(x);
         case LHTAN:
             return lhtan_activate(x);
+		case MISH:
+		    return mish_activate(x);
+        default:
+            return relu_activate(x);;
     }
     return 0;
 }
@@ -113,6 +125,8 @@ float gradient(float x, ACTIVATION a)
             return relu_gradient(x);
         case ELU:
             return elu_gradient(x);
+        case SELU:
+            return selu_gradient(x);
         case RELIE:
             return relie_gradient(x);
         case RAMP:
@@ -129,6 +143,10 @@ float gradient(float x, ACTIVATION a)
             return hardtan_gradient(x);
         case LHTAN:
             return lhtan_gradient(x);
+		case MISH:
+            return mish_gradient(x);
+        default:
+            return relu_gradient(x);
     }
     return 0;
 }

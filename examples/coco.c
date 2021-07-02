@@ -8,11 +8,11 @@ int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25
 
 void train_coco(char *cfgfile, char *weightfile)
 {
-    //char *train_images = "/home/pjreddie/data/voc/test/train.txt";
-    //char *train_images = "/home/pjreddie/data/coco/train.txt";
+    //char *train_images = "/home/piotr/data/voc/test/train.txt";
+    //char *train_images = "/home/piotr/data/coco/train.txt";
     char *train_images = "data/coco.trainval.txt";
     //char *train_images = "data/bags.train.list";
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *backup_directory = "/home/piotr/backup/";
     srand(time(0));
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
@@ -134,8 +134,8 @@ void validate_coco(char *cfg, char *weights)
 
     char *base = "results/";
     list *plist = get_paths("data/coco_val_5k.list");
-    //list *plist = get_paths("/home/pjreddie/data/people-art/test.txt");
-    //list *plist = get_paths("/home/pjreddie/data/voc/test/2007_test.txt");
+    //list *plist = get_paths("/home/piotr/data/people-art/test.txt");
+    //list *plist = get_paths("/home/piotr/data/voc/test/2007_test.txt");
     char **paths = (char **)list_to_array(plist);
 
     layer l = net->layers[net->n-1];
@@ -217,7 +217,7 @@ void validate_coco_recall(char *cfgfile, char *weightfile)
     srand(time(0));
 
     char *base = "results/comp4_det_test_";
-    list *plist = get_paths("/home/pjreddie/data/voc/test/2007_test.txt");
+    list *plist = get_paths("/home/piotr/data/voc/test/2007_test.txt");
     char **paths = (char **)list_to_array(plist);
 
     layer l = net->layers[net->n-1];
@@ -323,16 +323,12 @@ void test_coco(char *cfgfile, char *weightfile, char *filename, float thresh)
         detection *dets = get_network_boxes(net, 1, 1, thresh, 0, 0, 0, &nboxes);
         if (nms) do_nms_sort(dets, l.side*l.side*l.n, l.classes, nms);
 
-        draw_detections(im, dets, l.side*l.side*l.n, thresh, coco_classes, alphabet, 80);
+        draw_detections(im, dets, l.side*l.side*l.n, thresh, coco_classes, alphabet, 80, 0);
         save_image(im, "prediction");
-        show_image(im, "predictions");
+        show_image(im, "predictions", 0);
         free_detections(dets, nboxes);
         free_image(im);
         free_image(sized);
-#ifdef OPENCV
-        cvWaitKey(0);
-        cvDestroyAllWindows();
-#endif
         if (filename) break;
     }
 }

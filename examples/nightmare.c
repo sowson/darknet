@@ -46,21 +46,22 @@ void optimize_picture(network *net, image orig, int max_layer, float scale, floa
     image delta = make_image(im.w, im.h, im.c);
 
 #ifdef GPU
-    net->delta_gpu = cuda_make_array(delta.data, im.w*im.h*im.c);
-    copy_cpu(net->inputs, im.data, 1, net->input, 1);
+    if(gpu_index >= 0) {
+    	net->delta_gpu = opencl_make_array(delta.data, im.w*im.h*im.c);
+    	copy_cpu(net->inputs, im.data, 1, net->input, 1);
 
-    forward_network_gpu(net);
-    copy_gpu(last.outputs, last.output_gpu, 1, last.delta_gpu, 1);
+    	forward_network_gpu(net);
+    	copy_gpu(last.outputs, last.output_gpu, 1, last.delta_gpu, 1);
 
-    cuda_pull_array(last.delta_gpu, last.delta, last.outputs);
-    calculate_loss(last.delta, last.delta, last.outputs, thresh);
-    cuda_push_array(last.delta_gpu, last.delta, last.outputs);
+    	opencl_pull_array(last.delta_gpu, last.delta, last.outputs);
+    	calculate_loss(last.delta, last.delta, last.outputs, thresh);
+    	opencl_push_array(last.delta_gpu, last.delta, last.outputs);
 
-    backward_network_gpu(net);
+    	backward_network_gpu(net);
 
-    cuda_pull_array(net->delta_gpu, delta.data, im.w*im.h*im.c);
-    cuda_free(net->delta_gpu);
-    net->delta_gpu = 0;
+    	opencl_pull_array(net->delta_gpu, delta.data, im.w*im.h*im.c);
+    	opencl_free(net->delta_gpu);
+	}
 #else
     printf("\nnet: %d %d %d im: %d %d %d\n", net->w, net->h, net->inputs, im.w, im.h, im.c);
     copy_cpu(net->inputs, im.data, 1, net->input, 1);
@@ -139,19 +140,20 @@ void reconstruct_picture(network *net, float *features, image recon, image updat
         image delta = make_image(recon.w, recon.h, recon.c);
 
 #ifdef GPU
-        layer l = get_network_output_layer(net);
-        cuda_push_array(net->input_gpu, recon.data, recon.w*recon.h*recon.c);
-        //cuda_push_array(net->truth_gpu, features, net->truths);
-        net->delta_gpu = cuda_make_array(delta.data, delta.w*delta.h*delta.c);
+        if(gpu_index >= 0) {
+        	layer l = get_network_output_layer(net);
+        	opencl_push_array(net->input_gpu, recon.data, recon.w*recon.h*recon.c);
+        	//opencl_push_array(net->truth_gpu, features, net->truths);
+        	net->delta_gpu = opencl_make_array(delta.data, delta.w*delta.h*delta.c);
 
-        forward_network_gpu(net);
-        cuda_push_array(l.delta_gpu, features, l.outputs);
-        axpy_gpu(l.outputs, -1, l.output_gpu, 1, l.delta_gpu, 1);
-        backward_network_gpu(net);
+        	forward_network_gpu(net);
+        	opencl_push_array(l.delta_gpu, features, l.outputs);
+        	axpy_gpu(l.outputs, -1, l.output_gpu, 1, l.delta_gpu, 1);
+        	backward_network_gpu(net);
 
-        cuda_pull_array(net->delta_gpu, delta.data, delta.w*delta.h*delta.c);
-
-        cuda_free(net->delta_gpu);
+        	opencl_pull_array(net->delta_gpu, delta.data, delta.w*delta.h*delta.c);
+			opencl_free(net->delta_gpu);
+		}
 #else
         net->input = recon.data;
         net->delta = delta.data;
@@ -376,10 +378,7 @@ void run_nightmare(int argc, char **argv)
             if(reconstruct){
                 reconstruct_picture(net, features, im, update, rate, momentum, lambda, smooth_size, 1);
                 //if ((n+1)%30 == 0) rate *= .5;
-                show_image(im, "reconstruction");
-#ifdef OPENCV
-                cvWaitKey(10);
-#endif
+                show_image(im, "reconstruction", 10);
             }else{
                 int layer = max_layer + rand()%range - range/2;
                 int octave = rand()%octaves;
@@ -400,8 +399,7 @@ void run_nightmare(int argc, char **argv)
         }
         printf("%d %s\n", e, buff);
         save_image(im, buff);
-        //show_image(im, buff);
-        //cvWaitKey(0);
+        //show_image(im, buff, 0);
 
         if(rotate){
             image rot = rotate_image(im, rotate);
