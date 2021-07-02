@@ -1,6 +1,6 @@
 #include "gemm.h"
 #include "utils.h"
-#include "cuda.h"
+#include "opencl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -167,18 +167,106 @@ void gemm_cpu(int TA, int TB, int M, int N, int K, float ALPHA,
 
 #ifdef GPU
 
-#include <math.h>
+#ifndef ARM
+#include "clBLAS.h"
+#endif
 
-void gemm_gpu(int TA, int TB, int M, int N, int K, float ALPHA, 
-        float *A_gpu, int lda, 
-        float *B_gpu, int ldb,
-        float BETA,
-        float *C_gpu, int ldc)
+void gemm_kernel_init(void)
 {
-    cublasHandle_t handle = blas_handle();
-    cudaError_t status = cublasSgemm(handle, (TB ? CUBLAS_OP_T : CUBLAS_OP_N), 
-            (TA ? CUBLAS_OP_T : CUBLAS_OP_N), N, M, K, &ALPHA, B_gpu, ldb, A_gpu, lda, &BETA, C_gpu, ldc);
-    check_error(status);
+#ifndef ARM
+    cl_int clErr;
+    clErr = clblasSetup();
+
+    if (clErr != CL_SUCCESS)
+    {
+        printf("gemm_kernel_init: Could not setup clBLAS. Errorcode: %d\n", clErr);
+    }
+#endif
+}
+
+void gemm_kernel_release(void)
+{
+#ifndef ARM
+    clblasTeardown();
+#endif
+}
+
+cl_mem_ext random_matrix_gpu(int rows, int cols)
+{
+    int i;
+    float *m = calloc(rows*cols, sizeof(float));
+    for(i = 0; i < rows*cols; ++i){
+        m[i] = (float)rand()/RAND_MAX;
+    }
+    return opencl_make_array(m, rows*cols);
+}
+
+#if !defined(GPU_MULTI) && !defined(ARM)
+void gemm_offset_gpu(
+        int TA, int TB, int M, int N, int K,
+        float ALPHA,
+        cl_mem_ext A_gpu, int offset_A, int lda,
+        cl_mem_ext B_gpu, int offset_B, int ldb,
+        float BETA,
+        cl_mem_ext C_gpu, int offset_C, int ldc)
+{
+#ifdef BENCHMARK
+    clock_t t;
+    t = clock();
+#endif
+
+    cl_int clErr;
+
+    clErr = clblasSgemm(clblasRowMajor,
+                        (TA ? clblasTrans : clblasNoTrans),
+                        (TB ? clblasTrans : clblasNoTrans),
+                        M, N, K,
+                        ALPHA,
+                        A_gpu.mem, offset_A, lda,
+                        B_gpu.mem, offset_B, ldb,
+                        BETA,
+                        C_gpu.mem, offset_C, ldc,
+                        1, &opencl_queues[opencl_device_id_t], 0, NULL, NULL);
+
+#ifdef GPU_SAFE
+    clFinish(opencl_queues[opencl_device_id_t]);
+#endif
+
+#ifdef BENCHMARK
+    t = clock() - t;
+    double time_taken = ((double)t);
+    printf("%s\t%d\n", "clblasSgemm", (int)time_taken);
+#endif
+
+    if (clErr != CL_SUCCESS)
+    {
+        printf("gemm_gpu: clblasSgemm failed. Errorcode: %d\n", clErr);
+    }
+}
+#endif
+
+void gemm_gpu(int TA, int TB, int M, int N, int K,
+              float ALPHA,
+              cl_mem_ext A_gpu, int lda,
+              cl_mem_ext B_gpu, int ldb,
+              float BETA,
+              cl_mem_ext C_gpu, int ldc)
+{
+#ifdef BENCHMARK
+    clock_t t;
+    t = clock();
+#endif
+    gemm_offset_gpu(TA, TB, M, N, K,
+                    ALPHA,
+                    A_gpu, 0, lda,
+                    B_gpu, 0, ldb,
+                    BETA,
+                    C_gpu, 0, ldc);
+#ifdef BENCHMARK
+    t = clock() - t;
+    double time_taken = ((double)t);
+    printf("%s\t%d\n", "gemm_offset_gpu", (int)time_taken);
+#endif
 }
 
 #include <stdio.h>
@@ -188,16 +276,16 @@ void gemm_gpu(int TA, int TB, int M, int N, int K, float ALPHA,
 
 void time_gpu_random_matrix(int TA, int TB, int m, int k, int n)
 {
-    float *a;
-    if(!TA) a = random_matrix(m,k);
-    else a = random_matrix(k,m);
+    cl_mem_ext a;
+    if(!TA) a = random_matrix_gpu(m,k);
+    else a = random_matrix_gpu(k,m);
     int lda = (!TA)?k:m;
-    float *b;
-    if(!TB) b = random_matrix(k,n);
-    else b = random_matrix(n,k);
+    cl_mem_ext b;
+    if(!TB) b = random_matrix_gpu(k,n);
+    else b = random_matrix_gpu(n,k);
     int ldb = (!TB)?n:k;
 
-    float *c = random_matrix(m,n);
+    cl_mem_ext c = random_matrix_gpu(m,n);
     int i;
     clock_t start = clock(), end;
     for(i = 0; i<32; ++i){
@@ -205,9 +293,9 @@ void time_gpu_random_matrix(int TA, int TB, int m, int k, int n)
     }
     end = clock();
     printf("Matrix Multiplication %dx%d * %dx%d, TA=%d, TB=%d: %lf s\n",m,k,k,n, TA, TB, (float)(end-start)/CLOCKS_PER_SEC);
-    free(a);
-    free(b);
-    free(c);
+    opencl_free(a);
+    opencl_free(b);
+    opencl_free(c);
 }
 
 void time_gpu(int TA, int TB, int m, int k, int n)
@@ -221,44 +309,44 @@ void time_gpu(int TA, int TB, int m, int k, int n)
 
     float *c = random_matrix(m,n);
 
-    float *a_cl = cuda_make_array(a, m*k);
-    float *b_cl = cuda_make_array(b, k*n);
-    float *c_cl = cuda_make_array(c, m*n);
+    cl_mem_ext a_cl = opencl_make_array(a, m*k);
+    cl_mem_ext b_cl = opencl_make_array(b, k*n);
+    cl_mem_ext c_cl = opencl_make_array(c, m*n);
 
     int i;
     clock_t start = clock(), end;
     for(i = 0; i<iter; ++i){
         gemm_gpu(TA,TB,m,n,k,1,a_cl,lda,b_cl,ldb,1,c_cl,n);
-        cudaThreadSynchronize();
+        // clFinish(opencl_queues[opencl_device_id_t]);
     }
     double flop = ((double)m)*n*(2.*k + 2.)*iter;
     double gflop = flop/pow(10., 9);
     end = clock();
     double seconds = sec(end-start);
     printf("Matrix Multiplication %dx%d * %dx%d, TA=%d, TB=%d: %lf s, %lf GFLOPS\n",m,k,k,n, TA, TB, seconds, gflop/seconds);
-    cuda_free(a_cl);
-    cuda_free(b_cl);
-    cuda_free(c_cl);
+    opencl_free(a_cl);
+    opencl_free(b_cl);
+    opencl_free(c_cl);
     free(a);
     free(b);
     free(c);
 }
 
-
+/* TODO: THINK ABOUT IT?!
 void test_gpu_accuracy(int TA, int TB, int m, int k, int n)
 {
     srand(0);
-    float *a;
-    if(!TA) a = random_matrix(m,k);
-    else a = random_matrix(k,m);
+    cl_mem_ext a;
+    if(!TA) a = random_matrix_gpu(m,k);
+    else a = random_matrix_gpu(k,m);
     int lda = (!TA)?k:m;
-    float *b;
-    if(!TB) b = random_matrix(k,n);
-    else b = random_matrix(n,k);
+    cl_mem_ext b;
+    if(!TB) b = random_matrix_gpu(k,n);
+    else b = random_matrix_gpu(n,k);
     int ldb = (!TB)?n:k;
 
-    float *c = random_matrix(m,n);
-    float *c_gpu = random_matrix(m,n);
+    cl_mem_ext c = random_matrix_gpu(m,n);
+    cl_mem_ext c_gpu = random_matrix_gpu(m,n);
     memset(c, 0, m*n*sizeof(float));
     memset(c_gpu, 0, m*n*sizeof(float));
     int i;
@@ -276,11 +364,12 @@ void test_gpu_accuracy(int TA, int TB, int m, int k, int n)
         sse += pow(c[i]-c_gpu[i], 2);
     }
     printf("Matrix Multiplication %dx%d * %dx%d, TA=%d, TB=%d: %g SSE\n",m,k,k,n, TA, TB, sse/(m*n));
-    free(a);
-    free(b);
-    free(c);
-    free(c_gpu);
+    opencl_free(a);
+    opencl_free(b);
+    opencl_free(c);
+    opencl_free(c_gpu);
 }
+*/
 
 int test_gpu_blas()
 {

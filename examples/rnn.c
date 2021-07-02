@@ -167,7 +167,7 @@ void train_char_rnn(char *cfgfile, char *weightfile, char *filename, int clear, 
         size = strlen((const char*)text);
     }
 
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *backup_directory = "/home/piotr/backup/";
     char *base = basecfg(cfgfile);
     fprintf(stderr, "%s\n", base);
     float avg_loss = -1;
@@ -506,7 +506,9 @@ void vec_char_rnn(char *cfgfile, char *weightfile, char *seed)
 
         layer l = net->layers[0];
         #ifdef GPU
-        cuda_pull_array(l.output_gpu, l.output, l.outputs);
+		if(gpu_index >= 0) {
+        	opencl_pull_array(l.output_gpu, l.output, l.outputs);
+		}
         #endif
         printf("%s", line);
         for(i = 0; i < l.outputs; ++i){

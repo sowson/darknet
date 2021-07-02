@@ -1,7 +1,7 @@
 #include "l2norm_layer.h"
 #include "activations.h"
 #include "blas.h"
-#include "cuda.h"
+#include "opencl.h"
 
 #include <float.h>
 #include <math.h>
@@ -23,14 +23,15 @@ layer make_l2norm_layer(int batch, int inputs)
 
     l.forward = forward_l2norm_layer;
     l.backward = backward_l2norm_layer;
-    #ifdef GPU
-    l.forward_gpu = forward_l2norm_layer_gpu;
-    l.backward_gpu = backward_l2norm_layer_gpu;
-
-    l.output_gpu = cuda_make_array(l.output, inputs*batch); 
-    l.scales_gpu = cuda_make_array(l.output, inputs*batch); 
-    l.delta_gpu = cuda_make_array(l.delta, inputs*batch); 
-    #endif
+#ifdef GPU
+    if (gpu_index >= 0) {
+        l.forward_gpu = forward_l2norm_layer_gpu;
+        l.backward_gpu = backward_l2norm_layer_gpu;
+        l.output_gpu = opencl_make_array(l.output, inputs * batch);
+        l.scales_gpu = opencl_make_array(l.output, inputs * batch);
+        l.delta_gpu = opencl_make_array(l.delta, inputs * batch);
+    }
+#endif
     return l;
 }
 

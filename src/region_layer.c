@@ -2,7 +2,7 @@
 #include "activations.h"
 #include "blas.h"
 #include "box.h"
-#include "cuda.h"
+#include "opencl.h"
 #include "utils.h"
 
 #include <stdio.h>
@@ -41,10 +41,12 @@ layer make_region_layer(int batch, int w, int h, int n, int classes, int coords)
     l.forward = forward_region_layer;
     l.backward = backward_region_layer;
 #ifdef GPU
-    l.forward_gpu = forward_region_layer_gpu;
-    l.backward_gpu = backward_region_layer_gpu;
-    l.output_gpu = cuda_make_array(l.output, batch*l.outputs);
-    l.delta_gpu = cuda_make_array(l.delta, batch*l.outputs);
+    if (gpu_index >= 0) {
+        l.forward_gpu = forward_region_layer_gpu;
+        l.backward_gpu = backward_region_layer_gpu;
+        l.output_gpu = opencl_make_array(l.output, batch*l.outputs);
+        l.delta_gpu = opencl_make_array(l.delta, batch*l.outputs);
+    }
 #endif
 
     fprintf(stderr, "detection\n");
@@ -58,18 +60,21 @@ void resize_region_layer(layer *l, int w, int h)
     l->w = w;
     l->h = h;
 
+#ifdef GPU
+    if (gpu_index >= 0) {
+        opencl_free_gpu_only(l->delta_gpu);
+        opencl_free_gpu_only(l->output_gpu);
+    }
+#endif
     l->outputs = h*w*l->n*(l->classes + l->coords + 1);
     l->inputs = l->outputs;
-
     l->output = realloc(l->output, l->batch*l->outputs*sizeof(float));
     l->delta = realloc(l->delta, l->batch*l->outputs*sizeof(float));
-
 #ifdef GPU
-    cuda_free(l->delta_gpu);
-    cuda_free(l->output_gpu);
-
-    l->delta_gpu =     cuda_make_array(l->delta, l->batch*l->outputs);
-    l->output_gpu =    cuda_make_array(l->output, l->batch*l->outputs);
+    if (gpu_index >= 0) {
+        l->delta_gpu = opencl_make_array(l->delta, l->batch*l->outputs);
+        l->output_gpu = opencl_make_array(l->output, l->batch*l->outputs);
+    }
 #endif
 }
 
@@ -148,19 +153,13 @@ float tisnan(float x)
     return (x != x);
 }
 
-int entry_index(layer l, int batch, int location, int entry)
-{
-    int n =   location / (l.w*l.h);
-    int loc = location % (l.w*l.h);
-    return batch*l.outputs + n*l.w*l.h*(l.coords+l.classes+1) + entry*l.w*l.h + loc;
-}
-
 void forward_region_layer(const layer l, network net)
 {
     int i,j,b,t,n;
     memcpy(l.output, net.input, l.outputs*l.batch*sizeof(float));
 
 #ifndef GPU
+    if (gpu_index < 0) {
     for (b = 0; b < l.batch; ++b){
         for(n = 0; n < l.n; ++n){
             int index = entry_index(l, b, n*l.w*l.h, 0);
@@ -182,6 +181,7 @@ void forward_region_layer(const layer l, network net)
     } else if (l.softmax){
         int index = entry_index(l, 0, 0, l.coords + !l.background);
         softmax_cpu(net.input + index, l.classes + l.background, l.batch*l.n, l.inputs/l.n, l.w*l.h, 1, l.w*l.h, 1, l.output + index);
+    }
     }
 #endif
 
@@ -317,7 +317,9 @@ void forward_region_layer(const layer l, network net)
         }
     }
     *(l.cost) = pow(mag_array(l.delta, l.outputs * l.batch), 2);
+#if !defined(BENCHMARK) && !defined(LOSS_ONLY)
     printf("Region Avg IOU: %f, Class: %f, Obj: %f, No Obj: %f, Avg Recall: %f,  count: %d\n", avg_iou/count, avg_cat/class_count, avg_obj/count, avg_anyobj/(l.w*l.h*l.n*l.batch), recall/count, count);
+#endif
 }
 
 void backward_region_layer(const layer l, network net)
@@ -437,7 +439,6 @@ void get_region_detections(layer l, int w, int h, int netw, int neth, float thre
 }
 
 #ifdef GPU
-
 void forward_region_layer_gpu(const layer l, network net)
 {
     copy_gpu(l.batch*l.inputs, net.input_gpu, 1, l.output_gpu, 1);
@@ -445,34 +446,34 @@ void forward_region_layer_gpu(const layer l, network net)
     for (b = 0; b < l.batch; ++b){
         for(n = 0; n < l.n; ++n){
             int index = entry_index(l, b, n*l.w*l.h, 0);
-            activate_array_gpu(l.output_gpu + index, 2*l.w*l.h, LOGISTIC);
+            activate_array_offset_gpu(l.output_gpu, index, 2*l.w*l.h, LOGISTIC);
             if(l.coords > 4){
                 index = entry_index(l, b, n*l.w*l.h, 4);
-                activate_array_gpu(l.output_gpu + index, (l.coords - 4)*l.w*l.h, LOGISTIC);
+                activate_array_offset_gpu(l.output_gpu, index, (l.coords - 4)*l.w*l.h, LOGISTIC);
             }
             index = entry_index(l, b, n*l.w*l.h, l.coords);
-            if(!l.background) activate_array_gpu(l.output_gpu + index,   l.w*l.h, LOGISTIC);
+            if(!l.background) activate_array_offset_gpu(l.output_gpu, index,   l.w*l.h, LOGISTIC);
             index = entry_index(l, b, n*l.w*l.h, l.coords + 1);
-            if(!l.softmax && !l.softmax_tree) activate_array_gpu(l.output_gpu + index, l.classes*l.w*l.h, LOGISTIC);
+            if(!l.softmax && !l.softmax_tree) activate_array_offset_gpu(l.output_gpu, index, l.classes*l.w*l.h, LOGISTIC);
         }
     }
     if (l.softmax_tree){
         int index = entry_index(l, 0, 0, l.coords + 1);
-        softmax_tree(net.input_gpu + index, l.w*l.h, l.batch*l.n, l.inputs/l.n, 1, l.output_gpu + index, *l.softmax_tree);
+        softmax_offset_tree(net.input_gpu, index, l.w*l.h, l.batch*l.n, l.inputs/l.n, 1, l.output_gpu, *l.softmax_tree);
     } else if (l.softmax) {
         int index = entry_index(l, 0, 0, l.coords + !l.background);
-        softmax_gpu(net.input_gpu + index, l.classes + l.background, l.batch*l.n, l.inputs/l.n, l.w*l.h, 1, l.w*l.h, 1, l.output_gpu + index);
+        softmax_offset_gpu(net.input_gpu, index, l.classes + l.background, l.batch*l.n, l.inputs/l.n, l.w*l.h, 1, l.w*l.h, 1, l.output_gpu);
     }
     if(!net.train || l.onlyforward){
-        cuda_pull_array(l.output_gpu, l.output, l.batch*l.outputs);
+        opencl_pull_array(l.output_gpu, l.output, l.batch*l.outputs);
         return;
     }
 
-    cuda_pull_array(l.output_gpu, net.input, l.batch*l.inputs);
+    opencl_pull_array_map(l.output_gpu, net.input, l.batch*l.inputs);
     forward_region_layer(l, net);
-    //cuda_push_array(l.output_gpu, l.output, l.batch*l.outputs);
+    //opencl_push_array(l.output_gpu, l.output, l.batch*l.outputs);
     if(!net.train) return;
-    cuda_push_array(l.delta_gpu, l.delta, l.batch*l.outputs);
+    opencl_push_array(l.delta_gpu, l.delta, l.batch*l.outputs);
 }
 
 void backward_region_layer_gpu(const layer l, network net)
@@ -481,13 +482,13 @@ void backward_region_layer_gpu(const layer l, network net)
     for (b = 0; b < l.batch; ++b){
         for(n = 0; n < l.n; ++n){
             int index = entry_index(l, b, n*l.w*l.h, 0);
-            gradient_array_gpu(l.output_gpu + index, 2*l.w*l.h, LOGISTIC, l.delta_gpu + index);
+            gradient_array_offset_gpu(l.output_gpu, index, 2*l.w*l.h, LOGISTIC, l.delta_gpu);
             if(l.coords > 4){
                 index = entry_index(l, b, n*l.w*l.h, 4);
-                gradient_array_gpu(l.output_gpu + index, (l.coords - 4)*l.w*l.h, LOGISTIC, l.delta_gpu + index);
+                gradient_array_offset_gpu(l.output_gpu, index, (l.coords - 4)*l.w*l.h, LOGISTIC, l.delta_gpu);
             }
             index = entry_index(l, b, n*l.w*l.h, l.coords);
-            if(!l.background) gradient_array_gpu(l.output_gpu + index,   l.w*l.h, LOGISTIC, l.delta_gpu + index);
+            if(!l.background) gradient_array_offset_gpu(l.output_gpu, index,   l.w*l.h, LOGISTIC, l.delta_gpu);
         }
     }
     axpy_gpu(l.batch*l.inputs, 1, l.delta_gpu, 1, net.delta_gpu, 1);

@@ -1,5 +1,5 @@
 #include "reorg_layer.h"
-#include "cuda.h"
+#include "opencl.h"
 #include "blas.h"
 
 #include <stdio.h>
@@ -7,7 +7,7 @@
 
 layer make_reorg_layer(int batch, int w, int h, int c, int stride, int reverse, int flatten, int extra)
 {
-    layer l = {0};
+    layer l = { 0 };
     l.type = REORG;
     l.batch = batch;
     l.stride = stride;
@@ -46,11 +46,13 @@ layer make_reorg_layer(int batch, int w, int h, int c, int stride, int reverse, 
     l.forward = forward_reorg_layer;
     l.backward = backward_reorg_layer;
 #ifdef GPU
-    l.forward_gpu = forward_reorg_layer_gpu;
-    l.backward_gpu = backward_reorg_layer_gpu;
+    if (gpu_index >= 0) {
+        l.forward_gpu = forward_reorg_layer_gpu;
+        l.backward_gpu = backward_reorg_layer_gpu;
 
-    l.output_gpu  = cuda_make_array(l.output, output_size);
-    l.delta_gpu   = cuda_make_array(l.delta, output_size);
+        l.output_gpu = opencl_make_array(l.output, output_size);
+        l.delta_gpu = opencl_make_array(l.delta, output_size);
+    }
 #endif
     return l;
 }
@@ -73,18 +75,24 @@ void resize_reorg_layer(layer *l, int w, int h)
         l->out_c = c*(stride*stride);
     }
 
+#ifdef GPU
+    if (gpu_index >= 0) {
+        opencl_free_gpu_only(l->output_gpu);
+        opencl_free_gpu_only(l->delta_gpu);
+    }
+#endif
     l->outputs = l->out_h * l->out_w * l->out_c;
     l->inputs = l->outputs;
     int output_size = l->outputs * l->batch;
-
-    l->output = realloc(l->output, output_size * sizeof(float));
-    l->delta = realloc(l->delta, output_size * sizeof(float));
+	
+    l->output = realloc(l->output, output_size*sizeof(float));
+    l->delta = realloc(l->delta, output_size*sizeof(float));
 
 #ifdef GPU
-    cuda_free(l->output_gpu);
-    cuda_free(l->delta_gpu);
-    l->output_gpu  = cuda_make_array(l->output, output_size);
-    l->delta_gpu   = cuda_make_array(l->delta,  output_size);
+    if (gpu_index >= 0) {
+        l->output_gpu = opencl_make_array(l->output, output_size);
+        l->delta_gpu = opencl_make_array(l->delta, output_size);
+    }
 #endif
 }
 
@@ -142,7 +150,7 @@ void forward_reorg_layer_gpu(layer l, network net)
         }
     } else if (l.extra) {
         for(i = 0; i < l.batch; ++i){
-            copy_gpu(l.inputs, net.input_gpu + i*l.inputs, 1, l.output_gpu + i*l.outputs, 1);
+            copy_offset_gpu(l.inputs, net.input_gpu, i*l.inputs, 1, l.output_gpu, i*l.outputs, 1);
         }
     } else if (l.reverse) {
         reorg_gpu(net.input_gpu, l.w, l.h, l.c, l.batch, l.stride, 1, l.output_gpu);
@@ -162,7 +170,7 @@ void backward_reorg_layer_gpu(layer l, network net)
     } else if (l.extra) {
         int i;
         for(i = 0; i < l.batch; ++i){
-            copy_gpu(l.inputs, l.delta_gpu + i*l.outputs, 1, net.delta_gpu + i*l.inputs, 1);
+            copy_offset_gpu(l.inputs, l.delta_gpu, i*l.outputs, 1, net.delta_gpu, i*l.inputs, 1);
         }
     } else if(l.reverse){
         reorg_gpu(l.delta_gpu, l.w, l.h, l.c, l.batch, l.stride, 0, net.delta_gpu);

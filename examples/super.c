@@ -3,7 +3,7 @@
 void train_super(char *cfgfile, char *weightfile, int clear)
 {
     char *train_images = "/data/imagenet/imagenet1k.train.list";
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *backup_directory = "/home/piotr/backup/";
     srand(time(0));
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
@@ -93,7 +93,7 @@ void test_super(char *cfgfile, char *weightfile, char *filename)
         image out = get_network_image(net);
         printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
         save_image(out, "out");
-        show_image(out, "out");
+        show_image(out, "out", 0);
 
         free_image(im);
         if (filename) break;

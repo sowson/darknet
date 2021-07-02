@@ -12,6 +12,9 @@ void free_matrix(matrix m)
     int i;
     for(i = 0; i < m.rows; ++i) free(m.vals[i]);
     free(m.vals);
+#ifdef GPU_FETCH
+    //if (m.valsb_gpu.ptr) opencl_free(m.valsb_gpu);
+#endif
 }
 
 float matrix_topk_accuracy(matrix truth, matrix guess, int k)

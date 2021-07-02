@@ -1,7 +1,7 @@
 #include "lstm_layer.h"
 #include "connected_layer.h"
 #include "utils.h"
-#include "cuda.h"
+#include "opencl.h"
 #include "blas.h"
 #include "gemm.h"
 
@@ -19,10 +19,13 @@ static void increment_layer(layer *l, int steps)
     l->x_norm += num;
 
 #ifdef GPU
-    l->output_gpu += num;
-    l->delta_gpu += num;
-    l->x_gpu += num;
-    l->x_norm_gpu += num;
+    if (gpu_index >= 0) {
+        // TODO: CHECK IT (4)
+        l->output_gpu.inc(l->output_gpu, num, l->outputs * l->batch);
+        l->delta_gpu.inc(l->delta_gpu, num, l->outputs * l->batch);
+        l->x_gpu.inc(l->x_gpu, num, l->outputs * l->batch);
+        l->x_norm_gpu.inc(l->x_norm_gpu, num, l->outputs * l->batch);
+    }
 #endif
 }
 
@@ -102,40 +105,30 @@ layer make_lstm_layer(int batch, int inputs, int outputs, int steps, int batch_n
     l.dh_cpu =          calloc(batch*outputs, sizeof(float));
 
 #ifdef GPU
-    l.forward_gpu = forward_lstm_layer_gpu;
-    l.backward_gpu = backward_lstm_layer_gpu;
-    l.update_gpu = update_lstm_layer_gpu;
+    if (gpu_index >= 0) {
+        l.forward_gpu = forward_lstm_layer_gpu;
+        l.backward_gpu = backward_lstm_layer_gpu;
+        l.update_gpu = update_lstm_layer_gpu;
 
-    l.output_gpu = cuda_make_array(0, batch*outputs*steps);
-    l.delta_gpu = cuda_make_array(0, batch*l.outputs*steps);
+        l.output_gpu = opencl_make_array(l.output, batch*outputs*steps);
+        l.delta_gpu = opencl_make_array(l.delta, batch*l.outputs*steps);
 
-    l.prev_state_gpu = cuda_make_array(0, batch*outputs);
-    l.prev_cell_gpu = cuda_make_array(0, batch*outputs);
-    l.cell_gpu = cuda_make_array(0, batch*outputs*steps);
+        l.prev_state_gpu = opencl_make_array(l.prev_state, batch*outputs);
+        l.prev_cell_gpu = opencl_make_array(l.prev_cell_cpu, batch*outputs);
+        l.cell_gpu = opencl_make_array(l.cell_cpu, batch*outputs*steps);
 
-    l.f_gpu = cuda_make_array(0, batch*outputs);
-    l.i_gpu = cuda_make_array(0, batch*outputs);
-    l.g_gpu = cuda_make_array(0, batch*outputs);
-    l.o_gpu = cuda_make_array(0, batch*outputs);
-    l.c_gpu = cuda_make_array(0, batch*outputs);
-    l.h_gpu = cuda_make_array(0, batch*outputs);
-    l.temp_gpu =  cuda_make_array(0, batch*outputs);
-    l.temp2_gpu = cuda_make_array(0, batch*outputs);
-    l.temp3_gpu = cuda_make_array(0, batch*outputs);
-    l.dc_gpu = cuda_make_array(0, batch*outputs);
-    l.dh_gpu = cuda_make_array(0, batch*outputs);
-#ifdef CUDNN
-        cudnnSetTensor4dDescriptor(l.wf->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.wf->out_c, l.wf->out_h, l.wf->out_w); 
-        cudnnSetTensor4dDescriptor(l.wi->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.wi->out_c, l.wi->out_h, l.wi->out_w); 
-        cudnnSetTensor4dDescriptor(l.wg->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.wg->out_c, l.wg->out_h, l.wg->out_w); 
-        cudnnSetTensor4dDescriptor(l.wo->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.wo->out_c, l.wo->out_h, l.wo->out_w); 
-
-        cudnnSetTensor4dDescriptor(l.uf->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.uf->out_c, l.uf->out_h, l.uf->out_w); 
-        cudnnSetTensor4dDescriptor(l.ui->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.ui->out_c, l.ui->out_h, l.ui->out_w); 
-        cudnnSetTensor4dDescriptor(l.ug->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.ug->out_c, l.ug->out_h, l.ug->out_w); 
-        cudnnSetTensor4dDescriptor(l.uo->dstTensorDesc, CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, batch, l.uo->out_c, l.uo->out_h, l.uo->out_w); 
-#endif
-
+        l.f_gpu = opencl_make_array(l.f_cpu, batch*outputs);
+        l.i_gpu = opencl_make_array(l.i_cpu, batch*outputs);
+        l.g_gpu = opencl_make_array(l.g_cpu, batch*outputs);
+        l.o_gpu = opencl_make_array(l.o_cpu, batch*outputs);
+        l.c_gpu = opencl_make_array(l.c_cpu, batch*outputs);
+        l.h_gpu = opencl_make_array(l.h_cpu, batch*outputs);
+        l.temp_gpu = opencl_make_array(l.temp_cpu, batch*outputs);
+        l.temp2_gpu = opencl_make_array(l.temp2_cpu, batch*outputs);
+        l.temp3_gpu = opencl_make_array(l.temp3_cpu, batch*outputs);
+        l.dc_gpu = opencl_make_array(l.dc_cpu, batch*outputs);
+        l.dh_gpu = opencl_make_array(l.dh_cpu, batch*outputs);
+    }
 #endif
 
     return l;
@@ -465,9 +458,10 @@ void forward_lstm_layer_gpu(layer l, network state)
         copy_gpu(l.outputs*l.batch, l.c_gpu, 1, l.cell_gpu, 1);		
         copy_gpu(l.outputs*l.batch, l.h_gpu, 1, l.output_gpu, 1);
 
-        state.input_gpu += l.inputs*l.batch;
-        l.output_gpu    += l.outputs*l.batch;
-        l.cell_gpu      += l.outputs*l.batch;
+        // TODO: CHECK IT (3)
+        state.input_gpu.inc(state.input_gpu, l.inputs*l.batch, l.inputs);
+        l.output_gpu.inc(l.output_gpu, l.outputs*l.batch, l.outputs);
+        l.cell_gpu.inc(l.cell_gpu, l.outputs*l.batch, l.outputs);
 
         increment_layer(&wf, 1);
         increment_layer(&wi, 1);
@@ -506,20 +500,22 @@ void backward_lstm_layer_gpu(layer l, network state)
     increment_layer(&ug, l.steps - 1);
     increment_layer(&uo, l.steps - 1);
 
-    state.input_gpu += l.inputs*l.batch*(l.steps - 1);
-    if (state.delta_gpu) state.delta_gpu += l.inputs*l.batch*(l.steps - 1);
+    // TODO: CHECK IT (5)
+    state.input_gpu.inc(state.input_gpu, l.inputs*l.batch*(l.steps - 1), l.inputs*l.batch);
+    if (state.delta_gpu.ptr) state.delta_gpu.inc(state.delta_gpu, l.inputs*l.batch*(l.steps - 1), l.inputs*l.batch);
 
-    l.output_gpu += l.outputs*l.batch*(l.steps - 1);
-    l.cell_gpu += l.outputs*l.batch*(l.steps - 1);
-    l.delta_gpu += l.outputs*l.batch*(l.steps - 1);
+    l.output_gpu.inc(l.output_gpu, l.outputs*l.batch*(l.steps - 1), l.outputs*l.batch);
+    l.cell_gpu.inc(l.cell_gpu, l.outputs*l.batch*(l.steps - 1), l.outputs*l.batch);
+    l.delta_gpu.inc(l.delta_gpu, l.outputs*l.batch*(l.steps - 1), l.outputs*l.batch);
 
     for (i = l.steps - 1; i >= 0; --i) {
-        if (i != 0) copy_gpu(l.outputs*l.batch, l.cell_gpu - l.outputs*l.batch, 1, l.prev_cell_gpu, 1);
+        if (i != 0) copy_offset_gpu(l.outputs*l.batch, l.cell_gpu, -l.outputs*l.batch, 1, l.prev_cell_gpu, 0, 1);
         copy_gpu(l.outputs*l.batch, l.cell_gpu, 1, l.c_gpu, 1);
-        if (i != 0) copy_gpu(l.outputs*l.batch, l.output_gpu - l.outputs*l.batch, 1, l.prev_state_gpu, 1);
+        if (i != 0) copy_offset_gpu(l.outputs*l.batch, l.output_gpu, -l.outputs*l.batch, 1, l.prev_state_gpu, 0, 1);
         copy_gpu(l.outputs*l.batch, l.output_gpu, 1, l.h_gpu, 1);
 
-        l.dh_gpu = (i == 0) ? 0 : l.delta_gpu - l.outputs*l.batch;
+        // TODO: CHECK IT (1)
+        l.dh_gpu = (i == 0) ? opencl_make_array(0, 0) : l.delta_gpu.rem(l.delta_gpu, l.outputs*l.batch, l.outputs*l.batch);
 
         copy_gpu(l.outputs*l.batch, wf.output_gpu, 1, l.f_gpu, 1);			
         axpy_gpu(l.outputs*l.batch, 1, uf.output_gpu, 1, l.f_gpu, 1);			
@@ -606,11 +602,12 @@ void backward_lstm_layer_gpu(layer l, network state)
         mul_gpu(l.outputs*l.batch, l.f_gpu, 1, l.temp_gpu, 1);				
         copy_gpu(l.outputs*l.batch, l.temp_gpu, 1, l.dc_gpu, 1);				
 
-        state.input_gpu -= l.inputs*l.batch;
-        if (state.delta_gpu) state.delta_gpu -= l.inputs*l.batch;
-        l.output_gpu -= l.outputs*l.batch;
-        l.cell_gpu -= l.outputs*l.batch;
-        l.delta_gpu -= l.outputs*l.batch;
+        // TODO: CHECK IT (5)
+        state.input_gpu.dec(state.input_gpu, l.inputs*l.batch, l.inputs*l.batch);
+        if (state.delta_gpu.ptr) state.delta_gpu.dec(state.delta_gpu, l.inputs*l.batch, l.inputs*l.batch);
+        l.output_gpu.dec(l.output_gpu, l.outputs*l.batch, l.outputs*l.batch);
+        l.cell_gpu.dec(l.cell_gpu, l.outputs*l.batch, l.outputs*l.batch);
+        l.delta_gpu.dec(l.delta_gpu, l.outputs*l.batch, l.outputs*l.batch);
 
         increment_layer(&wf, -1);
         increment_layer(&wi, -1);

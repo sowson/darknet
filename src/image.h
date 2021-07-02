@@ -9,13 +9,32 @@
 #include "box.h"
 #include "darknet.h"
 
-#ifndef __cplusplus
 #ifdef OPENCV
-int fill_image_from_stream(CvCapture *cap, image im);
-image ipl_to_image(IplImage* src);
-void ipl_into_image(IplImage* src, image im);
-void flush_stream_buffer(CvCapture *cap, int n);
-void show_image_cv(image p, const char *name, IplImage *disp);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct {
+    float *x;
+    float *y;
+} float_pair;
+
+image ipl_to_image(void *src);
+image load_image_cv(char *filename, int channels);
+image get_image_from_stream_cv(void *cap);
+void save_image_jpg_cv(image p, const char *name);
+void *open_video_stream(const char *f, int c, int w, int h, int fps);
+int cv_wait_key(int key);
+void *cv_capture_from_file(const char* filename);
+void *cv_capture_from_camera(int cam_index, int w, int h, int frames);
+void *cv_create_image(image* buff);
+void cv_create_named_window(int fullscreen, int w, int h);
+int cv_show_image(image p, const char *name, int ms);
+void save_image_jpg_cv(image p, const char *name);
+void extract_voxel_cv(char *lfile, char *rfile, char *prefix, int w, int h);
+
+#ifdef __cplusplus
+}
 #endif
 #endif
 
@@ -43,7 +62,6 @@ void hsv_to_rgb(image im);
 void yuv_to_rgb(image im);
 void rgb_to_yuv(image im);
 
-
 image collapse_image_layers(image source, int border);
 image collapse_images_horz(image *ims, int n);
 image collapse_images_vert(image *ims, int n);
@@ -60,5 +78,6 @@ void copy_image_into(image src, image dest);
 
 image get_image_layer(image m, int l);
 
-#endif
+void reconstruct_picture(network net, float *features, image recon, image update, float rate, float momentum, float lambda, int smooth_size, int iters);
 
+#endif

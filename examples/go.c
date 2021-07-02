@@ -145,15 +145,18 @@ void train_go(char *cfgfile, char *weightfile, char *filename, int *gpus, int ng
     for(i = 0; i < ngpus; ++i){
         srand(seed);
 #ifdef GPU
-        cuda_set_device(gpus[i]);
+        if(gpu_index >= 0) {
+            opencl_set_device(i);
+        }
 #endif
         nets[i] = load_network(cfgfile, weightfile, clear);
         nets[i]->learning_rate *= ngpus;
     }
+
     network *net = nets[0];
     printf("Learning Rate: %g, Momentum: %g, Decay: %g\n", net->learning_rate, net->momentum, net->decay);
 
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *backup_directory = "/home/piotr/backup/";
 
     char buff[256];
     moves m = load_go_moves(filename);
@@ -171,10 +174,15 @@ void train_go(char *cfgfile, char *weightfile, char *filename, int *gpus, int ng
 
         float loss = 0;
 #ifdef GPU
-        if(ngpus == 1){
+        if (gpu_index >= 0) {
+            if (ngpus == 1) {
+                loss = train_network(net, train);
+            } else {
+                loss = train_networks(nets, ngpus, train, 10, gpus, ngpus);
+            }
+        }
+        else {
             loss = train_network(net, train);
-        } else {
-            loss = train_networks(nets, ngpus, train, 10);
         }
 #else
         loss = train_network(net, train);
@@ -741,7 +749,7 @@ void valid_go(char *cfgfile, char *weightfile, int multi, char *filename)
 
     float *board = calloc(19*19*3, sizeof(float));
     float *move = calloc(19*19+2, sizeof(float));
-    // moves m = load_go_moves("/home/pjreddie/backup/go.test");
+    // moves m = load_go_moves("/home/piotr/backup/go.test");
     moves m = load_go_moves(filename);
 
     int N = m.n;

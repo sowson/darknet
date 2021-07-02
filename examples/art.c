@@ -1,4 +1,5 @@
 #include "darknet.h"
+#include "image.h"
 
 #include <sys/time.h>
 
@@ -9,22 +10,18 @@ void demo_art(char *cfgfile, char *weightfile, int cam_index)
     set_batch_network(net, 1);
 
     srand(2222222);
-    CvCapture * cap;
 
-    cap = cvCaptureFromCAM(cam_index);
+    void * cap = open_video_stream(0, cam_index, 0,0,0);
 
     char *window = "ArtJudgementBot9000!!!";
     if(!cap) error("Couldn't connect to webcam.\n");
-    cvNamedWindow(window, CV_WINDOW_NORMAL); 
-    cvResizeWindow(window, 512, 512);
     int i;
     int idx[] = {37, 401, 434};
     int n = sizeof(idx)/sizeof(idx[0]);
 
     while(1){
-        image in = get_image_from_stream(cap);
+        image in = get_image_from_stream_cv(cap);
         image in_s = resize_image(in, net->w, net->h);
-        show_image(in, window);
 
         float *p = network_predict(net, in_s.data);
 
@@ -45,10 +42,9 @@ void demo_art(char *cfgfile, char *weightfile, int cam_index)
         }
         printf("]\n");
 
+        show_image(in, window, 1);
         free_image(in_s);
         free_image(in);
-
-        cvWaitKey(1);
     }
 #endif
 }
