@@ -26,6 +26,14 @@ int ngpusg;
 __thread int opencl_device_id_t;
 __thread int opencl_device_ct_t;
 
+cl_int *cl_native_double_width_s;
+size_t *cl_native_max_group_size_s;
+size_t *cl_native_address_bits_s;
+
+cl_context opencl_context;
+cl_command_queue* opencl_queues;
+cl_device_id* opencl_devices;
+
 cl_context_properties* cl_props;
 
 const char* clGetErrorString(int errorCode) {
@@ -549,7 +557,7 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
     size_t localItems[2];
     localItems[0] = localItemSize.x;
     localItems[1] = localItemSize.y;
-    
+
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
