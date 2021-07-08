@@ -314,7 +314,7 @@ function (ConfigureBinary target)
 
     if (DARKNET_OPENMP)
         find_package(OpenMP)
-        target_link_libraries(${target} OpenMP::OpenMP_CXX)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
     endif()
 
 #    if (DARKNET_TESTING)
@@ -329,6 +329,12 @@ function (ConfigureLibrary target)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:include>
     )
+
+    if (DARKNET_OPENMP)
+        find_package(OpenMP)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    endif()
+
     install(TARGETS ${target} EXPORT ${CMAKE_PROJECT_NAME}
         ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
