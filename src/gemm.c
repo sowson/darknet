@@ -217,6 +217,8 @@ void gemm_offset_gpu(
 
     cl_int clErr;
 
+    cl_command_queue que = opencl_queues[opencl_device_id_t];
+
     clErr = clblasSgemm(clblasRowMajor,
                         (TA ? clblasTrans : clblasNoTrans),
                         (TB ? clblasTrans : clblasNoTrans),
@@ -226,10 +228,10 @@ void gemm_offset_gpu(
                         B_gpu.mem, offset_B, ldb,
                         BETA,
                         C_gpu.mem, offset_C, ldc,
-                        1, &opencl_queues[opencl_device_id_t], 0, NULL, NULL);
+                        1, &que, 0, NULL, NULL);
 
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(que);
 #endif
 
 #ifdef BENCHMARK
