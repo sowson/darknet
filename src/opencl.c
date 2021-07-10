@@ -228,11 +228,24 @@ void opencl_load_buffer(const char *buffer, const size_t size, cl_program *outpu
         exit(-1);
     }
 
+#ifdef ARM
     clErr = clBuildProgram(
             *output,
             1,
             &opencl_devices[opencl_device_id_t],
             NULL, NULL, NULL);
+#else
+    clErr = clBuildProgram(
+            *output,
+            1,
+            &opencl_devices[opencl_device_id_t],
+            "-Werror "
+            "-cl-std=CL1.2 "
+            "-cl-opt-disable "
+            "-cl-denorms-are-zero "
+            "-cl-fp32-correctly-rounded-divide-sqrt "
+            , NULL, NULL);
+#endif
 
     if (clErr != CL_SUCCESS)
     {
