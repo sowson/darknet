@@ -29,7 +29,13 @@ class DETECTION(Structure):
                 ("prob", POINTER(c_float)),
                 ("mask", POINTER(c_float)),
                 ("objectness", c_float),
-                ("sort_class", c_int)]
+                ("sort_class", c_int),
+                ("uc", POINTER(c_float)),
+                ("points", c_int),
+                ("embeddings", POINTER(c_float)),
+                ("embedding_size", c_int),
+                ("sim", c_float),
+                ("track_id", c_int)]
 
 
 class IMAGE(Structure):
@@ -54,6 +60,10 @@ lib.network_height.restype = c_int
 predict = lib.network_predict
 predict.argtypes = [c_void_p, POINTER(c_float)]
 predict.restype = POINTER(c_float)
+
+opencl_init = lib.opencl_init
+opencl_init.argtypes = [POINTER(c_int), c_int]
+opencl_init.restype = c_void_p
 
 set_gpu = lib.opencl_set_device
 set_gpu.argtypes = [c_int]
@@ -148,6 +158,9 @@ if __name__ == "__main__":
     #meta = load_meta("cfg/imagenet1k.data")
     #r = classify(net, meta, im)
     #print r[:10]
+    gpu = c_int(0)
+    pgpu = pointer(gpu)
+    opencl_init(pgpu, 1)
     net = load_net("cfg/tiny-yolo.cfg", "tiny-yolo.weights", 0)
     meta = load_meta("cfg/coco.data")
     r = detect(net, meta, "data/dog.jpg")
