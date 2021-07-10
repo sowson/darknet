@@ -33,9 +33,16 @@ extern int ngpusg;
 extern __thread int opencl_device_id_t;
 extern __thread int opencl_device_ct_t;
 
-extern cl_int *cl_native_double_width_s;
-extern size_t *cl_native_max_group_size_s;
-extern size_t *cl_native_address_bits_s;
+extern cl_context opencl_context;
+
+cl_command_queue* opencl_queues;
+cl_device_id* opencl_devices;
+
+cl_int *cl_native_double_width_s;
+size_t *cl_native_max_group_size_s;
+size_t *cl_native_address_bits_s;
+
+cl_context_properties* cl_props;
 
 typedef struct _cl_mem_ext cl_mem_ext;
 
@@ -64,10 +71,6 @@ cl_mem_ext add(cl_mem_ext buf, int inc, size_t len);
 cl_mem_ext rem(cl_mem_ext buf, int dec, size_t len);
 cl_mem_ext upd(cl_mem_ext buf, size_t len);
 cl_command_queue que();
-
-extern cl_context opencl_context;
-extern cl_command_queue* opencl_queues;
-extern cl_device_id* opencl_devices;
 
 void activation_kernel_init(void);
 void blas_kernel_init(void);
