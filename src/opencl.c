@@ -429,6 +429,8 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
 {
     cl_int clErr;
 
+    cl_command_queue que = opencl_queues[opencl_device_id_t];
+
     va_list vl;
     va_start(vl, argc);
 
@@ -471,7 +473,7 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
     clock_t t;
     t = clock();
 #endif
-    clErr = clEnqueueNDRangeKernel(opencl_queues[opencl_device_id_t], kernel, 2,
+    clErr = clEnqueueNDRangeKernel(que, kernel, 2,
             globalOffset, globalItems, NULL, 0, NULL, NULL);
 #ifdef BENCHMARK
     t = clock() - t;
@@ -484,7 +486,7 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
 #endif
 
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(que);
 #endif
 
     if (clErr != CL_SUCCESS)
@@ -513,6 +515,8 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
 void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2 localItemSize, const int argc, ...)
 {
     cl_int clErr;
+
+    cl_command_queue que = opencl_queues[opencl_device_id_t];
 
     va_list vl;
     va_start(vl, argc);
@@ -562,7 +566,7 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
     clock_t t;
     t = clock();
 #endif
-    clErr = clEnqueueNDRangeKernel(opencl_queues[opencl_device_id_t], kernel, 2,
+    clErr = clEnqueueNDRangeKernel(que, kernel, 2,
                                    globalOffset, globalItems, localItems, 0, NULL, NULL);
 #ifdef BENCHMARK
     t = clock() - t;
@@ -575,7 +579,7 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
 #endif
 
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(que);
 #endif
 
     if (clErr != CL_SUCCESS)
@@ -691,7 +695,7 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
     buf.que = opencl_queues[opencl_device_id_t];
 
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(buf.que);
 #endif
     return buf;
 }
@@ -727,7 +731,7 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
     buf.que = opencl_queues[opencl_device_id_t];
 
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(buf.que);
 #endif
     return buf;
 }
@@ -763,7 +767,7 @@ void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_push_int_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
@@ -798,7 +802,7 @@ void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_pull_int_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
@@ -833,7 +837,7 @@ void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_push_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
@@ -868,7 +872,7 @@ void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_pull_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
@@ -903,7 +907,7 @@ void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_push_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
@@ -938,7 +942,7 @@ void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     printf("%s\t%x\t%d\n", "opencl_pull_array", x_gpu.ptr, (int)time_taken);
 #endif
 #ifdef GPU_SAFE
-    clFinish(opencl_queues[opencl_device_id_t]);
+    clFinish(x_gpu.que);
 #endif
 }
 
