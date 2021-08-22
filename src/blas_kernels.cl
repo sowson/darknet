@@ -59,6 +59,8 @@ __kernel void backward_scale_kernel(int tuning, __local float* sums, int batch, 
         }
     }
 
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
     for(s = 0; s < tuning; ++s) {
         scale_updates[i] += sums[s];
     }
@@ -94,11 +96,12 @@ __kernel void backward_bias_kernel(int tuning, __local float* sums, int batch, i
         }
     }
 
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
     for(s = 0; s < tuning; ++s) {
         bias_updates[i] += sums[s];
     }
 }
-
 
 __kernel void  mean_kernel(int N, __global float *x, int batch, int filters, int spatial, __global float *mean)
 {
@@ -203,6 +206,8 @@ __kernel void fast_mean_kernel(int tuning, __local float *sums, int filters, int
         }
     }
 
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
     mean[i] = 0;
     for (s = 0; s < tuning; ++s) {
         mean[i] += sums[s];
@@ -227,6 +232,8 @@ __kernel void fast_variance_kernel(int tuning, __local float *sums, int filters,
             sums[t] += pow((x[index] - mean[i]), 2);
         }
     }
+
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
     variance[i] = 0;
     for (s = 0; s < tuning; ++s) {
@@ -253,6 +260,8 @@ __kernel void fast_variance_kernel(int tuning, __local float *sums, int filters,
         }
     }
 
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+
     mean_delta[i] = 0;
     for (s = 0; s < tuning; ++s) {
         mean_delta[i] += sums[s];
@@ -276,6 +285,8 @@ __kernel void fast_variance_delta_kernel(int tuning, __local float *sums, int fi
             sums[t] += delta[index] * (x[index] - mean[i]);
         }
     }
+
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
     variance_delta[i] = 0;
     for (s = 0; s < tuning; ++s) {
@@ -775,9 +786,9 @@ __kernel void gemm_kernel(
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE);
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-    if (td == tuning-1) {
+    if (td == 0) {
         for(ts = 0; ts < tuning; ++ts) {
             if (TA==0 && TB==0) {
                 C[iM * ldc + jN + offset_C] += sums[ts];

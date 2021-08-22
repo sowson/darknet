@@ -47,6 +47,11 @@ network *load_network(char *cfg, char *weights, int clear)
 	return net;
 }
 
+int64_t get_current_iteration(network net)
+{
+    return *net.cur_iteration;
+}
+
 size_t get_current_batch(network *net)
 {
 	size_t batch_num = (*net->seen)/(net->batch*net->subdivisions);
@@ -432,8 +437,10 @@ float train_network(network *net, data d)
 	int i;
 	float sum = 0;
 	for(i = 0; i < n; ++i){
-#ifdef GPU_FETCH
-        get_next_batch_gpu(d, batch, i*batch, net->input_gpu, net->truth_gpu);
+#if GPU
+	    if (gpu_index >= 0) {
+            opencl_set_device(net->gpu_index);
+        }
 #endif
 		get_next_batch(d, batch, i*batch, net->input, net->truth);
 		float err = train_network_datum(net);
@@ -905,18 +912,15 @@ float *network_output(network *net)
 void forward_network_gpu(network *netp)
 {
 	network net = *netp;
-	opencl_set_device(net.gpu_index);
-#ifndef GPU_FETCH
 	opencl_push_array(net.input_gpu, net.input, net.inputs*net.batch);
-	if(net.truth){
+	if(net.train && net.truth){
 		opencl_push_array(net.truth_gpu, net.truth, net.truths*net.batch);
 	}
-#endif
 	int i;
 	for(i = 0; i < net.n; ++i){
 		net.index = i;
 		layer l = net.layers[i];
-		if(l.delta_gpu.ptr){
+		if(net.train && l.delta){
 			fill_gpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
 		}
 #ifdef BENCHMARK
@@ -930,15 +934,18 @@ void forward_network_gpu(network *netp)
 		const char* layerName[] = { "CONVOLUTIONAL","DECONVOLUTIONAL","CONNECTED", "MAXPOOL", "SOFTMAX", "DETECTION", "DROPOUT", "CROP", "ROUTE", "COST", "NORMALIZATION", "AVGPOOL", "LOCAL", "SHORTCUT", "ACTIVE", "RNN", "GRU", "LSTM", "CRNN", "BATCHNORM", "NETWORK", "XNOR", "REGION", "YOLO", "YOLO4", "ISEG", "REORG", "UPSAMPLE", "LOGXENT", "L2NORM", "BLANK"};
 		printf("FW %s\t%d\n", layerName[(int)l.type], (int)time_taken);
 #endif
-		net.input_gpu = l.output_gpu;
-		net.input = l.output;
+        net.input = l.output;
+        net.input_gpu = l.output_gpu;
 		if(l.truth) {
 			net.truth_gpu = l.output_gpu;
 			net.truth = l.output;
 		}
 	}
+
+    clFlush(opencl_queues[opencl_device_id_t]);
+
 	pull_network_output(netp);
-	calc_network_cost(netp);
+	if(net.train) calc_network_cost(netp);
 }
 
 void backward_network_gpu(network *netp)
@@ -946,7 +953,6 @@ void backward_network_gpu(network *netp)
 	int i;
 	network net = *netp;
 	network orig = net;
-	opencl_set_device(net.gpu_index);
 	for(i = net.n-1; i >= 0; --i){
 		layer l = net.layers[i];
 		if(l.stopbackward) break;
@@ -954,10 +960,10 @@ void backward_network_gpu(network *netp)
 			net = orig;
 		}else{
 			layer prev = net.layers[i-1];
-			net.input = prev.output;
 			net.delta = prev.delta;
+            net.delta_gpu = prev.delta_gpu;
+            net.input = prev.output;
 			net.input_gpu = prev.output_gpu;
-			net.delta_gpu = prev.delta_gpu;
 		}
 		net.index = i;
 #ifdef BENCHMARK
@@ -972,12 +978,13 @@ void backward_network_gpu(network *netp)
 		printf("BW %s\t%d\n", layerName[(int)l.type], (int)time_taken);
 #endif
 	}
+
+    clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void update_network_gpu(network *netp)
 {
 	network net = *netp;
-	opencl_set_device(net.gpu_index);
 	int i;
 	update_args a = {0};
 	a.batch = net.batch*net.subdivisions;
@@ -1007,6 +1014,8 @@ void update_network_gpu(network *netp)
 #endif
 		}
 	}
+
+    clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void harmless_update_network_gpu(network *netp)
@@ -1027,8 +1036,6 @@ typedef struct {
 	data d;
 	data o;
 	float *err;
-	int *gpus;
-	int ngpus;
 } train_args;
 
 void *train_thread(void *ptr)
@@ -1040,45 +1047,46 @@ void *train_thread(void *ptr)
 	return 0;
 }
 
-pthread_t train_network_in_thread(network *net, data d, float *err, int *gpus, int ngpus)
+pthread_t train_network_in_thread(network *net, data d, float *err)
 {
 	pthread_t thread;
 	train_args *ptr = (train_args *)calloc(1, sizeof(train_args));
 	ptr->net = net;
 	ptr->d = d;
 	ptr->err = err;
-	ptr->gpus = gpus;
-	ptr->ngpus = ngpus;
-	if(pthread_create(&thread, 0, train_thread, ptr)) error("Thread creation failed");
+	if(pthread_create(&thread, 0, train_thread, ptr)) {
+	    error("Thread creation failed");
+	    return 0;
+	}
 	return thread;
 }
 
 void merge_weights(layer l)
 {
-	if (l.type == CONVOLUTIONAL) {
-		axpy_cpu(l.n, 1, l.bias_updates, 1, l.biases, 1);
-		axpy_cpu(l.nweights, 1, l.weight_updates, 1, l.weights, 1);
-		if (l.scales) {
-			axpy_cpu(l.n, 1, l.scale_updates, 1, l.scales, 1);
-		}
-	} else if(l.type == CONNECTED) {
-		axpy_cpu(l.outputs, 1, l.bias_updates, 1, l.biases, 1);
-		axpy_cpu(l.outputs*l.inputs, 1, l.weight_updates, 1, l.weights, 1);
-	}
+    if (l.type == CONVOLUTIONAL) {
+        axpy_cpu(l.n, 1, l.bias_updates, 1, l.biases, 1);
+        axpy_cpu(l.nweights, 1, l.weight_updates, 1, l.weights, 1);
+        if (l.scales) {
+            axpy_cpu(l.n, 1, l.scale_updates, 1, l.scales, 1);
+        }
+    } else if(l.type == CONNECTED) {
+        axpy_cpu(l.outputs, 1, l.bias_updates, 1, l.biases, 1);
+        axpy_cpu(l.outputs*l.inputs, 1, l.weight_updates, 1, l.weights, 1);
+    }
 }
 
 void scale_weights(layer l, float s)
 {
-	if (l.type == CONVOLUTIONAL) {
-		scal_cpu(l.n, s, l.biases, 1);
-		scal_cpu(l.nweights, s, l.weights, 1);
-		if (l.scales) {
-			scal_cpu(l.n, s, l.scales, 1);
-		}
-	} else if(l.type == CONNECTED) {
-		scal_cpu(l.outputs, s, l.biases, 1);
-		scal_cpu(l.outputs*l.inputs, s, l.weights, 1);
-	}
+    if (l.type == CONVOLUTIONAL) {
+        scal_cpu(l.n, s, l.biases, 1);
+        scal_cpu(l.nweights, s, l.weights, 1);
+        if (l.scales) {
+            scal_cpu(l.n, s, l.scales, 1);
+        }
+    } else if(l.type == CONNECTED) {
+        scal_cpu(l.outputs, s, l.biases, 1);
+        scal_cpu(l.outputs*l.inputs, s, l.weights, 1);
+    }
 }
 
 void pull_weights(layer l)
@@ -1105,191 +1113,104 @@ void push_weights(layer l)
     }
 }
 
-/*
-
-   void pull_updates(layer l)
-   {
-   if(l.type == CONVOLUTIONAL){
-   opencl_pull_array(l.bias_updates_gpu, l.bias_updates, l.n);
-   opencl_pull_array(l.weight_updates_gpu, l.weight_updates, l.nweights);
-   if(l.scale_updates) opencl_pull_array(l.scale_updates_gpu, l.scale_updates, l.n);
-   } else if(l.type == CONNECTED){
-   opencl_pull_array(l.bias_updates_gpu, l.bias_updates, l.outputs);
-   opencl_pull_array(l.weight_updates_gpu, l.weight_updates, l.outputs*l.inputs);
-   }
-   }
-
-   void push_updates(layer l)
-   {
-   if(l.type == CONVOLUTIONAL){
-   opencl_push_array(l.bias_updates_gpu, l.bias_updates, l.n);
-   opencl_push_array(l.weight_updates_gpu, l.weight_updates, l.nweights);
-   if(l.scale_updates) opencl_push_array(l.scale_updates_gpu, l.scale_updates, l.n);
-   } else if(l.type == CONNECTED){
-   opencl_push_array(l.bias_updates_gpu, l.bias_updates, l.outputs);
-   opencl_push_array(l.weight_updates_gpu, l.weight_updates, l.outputs*l.inputs);
-   }
-   }
-
-   void update_layer(layer l, network net)
-   {
-   int update_batch = net.batch*net.subdivisions;
-   float rate = get_current_rate(net);
-   l.t = get_current_batch(net);
-   if(l.update_gpu){
-   l.update_gpu(l, update_batch, rate*l.learning_rate_scale, net.momentum, net.decay);
-   }
-   }
-   void merge_updates(layer l, layer base)
-   {
-   if (l.type == CONVOLUTIONAL) {
-   axpy_cpu(l.n, 1, l.bias_updates, 1, base.bias_updates, 1);
-   axpy_cpu(l.nweights, 1, l.weight_updates, 1, base.weight_updates, 1);
-   if (l.scale_updates) {
-   axpy_cpu(l.n, 1, l.scale_updates, 1, base.scale_updates, 1);
-   }
-   } else if(l.type == CONNECTED) {
-   axpy_cpu(l.outputs, 1, l.bias_updates, 1, base.bias_updates, 1);
-   axpy_cpu(l.outputs*l.inputs, 1, l.weight_updates, 1, base.weight_updates, 1);
-   }
-   }
-
-   void distribute_updates(layer l, layer base)
-   {
-   if(l.type == CONVOLUTIONAL || l.type == DECONVOLUTIONAL){
-   opencl_push_array(l.bias_updates_gpu, base.bias_updates, l.n);
-   opencl_push_array(l.weight_updates_gpu, base.weight_updates, l.nweights);
-   if(base.scale_updates) opencl_push_array(l.scale_updates_gpu, base.scale_updates, l.n);
-   } else if(l.type == CONNECTED){
-   opencl_push_array(l.bias_updates_gpu, base.bias_updates, l.outputs);
-   opencl_push_array(l.weight_updates_gpu, base.weight_updates, l.outputs*l.inputs);
-   }
-   }
- */
-
-/*
-   void sync_layer(network *nets, int n, int j)
-   {
-   int i;
-   network net = nets[0];
-   layer base = net.layers[j];
-   scale_weights(base, 0);
-   for (i = 0; i < n; ++i) {
-   opencl_set_device(nets[i].gpu_index);
-   layer l = nets[i].layers[j];
-   pull_weights(l);
-   merge_weights(l, base);
-   }
-   scale_weights(base, 1./n);
-   for (i = 0; i < n; ++i) {
-   opencl_set_device(nets[i].gpu_index);
-   layer l = nets[i].layers[j];
-   distribute_weights(l, base);
-   }
-   }
- */
-
 void sync_layer(network **nets, int n, int j)
 {
-	int i;
-	network *net = nets[0];
-	layer base = net->layers[j];
-	scale_weights(base, 0);
-	for (i = 0; i < n; ++i) {
-		opencl_set_device(nets[i]->gpu_index);
-		layer l = nets[i]->layers[j];
-		pull_weights(l);
-		merge_weights(l);
-	}
-	scale_weights(base, 1./n);
-	for (i = 0; i < n; ++i) {
-		opencl_set_device(nets[i]->gpu_index);
-		layer l = nets[i]->layers[j];
-		push_weights(l);
-	}
+    int i;
+    network *net = nets[0];
+    layer base = net->layers[j];
+    scale_weights(base, 0);
+    for (i = 0; i < n; ++i) {
+        opencl_set_device(nets[i]->gpu_index);
+        layer l = nets[i]->layers[j];
+        pull_weights(l);
+        merge_weights(l);
+    }
+    scale_weights(base, 1./n);
+    for (i = 0; i < n; ++i) {
+        opencl_set_device(nets[i]->gpu_index);
+        layer l = nets[i]->layers[j];
+        push_weights(l);
+    }
 }
 
 typedef struct{
-	network **nets;
-	int n;
-	int j;
+    network **nets;
+    int n;
+    int j;
 } sync_args;
 
 void *sync_layer_thread(void *ptr)
 {
-	sync_args args = *(sync_args*)ptr;
-	sync_layer(args.nets, args.n, args.j);
-	free(ptr);
-	return 0;
+    sync_args args = *(sync_args*)ptr;
+    sync_layer(args.nets, args.n, args.j);
+    free(ptr);
+    return 0;
 }
 
 pthread_t sync_layer_in_thread(network **nets, int n, int j)
 {
-	pthread_t thread;
-	sync_args *ptr = (sync_args *)calloc(1, sizeof(sync_args));
-	ptr->nets = nets;
-	ptr->n = n;
-	ptr->j = j;
-	if(pthread_create(&thread, 0, sync_layer_thread, ptr)) error("Thread creation failed");
-	return thread;
+    pthread_t thread;
+    sync_args *ptr = (sync_args *)calloc(1, sizeof(sync_args));
+    ptr->nets = nets;
+    ptr->n = n;
+    ptr->j = j;
+    if(pthread_create(&thread, 0, sync_layer_thread, ptr)) error("Thread creation failed");
+    return thread;
 }
 
 void sync_nets(network **nets, int n, int interval)
 {
-	int j;
-	int layers = nets[0]->n;
-	pthread_t *threads = (pthread_t *) calloc(layers, sizeof(pthread_t));
+    int j;
+    int layers = nets[0]->n;
+    pthread_t *threads = (pthread_t *) calloc(layers, sizeof(pthread_t));
 
-	*(nets[0]->seen) += interval * (n-1) * nets[0]->batch * nets[0]->subdivisions;
-	for (j = 0; j < n; ++j){
-		*(nets[j]->seen) = *(nets[0]->seen);
-	}
-	for (j = 0; j < layers; ++j) {
-		threads[j] = sync_layer_in_thread(nets, n, j);
-	}
-	for (j = 0; j < layers; ++j) {
-		pthread_join(threads[j], 0);
-	}
-	free(threads);
+    *(nets[0]->seen) += interval * (n-1) * nets[0]->batch * nets[0]->subdivisions;
+    for (j = 0; j < n; ++j){
+        *(nets[j]->seen) = *(nets[0]->seen);
+    }
+    for (j = 0; j < layers; ++j) {
+        threads[j] = sync_layer_in_thread(nets, n, j);
+    }
+    for (j = 0; j < layers; ++j) {
+        pthread_join(threads[j], 0);
+    }
+    free(threads);
 }
 
-float train_networks(network **nets, int n, data d, int interval, int* gpus, int ngpus)
+float train_networks(network **nets, int n, data d, int interval)
 {
-	assert(gpus);
-	int i;
-	int batch = nets[0]->batch;
-	int subdivisions = nets[0]->subdivisions;
-	assert(batch * subdivisions * n == d.X.rows);
-	pthread_t *threads = (pthread_t *) calloc(n, sizeof(pthread_t));
-	float *errors = (float *) calloc(n, sizeof(float));
+    int i;
+    int batch = nets[0]->batch;
+    int subdivisions = nets[0]->subdivisions;
+    assert(batch * subdivisions * n == d.X.rows);
+    pthread_t *threads = (pthread_t *) calloc(n, sizeof(pthread_t));
+    float *errors = (float *) calloc(n, sizeof(float));
 
-	float sum = 0;
-	for(i = 0; i < n; ++i){
-		data p = get_data_part(d, i, n);
-		threads[i] = train_network_in_thread(nets[i], p, errors + i, gpus, ngpus);
-	}
-	for(i = 0; i < n; ++i){
-		pthread_join(threads[i], 0);
-		//printf("%f\n", errors[i]);
-		sum += errors[i];
-	}
-	//cudaDeviceSynchronize();
-    for(i = 0; i < ngpus; ++i) {
+    float sum = 0;
+    for(i = 0; i < n; ++i){
+        data p = get_data_part(d, i, n);
+        threads[i] = train_network_in_thread(nets[i], p, errors + i);
+    }
+    for(i = 0; i < n; ++i){
+        pthread_join(threads[i], 0);
+        //printf("%f\n", errors[i]);
+        sum += errors[i];
+    }
+    for(i = 0; i < n; ++i){
         clFinish(opencl_queues[i]);
     }
-	if (get_current_batch(nets[0]) % interval == 0) {
-		printf("Syncing... ");
-		fflush(stdout);
-		sync_nets(nets, n, interval);
-		printf("Done!\n");
-	}
-	//cudaDeviceSynchronize();
-    for(i = 0; i < ngpus; ++i) {
+    if (get_current_batch(nets[0]) % interval == 0) {
+        printf("Syncing... ");
+        fflush(stdout);
+        sync_nets(nets, n, interval);
+        printf("Done!\n");
+    }
+    for(i = 0; i < n; ++i){
         clFinish(opencl_queues[i]);
     }
-	free(threads);
-	free(errors);
-	return (float)sum/(n);
+    free(threads);
+    free(errors);
+    return (float)sum/(n);
 }
 
 void pull_network_output(network *net)

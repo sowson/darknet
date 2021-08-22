@@ -11,9 +11,6 @@ typedef enum { UNUSED_DEF_VAL } UNUSED_ENUM_TYPE;
 extern int gpu_index;
 
 #ifdef GPU
-// EXPERIMENTS ONLY!
-// #define GPU_FETCH
-
 #include "opencl.h"
 #endif // GPU
 
@@ -348,6 +345,8 @@ struct layer {
 
     float scale_x_y;
     int objectness_smooth;
+    int new_coords;
+    int show_details;
     float max_delta;
     float uc_normalizer;
     float iou_normalizer;
@@ -774,10 +773,6 @@ typedef struct detection{
 typedef struct matrix{
     int rows, cols;
     float **vals;
-#ifdef GPU_FETCH
-    float *valsb;
-    cl_mem_ext valsb_gpu;
-#endif
 } matrix;
 
 
@@ -915,8 +910,8 @@ void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n);
 void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n);
 void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n);
 void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n);
-void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n);
-void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n);
+void opencl_pull_array_map(cl_mem_ext x_gpu, void *x, size_t n);
+void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n);
 
 float opencl_mag_array(cl_mem_ext x_gpu, size_t n);
 
@@ -924,8 +919,8 @@ void forward_network_gpu(network *net);
 void backward_network_gpu(network *net);
 void update_network_gpu(network *net);
 
-float train_networks(network **nets, int n, data d, int interval, int* gpus, int ngpus);
-float train_networks_cgan(network **nets, int n, data d, data o, int interval, int* gpus, int ngpus);
+float train_networks(network **nets, int n, data d, int interval);
+float train_networks_cgan(network **nets, int n, data d, data o, int interval);
 void sync_nets(network **nets, int n, int interval);
 void harmless_update_network_gpu(network *net);
 #endif

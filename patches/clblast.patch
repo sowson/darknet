@@ -1,0 +1,136 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3d6334f..cfb3ef2 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -69,12 +69,12 @@ if (DARKNET_GPU)
+ 	if (DARKNET_ARM)
+ 		list (APPEND DARKNET_DEFINITIONS ARM)
+ 	else()
+-		find_package(clBLAS REQUIRED)
+-		add_library(clblas INTERFACE IMPORTED)
+-		set_property(TARGET clblas PROPERTY
+-			INTERFACE_INCLUDE_DIRECTORIES ${CLBLAS_INCLUDE_DIRS})
+-		set_property(TARGET clblas PROPERTY
+-			INTERFACE_LINK_LIBRARIES ${CLBLAS_LIBRARIES})
++		find_package(clblast REQUIRED)
++		add_library(CLBlast INTERFACE IMPORTED)
++		set_property(TARGET CLBlast PROPERTY
++			INTERFACE_INCLUDE_DIRECTORIES ${CLBLAST_INCLUDE_DIRS})
++		set_property(TARGET CLBlast PROPERTY
++			INTERFACE_LINK_LIBRARIES ${CLBLAST_LIBRARIES})
+ 	endif()
+ endif()
+ 
+@@ -302,7 +302,7 @@ function (ConfigureBinary target)
+     if (DARKNET_ARM)
+         target_link_libraries(${target} opencl)
+     elseif (DARKNET_GPU)
+-        target_link_libraries(${target} opencl clblas)
++        target_link_libraries(${target} opencl clblast)
+     endif()
+ 
+     if (DARKNET_OPENCV)
+diff --git a/Makefile b/Makefile
+index cd2c139..3fe0a79 100644
+--- a/Makefile
++++ b/Makefile
+@@ -11,6 +11,10 @@
+ #
+ # Setup VC4CL for RPI
+ # https://github.com/doe300/VC4CL/wiki/How-to-get
++#
++# Setup CLBlast for LINUX
++# git clone https://github.com/CNugteren/CLBlast.git
++# cd CLBlast; mkdir b; cd b; cmake ..; make; make install; cd ..; rm -r b;
+ 
+ GPU=1
+ GPU_FAST=1
+@@ -78,13 +82,13 @@ endif
+ ifeq ($(AMD), 1)
+ COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120
+ CFLAGS+= -DGPU -DOPENCL -I/usr/include/
+-LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
++LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclblast -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+ LDFLAGS+= -L/usr/lib64
+ endif
+ ifeq ($(NVIDIA), 1)
+ COMMON+= -DGPU -DOPENCL
+ CFLAGS+= -DGPU -DOPENCL -I/usr/include/ -I/usr/local/cuda/include/
+-LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
++LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lcblast -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+ LDFLAGS+= -L/usr/lib64
+ endif
+ endif
+diff --git a/src/gemm.c b/src/gemm.c
+index 77e724f..1094e89 100644
+--- a/src/gemm.c
++++ b/src/gemm.c
+@@ -168,12 +168,13 @@ void gemm_cpu(int TA, int TB, int M, int N, int K, float ALPHA,
+ #ifdef GPU
+ 
+ #ifndef ARM
+-#include "clBLAS.h"
++#include <clblast_c.h>
+ #endif
+ 
+ void gemm_kernel_init(void)
+ {
+ #ifndef ARM
++/*
+     cl_int clErr;
+     clErr = clblasSetup();
+ 
+@@ -181,13 +182,16 @@ void gemm_kernel_init(void)
+     {
+         printf("gemm_kernel_init: Could not setup clBLAS. Errorcode: %d\n", clErr);
+     }
++*/
+ #endif
+ }
+ 
+ void gemm_kernel_release(void)
+ {
+ #ifndef ARM
++/*
+     clblasTeardown();
++*/
+ #endif
+ }
+ 
+@@ -215,22 +219,20 @@ void gemm_offset_gpu(
+     t = clock();
+ #endif
+ 
+-    cl_int clErr;
++    CLBlastStatusCode clErr;
+ 
+     cl_command_queue que = opencl_queues[opencl_device_id_t];
+ 
+-    clErr = clblasSgemm(clblasRowMajor,
+-                        (TA ? clblasTrans : clblasNoTrans),
+-                        (TB ? clblasTrans : clblasNoTrans),
++    clErr = CLBlastSgemm(CLBlastLayoutRowMajor,
++                        (TA ? CLBlastTransposeYes : CLBlastTransposeNo),
++                        (TB ? CLBlastTransposeYes : CLBlastTransposeNo),
+                         M, N, K,
+                         ALPHA,
+                         A_gpu.mem, offset_A, lda,
+                         B_gpu.mem, offset_B, ldb,
+                         BETA,
+                         C_gpu.mem, offset_C, ldc,
+-                        1, &que, 0, NULL, NULL);
+-
+-    clFlush(que);
++                        &que, NULL);
+ 
+ #ifdef BENCHMARK
+     t = clock() - t;
+@@ -238,7 +240,7 @@ void gemm_offset_gpu(
+     printf("%s\t%d\n", "clblasSgemm", (int)time_taken);
+ #endif
+ 
+-    if (clErr != CL_SUCCESS)
++    if (clErr != CLBlastSuccess)
+     {
+         printf("gemm_gpu: clblasSgemm failed. Errorcode: %d\n", clErr);
+     }

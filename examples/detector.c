@@ -25,9 +25,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     for(i = 0; i < ngpus; ++i){
         srand(seed);
 #ifdef GPU
-	if(gpu_index >= 0) {
-        opencl_set_device(i);
-	}
+        if(gpu_index >= 0){
+            opencl_set_device(i);
+        }
 #endif
         nets[i] = load_network(cfgfile, weightfile, clear);
         nets[i]->learning_rate *= ngpus;
@@ -155,7 +155,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             if (ngpus == 1) {
                 loss = train_network(net, train);
             } else {
-                loss = train_networks(nets, ngpus, train, 4, gpus, ngpus);
+                loss = train_networks(nets, ngpus, train, 4);
             }
         }
         else {
@@ -173,6 +173,12 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 #else
         printf("%ld: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), what_time_is_it_now()-time, i*imgs);
 #endif
+#ifdef GPU
+        if (loss != loss && gpu_index >= 0) {
+            opencl_deinit(gpusg, ngpusg);
+        }
+#endif
+        if(loss != loss) { printf("NaN LOSS detected! No possible to continue!\n"); exit(-7); }
         if(i%100==0){
 #ifdef GPU
             if (gpu_index >= 0) {
@@ -209,10 +215,6 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     char buff[256];
     sprintf(buff, "%s/%s_final.weights", backup_directory, base);
     save_weights(net, buff);
-#ifdef GPU_FETCH
-    if (train.X.valsb_gpu.ptr) opencl_free(train.X.valsb_gpu);
-    if (train.y.valsb_gpu.ptr) opencl_free(train.y.valsb_gpu);
-#endif
     free(paths);
     free(plist);
     free(base);
@@ -400,8 +402,12 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
             int w = val[t].w;
             int h = val[t].h;
             int num = 0;
+            int nboxes = 0;
             detection *dets = get_network_boxes(net, w, h, thresh, .5, map, 0, &num);
-            if (nms) do_nms_sort(dets, num, classes, nms);
+            if (nms) {
+                if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+                else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+            }
             if (coco){
                 print_cocos(fp, path, dets, num, classes, w, h);
             } else if (imagenet){
@@ -527,7 +533,10 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
             int h = val[t].h;
             int nboxes = 0;
             detection *dets = get_network_boxes(net, w, h, thresh, .5, map, 0, &nboxes);
-            if (nms) do_nms_sort(dets, nboxes, classes, nms);
+            if (nms) {
+                if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+                else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+            }
             if (coco){
                 print_cocos(fp, path, dets, nboxes, classes, w, h);
             } else if (imagenet){
@@ -589,7 +598,10 @@ void validate_detector_recall(char *datacfg, char *cfgfile, char *weightfile)
         network_predict(net, sized.data);
         int nboxes = 0;
         detection *dets = get_network_boxes(net, sized.w, sized.h, thresh, .5, 0, 1, &nboxes);
-        if (nms) do_nms_obj(dets, nboxes, 1, nms);
+        if (nms) {
+            if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+            else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+        }
 
         char labelpath[4096];
         find_replace(path, "images", "labels", labelpath);
@@ -670,7 +682,10 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
         //printf("%d\n", nboxes);
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
-        if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
+        if (nms) {
+            if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+            else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+        }
         draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
         free_detections(dets, nboxes);
         if(outfile){
@@ -788,7 +803,10 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
             detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
             //printf("%d\n", nboxes);
             //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
-            if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
+            if (nms) {
+                if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+                else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+            }
             draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
             free_detections(dets, nboxes);
             free_image(im);
@@ -845,7 +863,10 @@ void censor_detector(char *datacfg, char *cfgfile, char *weightfile, int cam_ind
         int nboxes = 0;
         detection *dets = get_network_boxes(net, in.w, in.h, thresh, 0, 0, 0, &nboxes);
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
-        if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
+        if (nms) {
+            if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+            else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+        }
 
         for(i = 0; i < nboxes; ++i){
             if(dets[i].prob[class] > thresh){
@@ -921,7 +942,10 @@ void extract_detector(char *datacfg, char *cfgfile, char *weightfile, int cam_in
         network_predict(net, X);
         detection *dets = get_network_boxes(net, in.w, in.h, thresh, 0, 0, 1, &nboxes);
         //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
-        if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
+        if (nms) {
+            if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+            else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+        }
 
         for(i = 0; i < nboxes; ++i){
             if(dets[i].prob[class] > thresh){
@@ -962,7 +986,10 @@ void network_detect(network *net, image im, float thresh, float hier_thresh, flo
     layer l = net->layers[net->n-1];
     int nboxes = num_boxes(net);
     fill_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 0, dets);
-    if (nms) do_nms_sort(dets, nboxes, l.classes, nms);
+    if (nms) {
+        if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+        else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+    }
 }
 */
 

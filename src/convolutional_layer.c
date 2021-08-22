@@ -115,12 +115,13 @@ convolutional_layer make_convolutional_layer(int batch, int h, int w, int c, int
 	l.nweights = c/groups*n*size*size;
 	l.nbiases = n;
 
-	// float scale = 1./sqrt(size*size*c);
-	float scale = (float) sqrt(2. / (size * size * c / l.groups));
-	//printf("convscale %f\n", scale);
-	//scale = .02;
-	//for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_uniform(-1, 1);
-	for(i = 0; i < l.nweights; ++i) l.weights[i] = scale*rand_normal();
+    float scale = 1./sqrt(size*size*c);
+    //float scale = (float) sqrt(2. / (size * size * c / l.groups));
+    //printf("convscale %f\n", scale);
+    //float scale = .02;
+    for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_uniform(-1, 1);
+    //for(i = 0; i < l.nweights; ++i) l.weights[i] = scale*rand_normal();
+
 	int out_w = convolutional_out_width(l);
 	int out_h = convolutional_out_height(l);
 	l.out_h = out_h;
@@ -218,8 +219,8 @@ convolutional_layer make_convolutional_layer(int batch, int h, int w, int c, int
 			l.scales_gpu = opencl_make_array(l.scales, n);
 			l.scale_updates_gpu = opencl_make_array(l.scale_updates, n);
 
-			l.x_gpu = opencl_make_array(l.x, l.batch*out_h*out_w*n);
-			l.x_norm_gpu = opencl_make_array(l.x_norm, l.batch*out_h*out_w*n);
+			l.x_gpu = opencl_make_array(l.x, l.batch*l.outputs);
+			l.x_norm_gpu = opencl_make_array(l.x_norm, l.batch*l.outputs);
 		}
 	}
 #endif

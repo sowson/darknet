@@ -9,15 +9,18 @@
 # cp -r lib64/pkgconfig/* /usr/lib64/pkgconfig/
 # cp -r include/* /usr/include/
 #
+# Setup Mali-GPU OpenCL
+# git clone https://github.com/krrishnarraj/libopencl-stub
+# cd libopencl-stub; mkdir b; cd b; cmake ..; make; make install; cd ..; rm -r b;
+#
 # Setup VC4CL for RPI
 # https://github.com/doe300/VC4CL/wiki/How-to-get
 
 GPU=1
 GPU_FAST=1
 GPU_MULTI=0
-GPU_SAFE=1
 OPENCV=1
-OPENMP=1
+OPENMP=0
 # Choose only one (works if GPU=1): NVIDIA or AMD or ARM (for VC4CL or MaliGPU)
 NVIDIA=1
 AMD=0
@@ -52,7 +55,7 @@ else
 ifeq ($(ARM), 1)
 OPTS=-O2
 else
-OPTS=-O2
+OPTS=-O3
 endif
 endif
 
@@ -88,11 +91,6 @@ CFLAGS+= -DGPU -DOPENCL -I/usr/include/ -I/usr/local/cuda/include/
 LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
 LDFLAGS+= -L/usr/lib64
 endif
-endif
-
-ifeq ($(GPU_SAFE), 1)
-COMMON+= -DGPU_SAFE
-CFLAGS+= -DGPU_SAFE
 endif
 
 ifeq ($(GPU_FAST), 1)

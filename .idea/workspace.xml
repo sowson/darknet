@@ -18,9 +18,11 @@
   <component name="ChangeListManager">
     <list default="true" id="5c1f2602-dc6e-4bd5-b03e-d07ee3b8a66f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/darknet.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/darknet.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/data.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blas_kernels.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/blas_kernels.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/blas_kernels.cl" beforeDir="false" afterPath="$PROJECT_DIR$/src/blas_kernels.cl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gemm.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/gemm.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/network.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/opencl.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/opencl.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +51,7 @@
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="cmake.loaded.for.project" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../darknet-vNext" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../gpucomp" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -71,122 +73,117 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="bindarknet (Yv1Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo demo cfg/yolov1.cfg ../../../weights/yolov1.weights -c 0 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv1Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo demo cfg/yolov1.cfg ../../../weights/yolov1.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo test cfg/yolov1.cfg ../../../weights/yolov1.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo test cfg/yolov1.cfg ../../../weights/yolov1.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2Demo) (car_hw)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog_highway.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo) (car_hw)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog_highway.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2Demo) (car_low) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog_low_res.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo) (car_low) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog_low_res.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2Demo) (car_night)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_night.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo) (car_night)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_night.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights -c 0 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2y4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2y4-voc-test.cfg ../weights/yolov2y4-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2y4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2y4-voc-test.cfg ../weights/yolov2y4-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2y4SDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2y4s-voc-test.cfg ../weights/yolov2y4s-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2y4SDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2y4s-voc-test.cfg ../weights/yolov2y4s-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv2yRDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2-voc-test.cfg ../weights/yolov2-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2yRDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo voc.data yolov2-voc-test.cfg ../weights/yolov2-voc.weights ../car_vlog_25fps.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3-sppDemo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights -c 0 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3-sppDemo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3-spp)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3-spp)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights ../../../car_vlog.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights ../../../car_vlog.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights -c 0 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3SDemo) (car) (carla)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo yolo.data yolo-test.cfg weights/yolo.weights car_vlog.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3SDemo) (car) (carla)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo yolo.data yolo-test.cfg weights/yolo.weights car_vlog.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights ../../../car_vlog.mp4 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights ../../../car_vlog.mp4 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv4Demo) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights -c 0 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv4) (tiny)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4) (tiny)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (Yv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights data/dog.jpg -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (cifar) (try1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/6298_cat.png -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/6298_cat.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="bindarknet (cifar) (try2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/4882_frog.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (cifar) (try2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/4882_frog.png -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -196,87 +193,97 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try4)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/5238_bird.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (cifar) (try4)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/5238_bird.png -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try5)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/train/35728_automobile.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (cifar) (try5)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/train/35728_automobile.png -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv1) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="yolo train yolov1.cfg voc1.data backup1/yolov1.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv1) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data backup1/yolov1.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo train yolov1.cfg voc1.data darknet.conv.weights" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data darknet.conv.weights -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (Y4S) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2y4s-voc.cfg backup1/yolov2y4s-voc.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2) (Y4S) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2y4s-voc.cfg backup/yolov2y4s-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (Y4S)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2y4s-voc.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2) (Y4S)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2y4s-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (Y4) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2y4-voc.cfg backup1/yolov2y4-voc.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2) (Y4) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2y4-voc.cfg backup/yolov2y4-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (Y4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2y4-voc.cfg darknet19_448.conv.23" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2) (Y4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2y4-voc.cfg darknet19_448.conv.23 -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc1.data yolov2-voc.cfg backup1/yolov2-voc.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2-voc.cfg backup/yolov2-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train coco.data yolov2.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train coco.data yolov2-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv3) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc2.data yolov3-voc.cfg backup2/yolov3-voc.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv3) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg backup/yolov3-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train voc2.data yolov3-voc.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg backup/yolov4-tiny.backup" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv4) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv4) (cnt) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg backup/yolov4-tiny.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar) (d19)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/darknet19.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv4) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg backup/yolov4.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar) (valid)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier valid cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tYv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tcifar) (d19)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/darknet19.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="bindarknet (tcifar) (valid)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier valid cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -289,6 +296,11 @@
     <configuration name="libdarknet_s" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="libdarknet_s" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -331,6 +343,8 @@
       <item itemvalue="CMake Application.bindarknet (tYv3)" />
       <item itemvalue="CMake Application.bindarknet (tYv4) (cnt)" />
       <item itemvalue="CMake Application.bindarknet (tYv4)" />
+      <item itemvalue="CMake Application.bindarknet (tYv4) (cnt) (T)" />
+      <item itemvalue="CMake Application.bindarknet (tYv4) (T)" />
       <item itemvalue="CMake Application.bindarknet (tcifar) (d19)" />
       <item itemvalue="CMake Application.bindarknet (tcifar) (valid)" />
       <item itemvalue="CMake Application.bindarknet (tcifar)" />
@@ -738,6 +752,54 @@
       <workItem from="1625140981563" duration="24875000" />
       <workItem from="1625201190107" duration="465000" />
       <workItem from="1625207858726" duration="3254000" />
+      <workItem from="1627325637778" duration="78000" />
+      <workItem from="1627326692325" duration="152000" />
+      <workItem from="1627327714040" duration="1842000" />
+      <workItem from="1627329655494" duration="525000" />
+      <workItem from="1627330264848" duration="642000" />
+      <workItem from="1627331086059" duration="430000" />
+      <workItem from="1627660623565" duration="8453000" />
+      <workItem from="1627669318068" duration="2510000" />
+      <workItem from="1628357977570" duration="366000" />
+      <workItem from="1628358424983" duration="255000" />
+      <workItem from="1628358843275" duration="1705000" />
+      <workItem from="1628360658273" duration="2733000" />
+      <workItem from="1628363593112" duration="85000" />
+      <workItem from="1628364487723" duration="176000" />
+      <workItem from="1628365623118" duration="1204000" />
+      <workItem from="1628418326546" duration="1964000" />
+      <workItem from="1628424768891" duration="347000" />
+      <workItem from="1628425849117" duration="96000" />
+      <workItem from="1628646902309" duration="96000" />
+      <workItem from="1628680532729" duration="172000" />
+      <workItem from="1628681010792" duration="2532000" />
+      <workItem from="1628683672130" duration="1000" />
+      <workItem from="1628683748095" duration="1324000" />
+      <workItem from="1628685169349" duration="954000" />
+      <workItem from="1628686338524" duration="5839000" />
+      <workItem from="1628692476743" duration="219000" />
+      <workItem from="1628695288544" duration="531000" />
+      <workItem from="1628696056786" duration="506000" />
+      <workItem from="1628699897141" duration="150000" />
+      <workItem from="1628700593806" duration="595000" />
+      <workItem from="1628701512215" duration="103000" />
+      <workItem from="1628709861939" duration="245000" />
+      <workItem from="1628710909138" duration="120000" />
+      <workItem from="1628714450994" duration="365000" />
+      <workItem from="1628715167864" duration="707000" />
+      <workItem from="1628716268187" duration="1299000" />
+      <workItem from="1628717736490" duration="1083000" />
+      <workItem from="1628719273545" duration="324000" />
+      <workItem from="1628720296939" duration="1803000" />
+      <workItem from="1628740659303" duration="738000" />
+      <workItem from="1628741893862" duration="625000" />
+      <workItem from="1628743159737" duration="9000" />
+      <workItem from="1628743618163" duration="162000" />
+      <workItem from="1628744387758" duration="519000" />
+      <workItem from="1628745649042" duration="920000" />
+      <workItem from="1628755578325" duration="2141000" />
+      <workItem from="1628759057663" duration="1811000" />
+      <workItem from="1628761758275" duration="1475000" />
     </task>
     <servers />
   </component>
@@ -763,64 +825,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1636</line>
-          <option name="timeStamp" value="126" />
+          <url>file://$PROJECT_DIR$/src/opencl.c</url>
+          <line>134</line>
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1318</line>
-          <option name="timeStamp" value="129" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1519</line>
-          <option name="timeStamp" value="131" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1295</line>
-          <option name="timeStamp" value="134" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1626</line>
-          <option name="timeStamp" value="137" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>1345</line>
-          <option name="timeStamp" value="139" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>642</line>
-          <option name="timeStamp" value="141" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/data.c</url>
-          <line>599</line>
-          <option name="timeStamp" value="144" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/network.c</url>
-          <line>742</line>
-          <option name="timeStamp" value="152" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/network.c</url>
-          <line>717</line>
-          <option name="timeStamp" value="154" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/network.c</url>
-          <line>782</line>
-          <option name="timeStamp" value="155" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/network.c</url>
-          <line>909</line>
-          <option name="timeStamp" value="156" />
+          <url>file://$PROJECT_DIR$/src/blas_kernels.cl</url>
+          <line>44</line>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -829,7 +841,14 @@
             <option name="notifyOnTerminate" value="true" />
           </properties>
         </breakpoint>
+        <breakpoint enabled="true" type="CidrExceptionBreakpoint" />
       </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="opencl_device_id_t" language="ObjectiveC" />
+        <watch expression="opencl_device_ct_t" language="ObjectiveC" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

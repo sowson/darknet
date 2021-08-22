@@ -52,11 +52,15 @@ layer make_deconvolutional_layer(int batch, int h, int w, int c, int n, int size
 
     l.biases = calloc(n, sizeof(float));
     l.bias_updates = calloc(n, sizeof(float));
+
+    float scale = 1./sqrt(size*size*c);
     //float scale = n/(size*size*c);
     //printf("scale: %f\n", scale);
-    float scale = .02;
-    for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_normal();
+    //float scale = .02;
+    for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_uniform(-1, 1);
+    //for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_normal();
     //bilinear_init(l);
+
     for(i = 0; i < n; ++i){
         l.biases[i] = 0;
     }
@@ -142,8 +146,8 @@ layer make_deconvolutional_layer(int batch, int h, int w, int c, int n, int size
             l.scales_gpu = opencl_make_array(l.scales, n);
             l.scale_updates_gpu = opencl_make_array(l.scale_updates, n);
 
-            l.x_gpu = opencl_make_array(l.x, l.batch*l.out_h*l.out_w*n);
-            l.x_norm_gpu = opencl_make_array(l.x_norm, l.batch*l.out_h*l.out_w*n);
+            l.x_gpu = opencl_make_array(l.x, l.batch*l.outputs);
+            l.x_norm_gpu = opencl_make_array(l.x_norm, l.batch*l.outputs);
         }
     }
 #endif

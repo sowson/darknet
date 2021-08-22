@@ -301,6 +301,27 @@ image ipl_to_image(void *src) {
     return out;
 }
 
+int is_invalid_file_to_imread_cv(char *filename, int channels) {
+    if (filename) filename[strcspn(filename, "\n\r")] = 0;
+
+    Mat src;
+
+    try {
+        src = imread(filename, channels == 1 ? IMREAD_GRAYSCALE : IMREAD_COLOR);
+    }
+    catch(...) {
+
+    }
+
+    if (!src.data) {
+        return 1;
+    }
+
+    src.release();
+
+    return 0;
+}
+
 image load_image_cv(char *filename, int channels) {
     if (filename) filename[strcspn(filename, "\n\r")] = 0;
 
@@ -308,7 +329,12 @@ image load_image_cv(char *filename, int channels) {
     if ((pos = strchr(filename, '\r')) != NULL) *pos = '\0';
     if ((pos = strchr(filename, '\n')) != NULL) *pos = '\0';
 
-    Mat src = imread(filename, channels == 1 ? IMREAD_GRAYSCALE : IMREAD_COLOR);
+    Mat src;
+
+    try {
+        src = imread(filename, channels == 1 ? IMREAD_GRAYSCALE : IMREAD_COLOR);
+    }
+    catch(...) { }
 
     if (src.empty()) {
         fprintf(stderr, "Cannot load image \"%s\"\n", filename);

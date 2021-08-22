@@ -47,7 +47,7 @@ void activate_array_offset_gpu(cl_mem_ext x, int offset, int n, ACTIVATION a)
 {
 	dim2 dimN;
 	dimN = opencl_gridsize(n);
-	opencl_kernel(opencl_activate_array_kernel[opencl_device_id_t], dimN, 8, &x, sizeof(cl_mem), &offset, sizeof(cl_int), &n, sizeof(cl_int), &a, sizeof(cl_int));
+	opencl_kernel(opencl_activate_array_kernel[opencl_device_id_t], dimN, 8, &x.mem, sizeof(cl_mem), &offset, sizeof(cl_int), &n, sizeof(cl_int), &a, sizeof(cl_int));
 }
 
 void activate_array_gpu(cl_mem_ext x, int n, ACTIVATION a)
@@ -59,7 +59,7 @@ void gradient_array_offset_gpu(cl_mem_ext x, int offset, int n, ACTIVATION a, cl
 {
 	dim2 dimN;
 	dimN = opencl_gridsize(n);
-	opencl_kernel(opencl_gradient_array_kernel[opencl_device_id_t], dimN, 10, &x, sizeof(cl_mem), &offset, sizeof(cl_int), &n, sizeof(cl_int), &a, sizeof(cl_int), &delta, sizeof(cl_mem));
+	opencl_kernel(opencl_gradient_array_kernel[opencl_device_id_t], dimN, 10, &x.mem, sizeof(cl_mem), &offset, sizeof(cl_int), &n, sizeof(cl_int), &a, sizeof(cl_int), &delta.mem, sizeof(cl_mem));
 }
 
 void gradient_array_gpu(cl_mem_ext x, int n, ACTIVATION a, cl_mem_ext delta)

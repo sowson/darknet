@@ -115,6 +115,8 @@ void test_voxel(char *cfgfile, char *weightfile, char *filename)
     }
 }
 
+#ifdef OPENCV
+
 void extract_voxel_cv(char *lfile, char *rfile, char *prefix, int w, int h) {
     int shift = 0;
     int count = 0;
@@ -159,3 +161,5 @@ void run_voxel(int argc, char **argv)
     else if(0==strcmp(argv[2], "valid")) validate_voxel(cfg, weights);
     */
 }
+
+#endif

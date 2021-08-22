@@ -644,7 +644,7 @@ void test_yolo4(char *cfgfile, char *weightfile, char *filename, float thresh)
         network_predict(&net, X);
         detection *dets = 0;
         int nboxes = 0;
-        dets = avg_predictions(&net, &nboxes);
+        dets = get_network_boxes(&net, 1, 1, thresh, 0, 0, 0, &nboxes);
         printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
         get_detection_boxes(l, 1, 1, thresh, probs, boxes, 0);
         if (nms) do_nms_sort_v2(boxes, probs, l.side*l.side*l.n, l.classes, nms);

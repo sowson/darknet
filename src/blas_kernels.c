@@ -305,7 +305,7 @@ void scale_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int 
 
 void backward_scale_gpu(cl_mem_ext x_norm, cl_mem_ext delta, int batch, int n, int size, cl_mem_ext scale_updates)
 {
-    int tuning = n / 8; // (int)ceil(sqrt(n));
+    int tuning = (int)ceil(sqrt(n));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, n);
     dim2 dimGridL1;
@@ -313,7 +313,6 @@ void backward_scale_gpu(cl_mem_ext x_norm, cl_mem_ext delta, int batch, int n, i
 
     opencl_kernel_local(opencl_backward_scale_kernel[opencl_device_id_t], dimGridG1, dimGridL1, 16, &tuning, sizeof(cl_int), NULL, tuning*sizeof(cl_float), &batch, sizeof(cl_int), &n, sizeof(cl_int), &size, sizeof(cl_int), &x_norm.mem, sizeof(cl_mem), &delta.mem, sizeof(cl_mem), &scale_updates.mem, sizeof(cl_mem));
 }
-
 
 void add_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int size)
 {
@@ -327,7 +326,7 @@ void add_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int si
 
 void backward_bias_gpu(cl_mem_ext bias_updates, cl_mem_ext delta, int batch, int n, int size)
 {
-    int tuning = n / 8;
+    int tuning = (int)ceil(sqrt(n));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, n);
     dim2 dimGridL1;
@@ -335,7 +334,6 @@ void backward_bias_gpu(cl_mem_ext bias_updates, cl_mem_ext delta, int batch, int
 
     opencl_kernel_local(opencl_backward_bias_kernel[opencl_device_id_t], dimGridG1, dimGridL1, 14, &tuning, sizeof(cl_int), NULL, tuning*sizeof(cl_float), &batch, sizeof(cl_int), &n, sizeof(cl_int), &size, sizeof(cl_int), &bias_updates.mem, sizeof(cl_mem), &delta.mem, sizeof(cl_mem));
 }
-
 
 void adam_gpu(int n, cl_mem_ext x, cl_mem_ext m, cl_mem_ext v, float B1, float B2, float rate, float eps, int t)
 {
@@ -414,7 +412,7 @@ void l2normalize_gpu(cl_mem_ext x, cl_mem_ext dx, int batch, int filters, int sp
 
 void fast_mean_gpu(cl_mem_ext x, int batch, int filters, int spatial, cl_mem_ext mean)
 {
-    int tuning = filters / 8;
+    int tuning = (int)ceil(sqrt(filters));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -425,7 +423,7 @@ void fast_mean_gpu(cl_mem_ext x, int batch, int filters, int spatial, cl_mem_ext
 
 void fast_variance_gpu(cl_mem_ext x, cl_mem_ext mean, int batch, int filters, int spatial, cl_mem_ext variance)
 {
-    int tuning = filters / 8;
+    int tuning = (int)ceil(sqrt(filters));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -436,7 +434,7 @@ void fast_variance_gpu(cl_mem_ext x, cl_mem_ext mean, int batch, int filters, in
 
 void fast_mean_delta_gpu(cl_mem_ext delta, cl_mem_ext variance, int batch, int filters, int spatial, cl_mem_ext mean_delta)
 {
-    int tuning = filters / 8;
+    int tuning = (int)ceil(sqrt(filters));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -447,7 +445,7 @@ void fast_mean_delta_gpu(cl_mem_ext delta, cl_mem_ext variance, int batch, int f
 
 void fast_variance_delta_gpu(cl_mem_ext x, cl_mem_ext delta, cl_mem_ext mean, cl_mem_ext variance, int batch, int filters, int spatial, cl_mem_ext variance_delta)
 {
-    int tuning = filters / 8;
+    int tuning = (int)ceil(sqrt(filters));
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -886,7 +884,7 @@ void gemm_offset_gpu(
 {
     //printf("gemm gpu: %d %d %d %d %d %f %d %d %f %d\n",TA, TB, M, N, K, ALPHA, lda, ldb, BETA, ldc);
 
-    int tuning = 8;
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, M*N);
     dim2 dimGridL1;

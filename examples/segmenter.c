@@ -93,7 +93,7 @@ void train_segmenter(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
             if (ngpus == 1) {
                 loss = train_network(net, train);
             } else {
-                loss = train_networks(nets, ngpus, train, 4, gpus, ngpus);
+                loss = train_networks(nets, ngpus, train, 4);
             }
         }
         else {

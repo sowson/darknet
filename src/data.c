@@ -11,7 +11,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 list *get_paths(char *filename)
 {
-	//if (filename) filename[strcspn(filename, "\n\r")] = 0;
+	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     char *pos;
     if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
     if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
@@ -47,9 +47,10 @@ char **get_random_paths(char **paths, int n, int m)
 {
     char **random_paths = calloc(n, sizeof(char*));
     int i;
+    int index;
     pthread_mutex_lock(&mutex);
     for(i = 0; i < n; ++i){
-        int index = rand()%m;
+        index = rand()%m;
         random_paths[i] = paths[index];
         //if(i == 0) printf("%s\n", paths[index]);
     }
@@ -678,12 +679,6 @@ void free_data(data d)
 	}else{
 		free(d.X.vals);
         free(d.y.vals);
-#ifdef GPU_FETCH
-        if (d.X.valsb) free(d.X.valsb);
-        if (d.X.valsb_gpu.ptr) opencl_free_gpu_only(d.X.valsb_gpu);
-        if (d.y.valsb) free(d.y.valsb);
-        if (d.y.valsb_gpu.ptr) opencl_free_gpu_only(d.y.valsb_gpu);
-#endif
 	}
 }
 
@@ -1059,12 +1054,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int boxes, in
 	d.X.cols = h*w*3;
 
 	d.y = make_matrix(n, 5*boxes);
-#ifdef GPU_FETCH
-    if (n && !d.X.valsb) d.X.valsb = calloc(n*d.X.rows*d.X.cols, sizeof(float));
-    if (n && !d.X.valsb_gpu.ptr) d.X.valsb_gpu = opencl_make_array(d.X.valsb, n*d.X.rows*d.X.cols);
-    if (n && !d.y.valsb) d.y.valsb = calloc(n*d.y.rows*d.y.cols, sizeof(float));
-    if (n && !d.y.valsb_gpu.ptr) d.y.valsb_gpu = opencl_make_array(d.y.valsb, n*d.y.rows*d.y.cols);
-#endif
+
 	for(i = 0; i < n; ++i){
 		image orig = load_image_color(random_paths[i], 0, 0);
 		image sized = make_image(w, h, orig.c);
@@ -1101,16 +1091,8 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int boxes, in
 		fill_truth_detection(random_paths[i], boxes, d.y.vals[i], classes, flip, -dx/w, -dy/h, nw/w, nh/h);
 
 		free_image(orig);
-#ifdef GPU_FETCH
-        if (n && d.X.valsb) memcpy(d.X.valsb+i*d.X.cols, d.X.vals[i], d.X.cols*sizeof(float));
-        if (n && d.y.valsb) memcpy(d.y.valsb+i*d.y.cols, d.y.vals[i], d.y.cols*sizeof(float));
-#endif
 	}
 	free(random_paths);
-#ifdef GPU_FETCH
-    if (n && d.X.valsb) opencl_push_array_map(d.X.valsb_gpu, d.X.valsb, n*d.X.rows*d.X.cols);
-    if (n && d.y.valsb) opencl_push_array_map(d.y.valsb_gpu, d.y.valsb, n*d.y.rows*d.y.cols);
-#endif
     return d;
 }
 
@@ -1209,7 +1191,10 @@ pthread_t load_data(load_args args)
 	pthread_t thread;
 	struct load_args *ptr = calloc(1, sizeof(struct load_args));
 	*ptr = args;
-	if(pthread_create(&thread, 0, load_threads, ptr)) error("Thread creation failed");
+	if(pthread_create(&thread, 0, load_threads, ptr)) {
+	    error("Thread creation failed");
+        return 0;
+	}
 	return thread;
 }
 
@@ -1403,22 +1388,7 @@ matrix concat_matrix(matrix m1, matrix m2)
 	for(i = 0; i < m2.rows; ++i){
 		m.vals[count++] = m2.vals[i];
 	}
-#ifdef GPU_FETCH
-	if (m.valsb_gpu.len != m1.rows*m1.cols + m2.rows*m2.cols) {
-        m.valsb = calloc(m1.rows * m1.cols + m2.rows * m2.cols, sizeof(float));
-    }
-    count = 0;
-    for (i = 0; i < m1.rows * m1.cols; ++i) {
-        m.valsb[count++] = m1.valsb[i];
-    }
-    for (i = 0; i < m2.rows * m2.cols; ++i) {
-        m.valsb[count++] = m2.valsb[i];
-    }
-    if (m.valsb_gpu.len != m1.rows*m1.cols + m2.rows*m2.cols) {
-        if (count && m.valsb) m.valsb_gpu = opencl_make_array(m.valsb, m.rows * m.cols);
-        if (count && m.valsb) opencl_push_array_map(m.valsb_gpu, m.valsb, m.rows * m.cols);
-    }
-#endif
+
     return m;
 }
 
@@ -1508,13 +1478,7 @@ void get_next_batch(data d, int n, int offset, float *X, float *y)
 		if(y) memcpy(y+j*d.y.cols, d.y.vals[index], d.y.cols*sizeof(float));
 	}
 }
-#ifdef GPU_FETCH
-void get_next_batch_gpu(data d, int n, int offset, cl_mem_ext X, cl_mem_ext y)
-{
-    if (d.X.vals) copy_offset_gpu(n*d.X.cols, d.X.valsb_gpu, offset+n*d.X.cols, 1, X, 0, 1);
-    if (d.y.vals) copy_offset_gpu(n*d.y.cols, d.y.valsb_gpu, offset+n*d.y.cols, 1, y, 0, 1);
-}
-#endif
+
 void smooth_data(data d)
 {
 	int i, j;
