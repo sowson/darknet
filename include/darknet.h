@@ -11,9 +11,6 @@ typedef enum { UNUSED_DEF_VAL } UNUSED_ENUM_TYPE;
 extern int gpu_index;
 
 #ifdef GPU
-// EXPERIMENTS ONLY!
-// #define GPU_FETCH
-
 #include "opencl.h"
 #endif // GPU
 
@@ -348,6 +345,8 @@ struct layer {
 
     float scale_x_y;
     int objectness_smooth;
+    int new_coords;
+    int show_details;
     float max_delta;
     float uc_normalizer;
     float iou_normalizer;
@@ -774,10 +773,6 @@ typedef struct detection{
 typedef struct matrix{
     int rows, cols;
     float **vals;
-#ifdef GPU_FETCH
-    float *valsb;
-    cl_mem_ext valsb_gpu;
-#endif
 } matrix;
 
 
@@ -924,8 +919,8 @@ void forward_network_gpu(network *net);
 void backward_network_gpu(network *net);
 void update_network_gpu(network *net);
 
-float train_networks(network **nets, int n, data d, int interval, int* gpus, int ngpus);
-float train_networks_cgan(network **nets, int n, data d, data o, int interval, int* gpus, int ngpus);
+float train_networks(network **nets, int n, data d, int interval);
+float train_networks_cgan(network **nets, int n, data d, data o, int interval);
 void sync_nets(network **nets, int n, int interval);
 void harmless_update_network_gpu(network *net);
 #endif

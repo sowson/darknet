@@ -438,7 +438,9 @@ layer parse_yolo4(list *options, size_params params)
         printf("filters= in the [convolutional]-layer doesn't correspond to classes= or mask= in [yolo4]-layer \n");
         exit(EXIT_FAILURE);
     }
+    //assert(l.outputs == params.inputs);
 
+    l.show_details = option_find_int_quiet(options, "show_details", 1);
     l.max_delta = option_find_float_quiet(options, "max_delta", FLT_MAX);   // set 10
     char *cpc = option_find_str(options, "counters_per_class", 0);
     l.classes_multipliers = get_classes_multipliers_y4(cpc, classes, l.max_delta);
@@ -446,7 +448,8 @@ layer parse_yolo4(list *options, size_params params)
     l.label_smooth_eps = option_find_float_quiet(options, "label_smooth_eps", 0.0f);
     l.scale_x_y = option_find_float_quiet(options, "scale_x_y", 1);
     l.objectness_smooth = option_find_int_quiet(options, "objectness_smooth", 0);
-    l.iou_normalizer = option_find_float_quiet(options, "iou_normalizer", 0.75);
+    l.new_coords = option_find_int_quiet(options, "new_coords", 0);
+    l.iou_normalizer = option_find_float_quiet(options, "iou_normalizer", 0.75f);
     l.obj_normalizer = option_find_float_quiet(options, "obj_normalizer", 1);
     l.cls_normalizer = option_find_float_quiet(options, "cls_normalizer", 1);
     l.delta_normalizer = option_find_float_quiet(options, "delta_normalizer", 1);
@@ -470,7 +473,7 @@ layer parse_yolo4(list *options, size_params params)
         l.iou_thresh_kind = IOU;
     }
 
-    l.beta_nms = option_find_float_quiet(options, "beta_nms", 0.6);
+    l.beta_nms = option_find_float_quiet(options, "beta_nms", 0.6f);
     char *nms_kind = option_find_str_quiet(options, "nms_kind", "default");
     if (strcmp(nms_kind, "default") == 0) l.nms_kind = DEFAULT_NMS;
     else {
@@ -480,20 +483,20 @@ layer parse_yolo4(list *options, size_params params)
         printf("nms_kind: %s (%d), beta = %f \n", nms_kind, l.nms_kind, l.beta_nms);
     }
 
-    l.jitter = option_find_float(options, "jitter", .2);
-    l.resize = option_find_float_quiet(options, "resize", 1.0);
+    l.jitter = option_find_float(options, "jitter", .2f);
+    l.resize = option_find_float_quiet(options, "resize", 1.0f);
     l.focal_loss = option_find_int_quiet(options, "focal_loss", 0);
 
-    l.ignore_thresh = option_find_float(options, "ignore_thresh", .5);
+    l.ignore_thresh = option_find_float(options, "ignore_thresh", .5f);
     l.truth_thresh = option_find_float(options, "truth_thresh", 1);
-    l.iou_thresh = option_find_float_quiet(options, "iou_thresh", 1); // recommended to use iou_thresh=0.213 in [yolo]
+    l.iou_thresh = option_find_float_quiet(options, "iou_thresh", 1); // recommended to use iou_thresh=0.213 in [yolo4]
     l.random = option_find_float_quiet(options, "random", 0);
 
     l.track_history_size = option_find_int_quiet(options, "track_history_size", 5);
-    l.sim_thresh = option_find_float_quiet(options, "sim_thresh", 0.8);
+    l.sim_thresh = option_find_float_quiet(options, "sim_thresh", 0.8f);
     l.dets_for_track = option_find_int_quiet(options, "dets_for_track", 1);
     l.dets_for_show = option_find_int_quiet(options, "dets_for_show", 1);
-    l.track_ciou_norm = option_find_float_quiet(options, "track_ciou_norm", 0.01);
+    l.track_ciou_norm = option_find_float_quiet(options, "track_ciou_norm", 0.01f);
     int embedding_layer_id = option_find_int_quiet(options, "embedding_layer", 999999);
     if (embedding_layer_id < 0) embedding_layer_id = params.index + embedding_layer_id;
     if (embedding_layer_id != 999999) {
@@ -504,7 +507,7 @@ layer parse_yolo4(list *options, size_params params)
         l.embedding_size = le.n / l.n;
         printf(" embedding_size = %d \n", l.embedding_size);
         if (le.n % l.n != 0) {
-            printf(" Warning: filters=%d number in embedding_layer=%d isn't divisable by number of anchors %d \n", le.n, embedding_layer_id, l.n);
+            printf(" Warning: filters=%d number in embedding_layer=%d isn't divisible by number of anchors %d \n", le.n, embedding_layer_id, l.n);
             getchar();
         }
     }
@@ -623,7 +626,7 @@ layer parse_gaussian_yolo4(list *options, size_params params) // Gaussian_YOLOv3
 
     l.ignore_thresh = option_find_float(options, "ignore_thresh", .5);
     l.truth_thresh = option_find_float(options, "truth_thresh", 1);
-    l.iou_thresh = option_find_float_quiet(options, "iou_thresh", 1); // recommended to use iou_thresh=0.213 in [yolo]
+    l.iou_thresh = option_find_float_quiet(options, "iou_thresh", 1); // recommended to use iou_thresh=0.213 in [yolo4]
     l.random = option_find_float_quiet(options, "random", 0);
 
     char *map_file = option_find_str(options, "map", 0);
@@ -1110,7 +1113,11 @@ network *parse_network_cfg(char *filename)
     node *n = sections->front;
     if(!n) error("Config file has no sections");
     network *net = make_network(sections->size - 1);
-    net->gpu_index = opencl_device_id_t;
+#if GPU
+    if (gpu_index >= 0) {
+        net->gpu_index = opencl_device_id_t;
+    }
+#endif
     size_params params;
 
     section *s = (section *)n->val;

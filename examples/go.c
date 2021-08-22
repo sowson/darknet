@@ -178,7 +178,7 @@ void train_go(char *cfgfile, char *weightfile, char *filename, int *gpus, int ng
             if (ngpus == 1) {
                 loss = train_network(net, train);
             } else {
-                loss = train_networks(nets, ngpus, train, 10, gpus, ngpus);
+                loss = train_networks(nets, ngpus, train, 10);
             }
         }
         else {

@@ -749,7 +749,7 @@ int rand_int(int min, int max)
     int r = (rand()%(max - min + 1)) + min;
     return r;
 }
-
+/*
 // From http://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 float rand_normal()
 {
@@ -771,17 +771,15 @@ float rand_normal()
 
     return sqrt(rand1) * cos(rand2);
 }
+*/
 
-/*
-   float rand_normal()
-   {
-   int n = 12;
+float rand_normal() {
+   int n = 24;
    int i;
    float sum= 0;
    for(i = 0; i < n; ++i) sum += (float)rand()/RAND_MAX;
    return sum-n/2.;
-   }
- */
+}
 
 size_t rand_size_t()
 {

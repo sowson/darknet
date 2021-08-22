@@ -92,9 +92,7 @@ void *detect_in_thread(void *ptr)
 
     layer l = net->layers[net->n-1];
     float *X = buff_letter[(buff_index+2)%3].data;
-#ifdef GPU_FETCH
-    opencl_push_array_map(net->input_gpu, X, net->inputs);
-#endif
+
     network_predict(net, X);
 
     remember_network(net);
@@ -102,7 +100,10 @@ void *detect_in_thread(void *ptr)
     int nboxes = 0;
     dets = avg_predictions(net, &nboxes);
 
-    if (nms > 0) do_nms_obj(dets, nboxes, l.classes, nms);
+    if (nms) {
+        if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
+        else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
+    }
 
     //TODO: CHANGE!!!
     //printf("\033[2J");

@@ -170,7 +170,7 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
             if (ngpus == 1) {
                 closs = train_network(net, train);
             } else {
-                closs = train_networks(nets, ngpus, train, 4, gpus, ngpus);
+                closs = train_networks(nets, ngpus, train, 4);
             }
         }
         else {
@@ -200,7 +200,7 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
             if (ngpus == 1) {
                 aloss = train_network(net, train);
             } else {
-                aloss = train_networks(nets, ngpus, train, 4, gpus, ngpus);
+                aloss = train_networks(nets, ngpus, train, 4);
             }
         }
         else {

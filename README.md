@@ -1,5 +1,14 @@
-#[DarkNet-vNext Link](https://github.com/sowson/darknet-v2)
-If you are looking for engine that has all the same functions, but it is FASTER!?
+# Take a look 4 x GPUs on macOS (click on img to see video)
+
+[![4 x AMD Radeon RX 6900 XT on macOS 11.5.2](https://iblog.isowa.io/wp-content/uploads/2021/08/moria-scaled.jpeg)](https://www.youtube.com/watch?v=W6VOLjgwKNI)
+
+# CLBlast instead of clBLAS for GEMM
+
+git apply patches/clblast.patch
+
+# Darknet-vNext
+
+[DarkNet-vNext Link](https://github.com/sowson/darknet-vNext) If you are looking for engine that has all the same functions, but it is FASTER!
 
 # OpenCV 4
 

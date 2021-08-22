@@ -31,6 +31,7 @@ void *cv_create_image(image* buff);
 void cv_create_named_window(int fullscreen, int w, int h);
 int cv_show_image(image p, const char *name, int ms);
 void save_image_jpg_cv(image p, const char *name);
+int is_invalid_file_to_imread_cv(char *filename, int channels);
 void extract_voxel_cv(char *lfile, char *rfile, char *prefix, int w, int h);
 
 #ifdef __cplusplus

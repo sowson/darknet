@@ -19,10 +19,8 @@ int gpu_index = 1;
 
 #include "blas.h"
 
-
 int *gpusg;
 int ngpusg;
-
 __thread int opencl_device_id_t;
 __thread int opencl_device_ct_t;
 
@@ -134,8 +132,8 @@ const char* clGetErrorString(int errorCode) {
 const char* clCheckError(int errorCode) {
     const char* error = clGetErrorString(errorCode);
     printf("FATAL ERROR: %s\n", error);
-    //exit(-1);
-    //assert(0);
+    exit(-1);
+    assert(0);
     return error;
 }
 
@@ -219,7 +217,7 @@ void opencl_load_buffer(const char *buffer, const size_t size, cl_program *outpu
 {
     cl_int clErr;
 
-    *output = clCreateProgramWithSource(opencl_context, CL_TRUE,
+    *output = clCreateProgramWithSource(opencl_context, 1,
                                         (const char**)&buffer, &size, &clErr);
 
     if (clErr != CL_SUCCESS)
@@ -242,8 +240,11 @@ void opencl_load_buffer(const char *buffer, const size_t size, cl_program *outpu
             "-Werror "
             "-cl-std=CL1.2 "
             "-cl-opt-disable "
-            "-cl-denorms-are-zero "
-            "-cl-fp32-correctly-rounded-divide-sqrt "
+          //"-cl-denorms-are-zero "
+          //"-cl-fp32-correctly-rounded-divide-sqrt "
+            "-cl-no-signed-zeros "
+            "-cl-mad-enable "
+          //"-cl-fast-relaxed-math "
             , NULL, NULL);
 #endif
 
@@ -422,11 +423,11 @@ void opencl_deinit(int *gpus, int ngpus)
         dropout_kernel_release();
 
         clReleaseCommandQueue(opencl_queues[opencl_device_id_t]);
-
-        // BUG! for Multi-GPU
-        // free(cl_props);
-        clReleaseContext(opencl_context);
     }
+
+    clReleaseContext(opencl_context);
+
+    //free(cl_props);
 
     free(opencl_queues);
     free(opencl_devices);
@@ -486,8 +487,11 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
     clock_t t;
     t = clock();
 #endif
-    clErr = clEnqueueNDRangeKernel(que, kernel, 2,
-            globalOffset, globalItems, NULL, 0, NULL, NULL);
+
+    clErr = clEnqueueNDRangeKernel(que, kernel, 2, globalOffset, globalItems, NULL, 0, NULL, NULL);
+
+    clFlush(que);
+
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
@@ -496,10 +500,6 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
     clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
     printf("%s\t%d\n", kernelName, (int)time_taken);
     free(kernelName);
-#endif
-
-#ifdef GPU_SAFE
-    clFinish(que);
 #endif
 
     if (clErr != CL_SUCCESS)
@@ -579,8 +579,11 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
     clock_t t;
     t = clock();
 #endif
-    clErr = clEnqueueNDRangeKernel(que, kernel, 2,
-                                   globalOffset, globalItems, localItems, 0, NULL, NULL);
+
+    clErr = clEnqueueNDRangeKernel(que, kernel, 2, globalOffset, globalItems, localItems, 0, NULL, NULL);
+
+    clFlush(que);
+
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
@@ -589,10 +592,6 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
     clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
     printf("%s\t%d\n", kernelName, (int)time_taken);
     free(kernelName);
-#endif
-
-#ifdef GPU_SAFE
-    clFinish(que);
 #endif
 
     if (clErr != CL_SUCCESS)
@@ -691,9 +690,11 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
     buf.ptr = x;
 
     cl_int clErr;
+
     buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
+
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
 
@@ -707,9 +708,8 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
-#ifdef GPU_SAFE
-    clFinish(buf.que);
-#endif
+    buf.idx = opencl_device_id_t;
+
     return buf;
 }
 
@@ -727,9 +727,11 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
     buf.ptr = x;
 
     cl_int clErr;
+
     buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
+
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
 
@@ -743,9 +745,8 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
-#ifdef GPU_SAFE
-    clFinish(buf.que);
-#endif
+    buf.idx = opencl_device_id_t;
+
     return buf;
 }
 
@@ -757,30 +758,14 @@ void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueWriteBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
+        cl_int clErr = clEnqueueWriteBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not push array to device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
-        cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_WRITE,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
-        if (clErr != CL_SUCCESS) {
-            printf("could not map array to device. error: %s\n", clCheckError(clErr));
-            exit(1);
-        }
-        memcpy(x_gpu.map, x, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_push_int_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -792,30 +777,14 @@ void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueReadBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
+        cl_int clErr = clEnqueueReadBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not pull array from device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
-        cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_READ,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
-        if (clErr != CL_SUCCESS) {
-            printf("could not map array to device. error: %s\n", clCheckError(clErr));
-            exit(1);
-        }
-        memcpy(x, x_gpu.map, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_pull_int_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -827,30 +796,14 @@ void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueWriteBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
+        cl_int clErr = clEnqueueWriteBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not push array to device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
-        cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_WRITE,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
-        if (clErr != CL_SUCCESS) {
-            printf("could not map array to device. error: %s\n", clCheckError(clErr));
-            exit(1);
-        }
-        memcpy(x_gpu.map, x, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_push_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -862,30 +815,14 @@ void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueReadBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
+        cl_int clErr = clEnqueueReadBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not pull array from device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
-        cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_READ,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
-        if (clErr != CL_SUCCESS) {
-            printf("could not map array to device. error: %s\n", clCheckError(clErr));
-            exit(1);
-        }
-        memcpy(x, x_gpu.map, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
 #ifdef BENCHMARK
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_pull_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -897,20 +834,19 @@ void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueWriteBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not push array to device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
+        opencl_push_array(x_gpu, x, n);
+    }
+    else {
+        assert(n == x_gpu.len && x != x_gpu.ptr && x && n);
         cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_WRITE,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
+        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, CL_MAP_WRITE,
+                                       x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
         if (clErr != CL_SUCCESS) {
             printf("could not map array to device. error: %s\n", clCheckError(clErr));
             exit(1);
         }
         memcpy(x_gpu.map, x, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
+        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.mem, x_gpu.map, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
@@ -918,9 +854,6 @@ void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_push_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -932,20 +865,19 @@ void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.ptr == (void*)x) {
-        cl_int clErr = clEnqueueReadBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, 0, (n - x_gpu.off) * x_gpu.obs, x, 0, NULL, NULL);
-        if (clErr != CL_SUCCESS)
-            printf("could not pull array from device. error: %s\n", clCheckError(clErr));
-    } else {
-        // assert(0);
+        opencl_pull_array(x_gpu, x, n);
+    }
+    else {
+        assert(n == x_gpu.len && x != x_gpu.ptr && x && n);
         cl_int clErr;
-        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.org, CL_TRUE, CL_MAP_READ,
-                                       0, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
+        x_gpu.map = clEnqueueMapBuffer(x_gpu.que, x_gpu.mem, CL_TRUE, CL_MAP_READ,
+                                       x_gpu.off * x_gpu.obs, (n - x_gpu.off) * x_gpu.obs, 0, NULL, NULL, &clErr);
         if (clErr != CL_SUCCESS) {
             printf("could not map array to device. error: %s\n", clCheckError(clErr));
             exit(1);
         }
         memcpy(x, x_gpu.map, (n - x_gpu.off) * x_gpu.obs);
-        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.org, x_gpu.map, 0, NULL, NULL);
+        clErr = clEnqueueUnmapMemObject(x_gpu.que, x_gpu.mem, x_gpu.map, 0, NULL, NULL);
         if (clErr != CL_SUCCESS)
             printf("could not unmap array from device. error: %s\n", clCheckError(clErr));
     }
@@ -953,9 +885,6 @@ void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n)
     t = clock() - t;
     double time_taken = ((double)t);
     printf("%s\t%x\t%d\n", "opencl_pull_array", x_gpu.ptr, (int)time_taken);
-#endif
-#ifdef GPU_SAFE
-    clFinish(x_gpu.que);
 #endif
 }
 
@@ -976,7 +905,7 @@ void opencl_free(cl_mem_ext x_gpu)
     x_gpu.org = 0;
     x_gpu.map = 0;
     x_gpu.que = 0;
-    free(x_gpu.ptr);
+    if(x_gpu.ptr) free(x_gpu.ptr);
     x_gpu.ptr = 0;
 }
 

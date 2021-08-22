@@ -15,7 +15,8 @@ jobs:
 
     steps:
     - name: apt
-      run: sudo apt install libopencv-dev intel-opencl-icd libclblas-dev
+     #run: sudo apt install libopencv-dev pocl-opencl-icd libclblas-dev libomp-dev
+      run: sudo apt install libopencv-dev pocl-opencl-icd libclblas-dev
       
     - uses: actions/checkout@v2
     - name: Configure CMake

@@ -158,7 +158,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
             if (ngpus == 1) {
                 loss = train_network(net, train);
             } else {
-                loss = train_networks(nets, ngpus, train, 4, gpus, ngpus);
+                loss = train_networks(nets, ngpus, train, 4);
             }
         }
         else {
@@ -174,6 +174,12 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
 #else
         printf("%ld, %.3f: %f, %f avg, %f rate, %lf seconds, %ld images\n", get_current_batch(net), (float)(*net->seen)/N, loss, avg_loss, get_current_rate(net), what_time_is_it_now()-time, *net->seen);
 #endif
+#ifdef GPU
+        if (loss != loss && gpu_index >= 0) {
+            opencl_deinit(gpusg, ngpusg);
+        }
+#endif
+        if(loss != loss) { printf("NaN LOSS detected! No possible to continue!\n"); exit(-7); }
         free_data(train);
         if(*net->seen/N > epoch){
             epoch = *net->seen/N;

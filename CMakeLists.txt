@@ -13,7 +13,6 @@ option(DARKNET_OPENMP "Enable OpenMP support" OFF)
 option(DARKNET_GPU "Enable OpenCL support" ON)
 option(DARKNET_GPU_FAST "Enable OpenCL fast kernels support" ON)
 option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" OFF)
-option(DARKNET_GPU_SAFE "Enable OpenCL safe mode for trainings" OFF)
 option(DARKNET_ARM "Enable ARM support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
@@ -43,7 +42,7 @@ else()
 	list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
 	list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
 	list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
-	list (APPEND DARKNET_CFLAGS "-O2")
+	list (APPEND DARKNET_CFLAGS "-O3")
 endif()
 
 # Find OpenCV
@@ -82,11 +81,6 @@ endif()
 # GPU Training
 if (DARKNET_GPU)
 	list (APPEND DARKNET_DEFINITIONS GPU)
-endif()
-
-# Safe Training
-if (DARKNET_GPU_SAFE)
-	list (APPEND DARKNET_DEFINITIONS GPU_SAFE)
 endif()
 
 # Fast Training
