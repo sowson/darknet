@@ -28,7 +28,6 @@
 #include "region_layer.h"
 #include "yolo_layer.h"
 #include "yolo4_layer.h"
-#include "gaussian_yolo4_layer.h"
 #include "iseg_layer.h"
 #include "reorg_layer.h"
 #include "rnn_layer.h"
@@ -528,122 +527,6 @@ layer parse_yolo4(list *options, size_params params)
             float bias = atof(a);
             l.biases[i] = bias;
             a = strchr(a, ',') + 1;
-        }
-    }
-    return l;
-}
-
-int *parse_gaussian_yolo4_mask(char *a, int *num) // Gaussian_YOLOv3
-{
-    int *mask = 0;
-    if (a) {
-        int len = strlen(a);
-        int n = 1;
-        int i;
-        for (i = 0; i < len; ++i) {
-            if (a[i] == '#') break;
-            if (a[i] == ',') ++n;
-        }
-        mask = (int *)calloc(n, sizeof(int));
-        for (i = 0; i < n; ++i) {
-            int val = atoi(a);
-            mask[i] = val;
-            a = strchr(a, ',') + 1;
-        }
-        *num = n;
-    }
-    return mask;
-}
-
-
-layer parse_gaussian_yolo4(list *options, size_params params) // Gaussian_YOLOv3
-{
-    int classes = option_find_int(options, "classes", 20);
-    int max_boxes = option_find_int_quiet(options, "max", 200);
-    int total = option_find_int(options, "num", 1);
-    int num = total;
-
-    char *a = option_find_str(options, "mask", 0);
-    int *mask = parse_gaussian_yolo4_mask(a, &num);
-    layer l = make_gaussian_yolo4_layer(params.batch, params.w, params.h, num, total, mask, classes, max_boxes);
-    if (l.outputs != params.inputs) {
-        printf("Error: l.outputs == params.inputs \n");
-        printf("filters= in the [convolutional]-layer doesn't correspond to classes= or mask= in [Gaussian_yolo]-layer \n");
-        exit(EXIT_FAILURE);
-    }
-    //assert(l.outputs == params.inputs);
-    l.max_delta = option_find_float_quiet(options, "max_delta", FLT_MAX);   // set 10
-    char *cpc = option_find_str(options, "counters_per_class", 0);
-    l.classes_multipliers = get_classes_multipliers(cpc, classes, l.max_delta);
-
-    l.label_smooth_eps = option_find_float_quiet(options, "label_smooth_eps", 0.0f);
-    l.scale_x_y = option_find_float_quiet(options, "scale_x_y", 1);
-    l.objectness_smooth = option_find_int_quiet(options, "objectness_smooth", 0);
-    l.uc_normalizer = option_find_float_quiet(options, "uc_normalizer", 1.0);
-    l.iou_normalizer = option_find_float_quiet(options, "iou_normalizer", 0.75);
-    l.obj_normalizer = option_find_float_quiet(options, "obj_normalizer", 1.0);
-    l.cls_normalizer = option_find_float_quiet(options, "cls_normalizer", 1);
-    l.delta_normalizer = option_find_float_quiet(options, "delta_normalizer", 1);
-    char *iou_loss = option_find_str_quiet(options, "iou_loss", "mse");   //  "iou");
-
-    if (strcmp(iou_loss, "mse") == 0) l.iou_loss = MSE;
-    else if (strcmp(iou_loss, "giou") == 0) l.iou_loss = GIOU;
-    else if (strcmp(iou_loss, "diou") == 0) l.iou_loss = DIOU;
-    else if (strcmp(iou_loss, "ciou") == 0) l.iou_loss = CIOU;
-    else l.iou_loss = IOU;
-
-    char *iou_thresh_kind_str = option_find_str_quiet(options, "iou_thresh_kind", "iou");
-    if (strcmp(iou_thresh_kind_str, "iou") == 0) l.iou_thresh_kind = IOU;
-    else if (strcmp(iou_thresh_kind_str, "giou") == 0) l.iou_thresh_kind = GIOU;
-    else if (strcmp(iou_thresh_kind_str, "diou") == 0) l.iou_thresh_kind = DIOU;
-    else if (strcmp(iou_thresh_kind_str, "ciou") == 0) l.iou_thresh_kind = CIOU;
-    else {
-        fprintf(stderr, " Wrong iou_thresh_kind = %s \n", iou_thresh_kind_str);
-        l.iou_thresh_kind = IOU;
-    }
-
-    l.beta_nms = option_find_float_quiet(options, "beta_nms", 0.6);
-    char *nms_kind = option_find_str_quiet(options, "nms_kind", "default");
-    if (strcmp(nms_kind, "default") == 0) l.nms_kind = DEFAULT_NMS;
-    else {
-        if (strcmp(nms_kind, "greedynms") == 0) l.nms_kind = GREEDY_NMS;
-        else if (strcmp(nms_kind, "diounms") == 0) l.nms_kind = DIOU_NMS;
-        else if (strcmp(nms_kind, "cornersnms") == 0) l.nms_kind = CORNERS_NMS;
-        else l.nms_kind = DEFAULT_NMS;
-        printf("nms_kind: %s (%d), beta = %f \n", nms_kind, l.nms_kind, l.beta_nms);
-    }
-
-    char *yolo_point = option_find_str_quiet(options, "yolo_point", "center");
-    if (strcmp(yolo_point, "left_top") == 0) l.yolo4_point = YOLO4_LEFT_TOP;
-    else if (strcmp(yolo_point, "right_bottom") == 0) l.yolo4_point = YOLO4_RIGHT_BOTTOM;
-    else l.yolo4_point = YOLO4_CENTER;
-
-    fprintf(stderr, "[Gaussian_yolo] iou loss: %s (%d), iou_norm: %2.2f, obj_norm: %2.2f, cls_norm: %2.2f, delta_norm: %2.2f, scale: %2.2f, point: %d\n",
-            iou_loss, l.iou_loss, l.iou_normalizer, l.obj_normalizer, l.cls_normalizer, l.delta_normalizer, l.scale_x_y, l.yolo4_point);
-
-    l.jitter = option_find_float(options, "jitter", .2);
-    l.resize = option_find_float_quiet(options, "resize", 1.0);
-
-    l.ignore_thresh = option_find_float(options, "ignore_thresh", .5);
-    l.truth_thresh = option_find_float(options, "truth_thresh", 1);
-    l.iou_thresh = option_find_float_quiet(options, "iou_thresh", 1); // recommended to use iou_thresh=0.213 in [yolo4]
-    l.random = option_find_float_quiet(options, "random", 0);
-
-    char *map_file = option_find_str(options, "map", 0);
-    if (map_file) l.map = read_map(map_file);
-
-    a = option_find_str(options, "anchors", 0);
-    if(a){
-        int len = strlen(a);
-        int n = 1;
-        int i;
-        for(i = 0; i < len; ++i){
-            if (a[i] == ',') ++n;
-        }
-        for(i = 0; i < n; ++i){
-            float bias = atof(a);
-            l.biases[i] = bias;
-            a = strchr(a, ',')+1;
         }
     }
     return l;
@@ -1177,9 +1060,6 @@ network *parse_network_cfg(char *filename)
             l = parse_yolo(options, params);
         }else if (lt == YOLO4) {
             l = parse_yolo4(options, params);
-            l.keep_delta_gpu = 1;
-        }else if (lt == GAUSSIAN_YOLO) {
-            l = parse_gaussian_yolo4(options, params);
             l.keep_delta_gpu = 1;
         }else if(lt == ISEG){
             l = parse_iseg(options, params);

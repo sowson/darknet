@@ -9,7 +9,6 @@
 #include "region_layer.h"
 #include "yolo_layer.h"
 #include "yolo4_layer.h"
-#include "gaussian_yolo4_layer.h"
 #include "normalization_layer.h"
 #include "maxpool_layer.h"
 #include "reorg_layer.h"
@@ -492,8 +491,6 @@ int resize_network(network *net, int w, int h)
 			resize_yolo_layer(&l, w, h);
         }else if(l.type == YOLO4){
 			resize_yolo4_layer(&l, w, h);
-        }else if (l.type == GAUSSIAN_YOLO) {
-            resize_gaussian_yolo4_layer(&l, w, h);
 		}else if(l.type == ROUTE){
 			resize_route_layer(&l, net);
 		}else if(l.type == SHORTCUT){
@@ -632,6 +629,43 @@ float *network_predict(network *net, float *input)
 	return out;
 }
 
+float *get_network_output_layer_gpu(network net, int i)
+{
+    layer l = net.layers[i];
+    if(l.type != REGION && l.type != YOLO && l.type != YOLO4) opencl_pull_array(l.output_gpu, l.output, l.outputs*l.batch);
+    return l.output;
+}
+
+float *get_network_output_gpu(network net)
+{
+    int i;
+    for(i = net.n-1; i > 0; --i) if(net.layers[i].type != COST) break;
+    return get_network_output_layer_gpu(net, i);
+}
+
+float *get_network_output_y4(network net)
+{
+#ifdef GPU
+    if (gpu_index >= 0) return get_network_output_gpu(net);
+#endif
+    int i;
+    for(i = net.n-1; i > 0; --i) if(net.layers[i].type != COST) break;
+    return net.layers[i].output;
+}
+
+float *network_predict_y4(network *net, float *input)
+{
+    net->index = 0;
+    //net->input = input;
+    memcpy(net->input, input, net->inputs * net->batch * sizeof(float));
+    net->truth = 0;
+    net->train = 0;
+    net->delta = 0;
+    forward_network(net);
+    float *out = get_network_output_y4(*net);
+    return out;
+}
+
 int num_detections(network *net, float thresh)
 {
 	int i;
@@ -691,11 +725,191 @@ void fill_network_boxes(network *net, int w, int h, float thresh, float hier, in
 	}
 }
 
+int num_detections_y4(network *net, float thresh)
+{
+    int i;
+    int s = 0;
+    for (i = 0; i < net->n; ++i) {
+        layer l = net->layers[i];
+        if (l.type == YOLO) {
+            s += yolo_num_detections(l, thresh);
+        }
+        if (l.type == YOLO4) {
+            s += yolo4_num_detections(l, thresh);
+        }
+        if (l.type == DETECTION || l.type == REGION) {
+            s += l.w*l.h*l.n;
+        }
+    }
+    return s;
+}
+
+int num_detections_batch_y4(network *net, float thresh, int batch)
+{
+    int i;
+    int s = 0;
+    for (i = 0; i < net->n; ++i) {
+        layer l = net->layers[i];
+        if (l.type == YOLO4) {
+            s += yolo4_num_detections_batch(l, thresh, batch);
+        }
+        if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+            s += l.w*l.h*l.n;
+        }
+    }
+    return s;
+}
+
+detection *make_network_boxes_y4(network *net, float thresh, int *num)
+{
+    int i;
+    layer l = net->layers[net->n - 1];
+    for (i = 0; i < net->n; ++i) {
+        layer l_tmp = net->layers[i];
+        if (l_tmp.type == YOLO || l_tmp.type == YOLO4 || l_tmp.type == DETECTION || l_tmp.type == REGION) {
+            l = l_tmp;
+            break;
+        }
+    }
+
+    int nboxes = num_detections_y4(net, thresh);
+    if (num) *num = nboxes;
+    detection* dets = (detection*)calloc(nboxes, sizeof(detection));
+    for (i = 0; i < nboxes; ++i) {
+        dets[i].prob = (float*)calloc(l.classes, sizeof(float));
+        // tx,ty,tw,th uncertainty
+        dets[i].uc = NULL;
+
+        if (l.coords > 4) dets[i].mask = (float*)calloc(l.coords - 4, sizeof(float));
+        else dets[i].mask = NULL;
+
+        if(l.embedding_output) dets[i].embeddings = (float*)calloc(l.embedding_size, sizeof(float));
+        else dets[i].embeddings = NULL;
+        dets[i].embedding_size = l.embedding_size;
+    }
+    return dets;
+}
+
+detection *make_network_boxes_batch_y4(network *net, float thresh, int *num, int batch)
+{
+    int i;
+    layer l = net->layers[net->n - 1];
+    for (i = 0; i < net->n; ++i) {
+        layer l_tmp = net->layers[i];
+        if (l_tmp.type == YOLO || l_tmp.type == YOLO4 || l_tmp.type == DETECTION || l_tmp.type == REGION) {
+            l = l_tmp;
+            break;
+        }
+    }
+
+    int nboxes = num_detections_batch_y4(net, thresh, batch);
+    assert(num != NULL);
+    *num = nboxes;
+    detection* dets = (detection*)calloc(nboxes, sizeof(detection));
+    for (i = 0; i < nboxes; ++i) {
+        dets[i].prob = (float*)calloc(l.classes, sizeof(float));
+        // tx,ty,tw,th uncertainty
+        dets[i].uc = NULL;
+
+        if (l.coords > 4) dets[i].mask = (float*)calloc(l.coords - 4, sizeof(float));
+        else dets[i].mask = NULL;
+
+        if (l.embedding_output) dets[i].embeddings = (float*)calloc(l.embedding_size, sizeof(float));
+        else dets[i].embeddings = NULL;
+        dets[i].embedding_size = l.embedding_size;
+    }
+    return dets;
+}
+
+void custom_get_region_detections(layer l, int w, int h, int net_w, int net_h, float thresh, int *map, float hier, int relative, detection *dets, int letter)
+{
+    box* boxes = (box*)calloc(l.w * l.h * l.n, sizeof(box));
+    float** probs = (float**)calloc(l.w * l.h * l.n, sizeof(float*));
+    int i, j;
+    for (j = 0; j < l.w*l.h*l.n; ++j) probs[j] = (float*)calloc(l.classes, sizeof(float));
+    get_region_boxes(l, 1, 1, thresh, probs, boxes, 0, map);
+    for (j = 0; j < l.w*l.h*l.n; ++j) {
+        dets[j].classes = l.classes;
+        dets[j].bbox = boxes[j];
+        dets[j].objectness = 1;
+        for (i = 0; i < l.classes; ++i) {
+            dets[j].prob[i] = probs[j][i];
+        }
+    }
+
+    free(boxes);
+    free_ptrs((void **)probs, l.w*l.h*l.n);
+
+    //correct_region_boxes(dets, l.w*l.h*l.n, w, h, net_w, net_h, relative);
+    correct_yolo4_boxes(dets, l.w*l.h*l.n, w, h, net_w, net_h, relative, letter);
+}
+
+void fill_network_boxes_y4(network *net, int w, int h, float thresh, float hier, int *map, int relative, detection *dets, int letter)
+{
+    int prev_classes = -1;
+    int j;
+    for (j = 0; j < net->n; ++j) {
+        layer l = net->layers[j];
+        if (l.type == YOLO || l.type == YOLO4) {
+            int count = get_yolo4_detections(l, w, h, net->w, net->h, thresh, map, relative, dets, letter);
+            dets += count;
+            if (prev_classes < 0) prev_classes = l.classes;
+            else if (prev_classes != l.classes) {
+                printf(" Error: Different [yolo] layers have different number of classes = %d and %d - check your cfg-file! \n",
+                       prev_classes, l.classes);
+            }
+        }
+        if (l.type == REGION) {
+            custom_get_region_detections(l, w, h, net->w, net->h, thresh, map, hier, relative, dets, letter);
+            //get_region_detections(l, w, h, net->w, net->h, thresh, map, hier, relative, dets);
+            dets += l.w*l.h*l.n;
+        }
+        if (l.type == DETECTION) {
+            get_detection_detections(l, w, h, thresh, dets);
+            dets += l.w*l.h*l.n;
+        }
+    }
+}
+
+void fill_network_boxes_batch_y4(network *net, int w, int h, float thresh, float hier, int *map, int relative, detection *dets, int letter, int batch)
+{
+    int prev_classes = -1;
+    int j;
+    for (j = 0; j < net->n; ++j) {
+        layer l = net->layers[j];
+        if (l.type == YOLO || l.type == YOLO4) {
+            int count = get_yolo4_detections_batch(l, w, h, net->w, net->h, thresh, map, relative, dets, letter, batch);
+            dets += count;
+            if (prev_classes < 0) prev_classes = l.classes;
+            else if (prev_classes != l.classes) {
+                printf(" Error: Different [yolo] layers have different number of classes = %d and %d - check your cfg-file! \n",
+                       prev_classes, l.classes);
+            }
+        }
+        if (l.type == REGION) {
+            custom_get_region_detections(l, w, h, net->w, net->h, thresh, map, hier, relative, dets, letter);
+            //get_region_detections(l, w, h, net->w, net->h, thresh, map, hier, relative, dets);
+            dets += l.w*l.h*l.n;
+        }
+        if (l.type == DETECTION) {
+            get_detection_detections(l, w, h, thresh, dets);
+            dets += l.w*l.h*l.n;
+        }
+    }
+}
+
 detection *get_network_boxes(network *net, int w, int h, float thresh, float hier, int *map, int relative, int *num)
 {
 	detection *dets = make_network_boxes(net, thresh, num);
 	fill_network_boxes(net, w, h, thresh, hier, map, relative, dets);
 	return dets;
+}
+
+detection *get_network_boxes_y4(network *net, int w, int h, float thresh, float hier, int *map, int relative, int *num, int letter)
+{
+    detection *dets = make_network_boxes_y4(net, thresh, num);
+    fill_network_boxes_y4(net, w, h, thresh, hier, map, relative, dets, letter);
+    return dets;
 }
 
 void free_detections(detection *dets, int n)

@@ -878,13 +878,20 @@ void correct_yolo4_boxes(detection *dets, int n, int w, int h, int netw, int net
 }
 */
 
+static int entry_index_y4(layer l, int batch, int location, int entry)
+{
+    int n =   location / (l.w*l.h);
+    int loc = location % (l.w*l.h);
+    return batch*l.outputs + n*l.w*l.h*(4+l.classes+1) + entry*l.w*l.h + loc;
+}
+
 int yolo4_num_detections(layer l, float thresh)
 {
     int i, n;
     int count = 0;
     for(n = 0; n < l.n; ++n){
         for (i = 0; i < l.w*l.h; ++i) {
-            int obj_index  = entry_index(l, 0, n*l.w*l.h + i, 4);
+            int obj_index  = entry_index_y4(l, 0, n*l.w*l.h + i, 4);
             if(l.output[obj_index] > thresh){
                 ++count;
             }

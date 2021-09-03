@@ -710,6 +710,8 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     buf.idx = opencl_device_id_t;
 
+    opencl_pull_array(buf, x, n);
+
     return buf;
 }
 
@@ -746,6 +748,8 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
     buf.que = opencl_queues[opencl_device_id_t];
 
     buf.idx = opencl_device_id_t;
+
+    opencl_pull_int_array(buf, x, n);
 
     return buf;
 }

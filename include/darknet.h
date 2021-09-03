@@ -97,7 +97,6 @@ typedef enum {
     XNOR,
     REGION,
     YOLO,
-    GAUSSIAN_YOLO,
     ISEG,
     REORG,
     REORG_OLD,
@@ -1047,11 +1046,15 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 #endif
 
 void draw_detections_y4(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps);
+void draw_detections_v3(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output);
 
 matrix network_predict_data(network *net, data test);
 image **load_alphabet();
 image get_network_image(network *net);
 float *network_predict(network *net, float *input);
+float *network_predict_y4(network *net, float *input);
+
+void get_region_boxes(layer l, int w, int h, float thresh, float **probs, box *boxes, int only_objectness, int *map);
 
 int network_width(network *net);
 int network_height(network *net);
