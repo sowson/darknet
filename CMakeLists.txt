@@ -17,7 +17,7 @@ option(DARKNET_ARM "Enable ARM support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
 option(DARKNET_TESTING "Build the unit tests" OFF)
-option(DARKNET_DEBUG "Enable debug mode" OFF)
+option(DARKNET_DEBUG "Enable debug mode" ON)
 option(DARKNET_STATIC "Build static library" ON)
 option(DARKNET_SHARED "Build shared library" ON)
 option(DARKNET_NO_BINARY "Do not build binary" OFF)
@@ -178,7 +178,6 @@ set (DARKNET_SOURCES
     "examples/yolo.c"
     "src/yolo_layer.c"
     "src/yolo4_layer.c"
-    "src/gaussian_yolo4_layer.c"
     "src/upsample_layer.c"
     "src/logistic_layer.c"
     "src/l2norm_layer.c"
@@ -235,7 +234,6 @@ set (DARKNET_PUBLIC_HEADERS
     "src/opencl.h"
     "src/yolo_layer.h"
     "src/yolo4_layer.h"
-    "src/gaussian_yolo4_layer.h"
     "src/upsample_layer.h"
     "src/logistic_layer.h"
     "src/l2norm_layer.h"

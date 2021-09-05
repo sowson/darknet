@@ -676,17 +676,32 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
         float *X = sized.data;
         time=what_time_is_it_now();
-        network_predict(net, X);
+        if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+            network_predict(net, X);
+        }
+        if (l.type == YOLO4) {
+            network_predict_y4(net, X);
+        }
         printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now()-time);
         int nboxes = 0;
-        detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+        detection *dets = 0;
+        if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+            dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+        }
+        if (l.type == YOLO4) {
+            dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+        }
         //printf("%d\n", nboxes);
-        //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
         if (nms) {
             if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
             else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
         }
-        draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+        if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+            draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+        }
+        if (l.type == YOLO4) {
+            draw_detections_v3(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+        }
         free_detections(dets, nboxes);
         if(outfile){
             save_image(im, outfile);
