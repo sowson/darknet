@@ -6,7 +6,7 @@
 
 extern void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 extern void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);
-
+extern void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir);
 extern void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir);
 extern void run_yolo(int argc, char **argv);
 extern void run_yolo4(int argc, char **argv);
@@ -210,7 +210,19 @@ void print_weights(char *cfgfile, char *weightfile, int n)
     }
     //printf("]");
 }
-
+/* TODO!!! CHECK!!!
+void partial(char *cfgfile, char *weightfile, char *outfile, int max)
+{
+    gpu_index = -1;
+    network net = parse_network_cfg_custom(cfgfile, 1, 1);
+    if(weightfile){
+        load_weights_upto(&net, weightfile, max);
+    }
+    *net.seen = 0;
+    *net.cur_iteration = 0;
+    save_weights_upto(net, outfile, max, 0);
+}
+*/
 void rescale_net(char *cfgfile, char *weightfile, char *outfile)
 {
     gpu_index = -1;
@@ -522,6 +534,8 @@ int main(int argc, char **argv)
         partial(argv[2], argv[3], argv[4], atoi(argv[5]));
     } else if (0 == strcmp(argv[1], "average")){
         average(argc, argv);
+    } else if (0 == strcmp(argv[1], "partial")){
+        partial(argv[2], argv[3], argv[4], atoi(argv[5]));
     } else if (0 == strcmp(argv[1], "visualize")){
         visualize(argv[2], (argc > 3) ? argv[3] : 0);
     } else if (0 == strcmp(argv[1], "mkimg")){

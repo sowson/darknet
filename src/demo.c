@@ -119,7 +119,7 @@ void *detect_in_thread(void *ptr)
     }
     if (l.type == YOLO4) {
         //draw_detections_y4(image im, int num, float thresh, box *boxes, float **probs, char **names, image **alphabet, int classes)
-        draw_detections_y4(display, dets, nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, fps);
+        draw_detections(display, dets, nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, fps);
     }
 
     free_detections(dets, nboxes);

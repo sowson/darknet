@@ -689,7 +689,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
             dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
         }
         if (l.type == YOLO4) {
-            dets = get_network_boxes_y4(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes, 1);
+            dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
         }
         //printf("%d\n", nboxes);
         if (nms) {
@@ -700,7 +700,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
             draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
         }
         if (l.type == YOLO4) {
-            draw_detections_y4(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            draw_detections_v3(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
         }
         free_detections(dets, nboxes);
         if(outfile){

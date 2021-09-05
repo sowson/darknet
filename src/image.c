@@ -385,7 +385,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
     int i;
     for (i = 0; i < selected_detections_num; ++i) {
         const int best_class = selected_detections[i].best_class;
-        printf("%s: %.0f%%", names[best_class],    selected_detections[i].det.prob[best_class] * 100);
+        //printf("%s: %.0f%%", names[best_class], selected_detections[i].det.prob[best_class] * 100);
         if (ext_output)
             printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
                    round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
@@ -396,8 +396,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
         int j;
         for (j = 0; j < classes; ++j) {
             if (selected_detections[i].det.prob[j] > thresh && j != best_class) {
-                printf("%s: %.0f%%", names[j], selected_detections[i].det.prob[j] * 100);
-
+                //printf("%s: %.0f%%", names[j], selected_detections[i].det.prob[j] * 100);
                 if (ext_output)
                     printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
                            round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
@@ -412,7 +411,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
     // image output
     qsort(selected_detections, selected_detections_num, sizeof(*selected_detections), compare_by_probs);
     for (i = 0; i < selected_detections_num; ++i) {
-        int width = im.h * .002;
+        int width = im.h * .004;
         if (width < 1)
             width = 1;
 
@@ -490,9 +489,9 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
                     strcat(labelstr, names[j]);
                 }
             }
-            image label = get_label_v3(alphabet, labelstr, (im.h*.02));
-            //draw_label(im, top + width, left, label, rgb);
-            draw_weighted_label(im, top + width, left, label, rgb, 0.7);
+            image label = get_label_v3(alphabet, labelstr, (im.h*.002));
+            draw_label(im, top + width, left, label, rgb);
+            //draw_weighted_label(im, top + width, left, label, rgb, 1.0);
             free_image(label);
         }
         if (selected_detections[i].det.mask) {
@@ -535,7 +534,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
         }
 
         if(class >= 0) {
-            int width = im.h * .002;
+            int width = im.h * .004;
 
             //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
             int offset = class * 123457 % classes;
@@ -607,7 +606,7 @@ void draw_detections_y4(image im, detection *dets, int num, float thresh, char *
         int class_id = max_index(dets[i].prob, classes);
         float prob = dets[i].prob[class_id];
         if(prob > thresh){
-            int width = im.h * .002;
+            int width = im.h * .004;
 
             if(0){
                 width = pow(prob, 1./2.)*10+1;
@@ -638,6 +637,7 @@ void draw_detections_y4(image im, detection *dets, int num, float thresh, char *
             //printf("\n");
 
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
+
             if (alphabet) {
                 char label_txt[512];
                 char percent[5];
@@ -645,12 +645,13 @@ void draw_detections_y4(image im, detection *dets, int num, float thresh, char *
                 gcvt(prob * 100, 5, percent);
                 strcat(label_txt, " ");
                 strcat(label_txt, percent);
-                image label = get_label(alphabet, label_txt, (im.h*.03)/8);
+                image label = get_label_y4(alphabet, label_txt, (im.h*.0002));
                 draw_label(im, top + width, left, label, rgb);
             }
+
             if (alphabet && i == 0 && fps != 0) {
                 char lfps[5];
-                image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h*0.3)/8);
+                image ilfps = get_label_y4(alphabet, gcvt(fps, 5, lfps), (im.h*0.0002));
                 draw_label(im, 0, 0, ilfps, rgb);
                 free_image(ilfps);
             }

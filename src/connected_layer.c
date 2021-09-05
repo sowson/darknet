@@ -28,6 +28,14 @@ layer make_connected_layer(int batch, int inputs, int outputs, ACTIVATION activa
 	l.out_h = 1;
 	l.out_w = 1;
 	l.out_c = outputs;
+    l.n = l.out_c;
+    l.size = 1;
+    l.stride = l.stride_x = l.stride_y = 1;
+    l.pad = 0;
+    l.activation = activation;
+    l.learning_rate_scale = 1;
+    l.groups = 1;
+    l.dilation = 1;
 
 	l.output = calloc(batch*outputs, sizeof(float));
 	l.delta = calloc(batch*outputs, sizeof(float));

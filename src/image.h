@@ -53,6 +53,7 @@ void letterbox_image_into(image im, int w, int h, image boxed);
 image resize_max(image im, int max);
 void translate_image(image m, float s);
 void embed_image(image source, image dest, int dx, int dy);
+void embed_image_y4(image source, image dest, int dx, int dy);
 void place_image(image im, int w, int h, int dx, int dy, image canvas);
 void saturate_image(image im, float sat);
 void exposure_image(image im, float sat);

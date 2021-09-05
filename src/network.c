@@ -569,6 +569,18 @@ layer get_network_detection_layer(network *net)
 	return l;
 }
 
+int get_network_output_size(network net)
+{
+    int i;
+    for(i = net.n-1; i > 0; --i) if(net.layers[i].type != COST) break;
+    return net.layers[i].outputs;
+}
+
+int get_network_input_size(network net)
+{
+    return net.layers[0].inputs;
+}
+
 image get_network_image_layer(network *net, int i)
 {
 	layer l = net->layers[i];
