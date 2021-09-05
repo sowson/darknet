@@ -802,8 +802,8 @@ void correct_yolo4_boxes(detection *dets, int n, int w, int h, int netw, int net
             new_h = (h*netw) / w;
         }
         else {
-            new_h = neth;
-            new_w = (w*neth) / h;
+            new_h = h == 0 ? 0 : neth;
+            new_w = h == 0 ? 0 : (w*neth) / h;
         }
     }
     else {

@@ -1176,8 +1176,8 @@ void letterbox_image_into(image im, int w, int h, image boxed)
         new_w = w;
         new_h = (im.h * w)/im.w;
     } else {
-        new_h = h;
-        new_w = (im.w * h)/im.h;
+        new_h = im.h == 0 ? 0 : h;
+        new_w = im.h == 0 ? 0 : (im.w * h)/im.h;
     }
     image resized = resize_image(im, new_w, new_h);
     embed_image(resized, boxed, (w-new_w)/2, (h-new_h)/2); 

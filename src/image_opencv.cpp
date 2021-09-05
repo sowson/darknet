@@ -242,7 +242,7 @@ void show_image_cv(image p, const char *name) {
 
     IplImage *img = (IplImage *)image_to_ipl_cv(p);
 
-    cvShowImage(buff, img);
+    if (img->width && img->height) cvShowImage(buff, img);
 
     cvReleaseImage(&img);
 }
