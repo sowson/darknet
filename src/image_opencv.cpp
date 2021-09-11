@@ -188,6 +188,45 @@ void make_window_cv(char *name, int w, int h, int fullscreen) {
     }
 }
 
+void blur_image_and_save_cv(image im, int num, int classes, detection *dets, float thresh, const char *fname) {
+    Mat m = image_to_mat_cv(im);
+
+    int i, j, classi;
+    for (i = 0; i < num; ++i) {
+        classi = -1;
+        for (j = 0; j < classes; ++j) {
+            if (dets[i].prob[j] > thresh) {
+                if (classi < 0) {
+                    classi = j;
+                }
+            }
+        }
+        if (classi >= 0) {
+            box bx = dets[i].bbox;
+
+            int l = (bx.x - bx.w / 2.) * im.w + 1;
+            int r = (bx.x + bx.w / 2.) * im.w - 1;
+            int t = (bx.y - bx.h / 2.) * im.h + 1;
+            int b = (bx.y + bx.h / 2.) * im.h - 1;
+
+            //printf("%i %i %i %i\n", l, t, r, b);
+
+            Point tl = Point(l, t);
+            Point br = Point(r, b);
+            Rect roi = Rect(tl, br);
+
+            GaussianBlur(m(roi), m(roi), Size(27, 27), 0, 0);
+        }
+    }
+
+    im = mat_to_image_cv(m);
+    //if (im.c == 3) rgbgr_image_cv(im);
+    char buff[512];
+    sprintf(buff, "%s.jpg", fname);
+    imwrite(buff, image_to_mat_cv(im));
+    free_image_cv(im);
+}
+
 int cv_wait_key(int k) {
     return cvWaitKey(k);
 }
@@ -364,6 +403,21 @@ image load_image_cv(char *filename, int channels) {
     //rgbgr_image_cv(out);
 
     return out;
+}
+
+void flush_stream_buffer_cv(void *cap, int n) {
+    int i;
+    for (i = 0; i < n; ++i) {
+        cvQueryFrame((CvCapture *) cap);
+    }
+}
+
+int fill_image_from_stream_cv(void *cap, image im) {
+    IplImage *src = cvQueryFrame((CvCapture *) cap);
+    if (!src) return 0;
+    ipl_into_image_cv(src, im);
+    //rgbgr_image_cv(im);
+    return 1;
 }
 
 void save_image_jpg_cv(image p, const char *name) {

@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#define class temp
 
 layer make_region_layer(int batch, int w, int h, int n, int classes, int coords)
 {
@@ -25,14 +26,14 @@ layer make_region_layer(int batch, int w, int h, int n, int classes, int coords)
     l.out_c = l.c;
     l.classes = classes;
     l.coords = coords;
-    l.cost = calloc(1, sizeof(float));
-    l.biases = calloc(n*2, sizeof(float));
-    l.bias_updates = calloc(n*2, sizeof(float));
+    l.cost = (float*)calloc(1, sizeof(float));
+    l.biases = (float*)calloc(n*2, sizeof(float));
+    l.bias_updates = (float*)calloc(n*2, sizeof(float));
     l.outputs = h*w*n*(classes + coords + 1);
     l.inputs = l.outputs;
     l.truths = 30*(l.coords + 1);
-    l.delta = calloc(batch*l.outputs, sizeof(float));
-    l.output = calloc(batch*l.outputs, sizeof(float));
+    l.delta = (float*)calloc(batch*l.outputs, sizeof(float));
+    l.output = (float*)calloc(batch*l.outputs, sizeof(float));
     int i;
     for(i = 0; i < n*2; ++i){
         l.biases[i] = .5;
@@ -68,8 +69,8 @@ void resize_region_layer(layer *l, int w, int h)
 #endif
     l->outputs = h*w*l->n*(l->classes + l->coords + 1);
     l->inputs = l->outputs;
-    l->output = realloc(l->output, l->batch*l->outputs*sizeof(float));
-    l->delta = realloc(l->delta, l->batch*l->outputs*sizeof(float));
+    l->output = (float*)realloc(l->output, l->batch*l->outputs*sizeof(float));
+    l->delta = (float*)realloc(l->delta, l->batch*l->outputs*sizeof(float));
 #ifdef GPU
     if (gpu_index >= 0) {
         l->delta_gpu = opencl_make_array(l->delta, l->batch*l->outputs);
@@ -575,4 +576,4 @@ void zero_objectness(layer l)
         }
     }
 }
-
+#undef class

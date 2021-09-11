@@ -296,7 +296,7 @@ int *parse_yolo_mask(char *a, int *num)
         for(i = 0; i < len; ++i){
             if (a[i] == ',') ++n;
         }
-        mask = calloc(n, sizeof(int));
+        mask = (int*)calloc(n, sizeof(int));
         for(i = 0; i < n; ++i){
             int val = atoi(a);
             mask[i] = val;
@@ -355,7 +355,7 @@ int *parse_yolo4_mask(char *a, int *num)
         for(i = 0; i < len; ++i){
             if (a[i] == ',') ++n;
         }
-        mask = calloc(n, sizeof(int));
+        mask = (int*)calloc(n, sizeof(int));
         for(i = 0; i < n; ++i){
             int val = atoi(a);
             mask[i] = val;
@@ -1007,7 +1007,7 @@ int is_network(section *s)
             || strcmp(s->type, "[network]")==0);
 }
 
-network *parse_network_cfg(char *filename)
+network *parse_network_cfg(char *filename, int batch)
 {
     list *sections = read_cfg(filename);
     node *n = sections->front;
@@ -1020,6 +1020,9 @@ network *parse_network_cfg(char *filename)
 #endif
     size_params params;
 
+	if (batch > 0) params.train = 0;
+    else params.train = 1;
+
     section *s = (section *)n->val;
     list *options = s->options;
     if(!is_network(s)) error("First section must be [net] or [network]");
@@ -1028,6 +1031,7 @@ network *parse_network_cfg(char *filename)
     params.h = net->h;
     params.w = net->w;
     params.c = net->c;
+	if (batch > 0) net->batch = batch;
     params.inputs = net->inputs;
     params.batch = net->batch;
     params.time_steps = net->time_steps;
@@ -1143,8 +1147,8 @@ network *parse_network_cfg(char *filename)
     net->truths = out.outputs;
     if(net->layers[net->n-1].truths) net->truths = net->layers[net->n-1].truths;
     net->output = out.output;
-    net->input = calloc(net->inputs*net->batch, sizeof(float));
-    net->truth = calloc(net->truths*net->batch, sizeof(float));
+    net->input = (float*)calloc(net->inputs*net->batch, sizeof(float));
+    net->truth = (float*)calloc(net->truths*net->batch, sizeof(float));
     //TODO: CHECK! (1)
     //net->delta = calloc(net->outputs*net->batch, sizeof(float));
 #ifdef GPU
@@ -1160,10 +1164,10 @@ network *parse_network_cfg(char *filename)
         //printf("%ld\n", workspace_size);
 #ifdef GPU
         if(gpu_index >= 0){
-            net->workspace = calloc(workspace_size, sizeof(float));
+            net->workspace = (float*)calloc(workspace_size, sizeof(float));
             net->workspace_gpu = opencl_make_array(net->workspace, workspace_size);
         }else {
-            net->workspace = calloc(workspace_size, sizeof(float));
+            net->workspace = (float*)calloc(workspace_size, sizeof(float));
         }
 #else
         net->workspace = calloc(workspace_size, sizeof(float));
@@ -1555,7 +1559,7 @@ list *read_cfg(char *filename)
         strip(line);
         switch(line[0]){
             case '[':
-                current = malloc(sizeof(section));
+                current =(section*) malloc(sizeof(section));
                 list_insert(options, current);
                 current->options = make_list();
                 current->type = line;
@@ -1744,7 +1748,7 @@ void save_weights(network *net, char *filename)
 
 void transpose_matrix(float *a, int rows, int cols)
 {
-    float *transpose = calloc(rows*cols, sizeof(float));
+    float *transpose = (float*)calloc(rows*cols, sizeof(float));
     int x, y;
     for(x = 0; x < rows; ++x){
         for(y = 0; y < cols; ++y){

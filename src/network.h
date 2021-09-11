@@ -1,6 +1,9 @@
 // Oh boy, why am I about to do this....
 #ifndef NETWORK_H
 #define NETWORK_H
+#ifdef __cplusplus
+#pragma error(disable:2440)
+#endif
 #include "darknet.h"
 
 #include "image.h"

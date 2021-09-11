@@ -1,8 +1,6 @@
 #ifndef __BLAS_KERNELS_CL__
 #define __BLAS_KERNELS_CL__
 
-static const char* const blas_kernel_source = CONVERT_KERNEL_TO_STRING(
-
 /*
 static void atomicAdd(volatile __global float *a, float v) {
     //float s = v;
@@ -29,6 +27,8 @@ static void atomicAdd(volatile __global float *a, float v) {
     } while (atom_cmpxchg((__global unsigned int *)a, o.i, n.i) != o.i);
 }
 */
+
+static const char* const blas_kernel_source = CONVERT_KERNEL_TO_STRING(
 
 __kernel void scale_bias_kernel(int N, __global float *output, __global float *biases, int batch, int n, int size)
 {

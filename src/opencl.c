@@ -21,9 +21,13 @@ int gpu_index = 1;
 
 int *gpusg;
 int ngpusg;
+#ifdef WIN32
+__declspec(thread) int opencl_device_id_t;
+__declspec(thread) int opencl_device_ct_t;
+#else
 __thread int opencl_device_id_t;
 __thread int opencl_device_ct_t;
-
+#endif
 cl_int *cl_native_double_width_s;
 size_t *cl_native_max_group_size_s;
 size_t *cl_native_address_bits_s;
@@ -132,8 +136,8 @@ const char* clGetErrorString(int errorCode) {
 const char* clCheckError(int errorCode) {
     const char* error = clGetErrorString(errorCode);
     printf("FATAL ERROR: %s\n", error);
-    exit(-1);
-    assert(0);
+    //exit(-1);
+    //assert(0);
     return error;
 }
 
@@ -207,7 +211,7 @@ void opencl_load(const char *fileName, cl_program *output)
 
 char* concat(const char *s1, const char *s2)
 {
-    char *result = calloc(strlen(s1) + strlen(s2) + 1, sizeof(char));
+    char *result = (char*)calloc(strlen(s1) + strlen(s2) + 1, sizeof(char));
     strcpy(result, s1);
     strcat(result, s2);
     return result;
@@ -277,9 +281,9 @@ void opencl_create_kernel(cl_program *program, const char *kernelName,
 void opencl_init(int *gpus, int ngpus) {
     opencl_device_ct_t = ngpus;
 
-    cl_native_double_width_s = calloc(ngpus, sizeof(int));
-    cl_native_max_group_size_s = calloc(ngpus, sizeof(int));
-    cl_native_address_bits_s = calloc(ngpus, sizeof(int));
+    cl_native_double_width_s = (cl_int*)calloc(ngpus, sizeof(int));
+    cl_native_max_group_size_s = (size_t*)calloc(ngpus, sizeof(int));
+    cl_native_address_bits_s = (size_t*)calloc(ngpus, sizeof(int));
 
     opencl_devices = (cl_device_id *) calloc((cl_uint)ngpus, sizeof(cl_device_id));
     opencl_queues = (cl_command_queue *) calloc((cl_uint)ngpus, sizeof(cl_command_queue));
@@ -291,7 +295,7 @@ void opencl_init(int *gpus, int ngpus) {
     cl_uint clNumPlatforms = 0;
     cl_uint clnumEntries = ngpus;
 
-    cl_props = calloc(3, sizeof(cl_context_properties));
+    cl_props = (cl_context_properties*)calloc(3, sizeof(cl_context_properties));
     cl_props[0] = CL_CONTEXT_PLATFORM;
     cl_props[1] = 0;
     cl_props[2] = 0;
@@ -305,7 +309,7 @@ void opencl_init(int *gpus, int ngpus) {
 
     cl_uint num = 32;
     cl_uint all = 0;
-    cl_device_id devices[num];
+    cl_device_id devices[32];
     clErr = clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, num, devices, &all);
 
     if (clErr != CL_SUCCESS) {
@@ -370,8 +374,6 @@ void opencl_init(int *gpus, int ngpus) {
         printf("Device max group size: %zu\n", cl_native_max_group_size_s[opencl_device_id_t]);
         printf("Device address bits: %zu\n", cl_native_address_bits_s[opencl_device_id_t]);
         free(buffer);
-
-        sleep(1);
 #endif
         activation_kernel_init();
         blas_kernel_init();
@@ -623,9 +625,9 @@ cl_mem_ext opencl_random(cl_mem_ext x_gpu, size_t n)
     float *m;
     if (!x_gpu.ptr)
     {
-        m = calloc(n, sizeof(float));
+        m = (float*)calloc(n, sizeof(float));
     } else {
-        m = x_gpu.ptr;
+        m = (float*)x_gpu.ptr;
     }
     for(i = 0; i < n; ++i){
         m[i] = (float)rand()/RAND_MAX;

@@ -16,9 +16,9 @@ cl_kernel* opencl_forward_crop_layer_kernel;
 void crop_kernel_init(void)
 {
     if (opencl_device_id_t == 0) {
-        opencl_crop_layer_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-        opencl_levels_image_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_forward_crop_layer_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_crop_layer_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+        opencl_levels_image_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_forward_crop_layer_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
     }
 
     opencl_load_buffer(crop_layer_kernel_source, strlen(crop_layer_kernel_source), &opencl_crop_layer_program[opencl_device_id_t]);

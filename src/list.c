@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "list.h"
+#define new new_temp
 
 list *make_list()
 {
-	list *l = malloc(sizeof(list));
+	list *l = (list*)malloc(sizeof(list));
 	l->size = 0;
 	l->front = 0;
 	l->back = 0;
@@ -39,7 +40,7 @@ void *list_pop(list *l){
 
 void list_insert(list *l, void *val)
 {
-	node *new = malloc(sizeof(node));
+	node *new = (node*)malloc(sizeof(node));
 	new->val = val;
 	new->next = 0;
 
@@ -81,7 +82,7 @@ void free_list_contents(list *l)
 
 void **list_to_array(list *l)
 {
-    void **a = calloc(l->size, sizeof(void*));
+    void **a = (void**)calloc(l->size, sizeof(void*));
     int count = 0;
     node *n = l->front;
     while(n){
@@ -90,3 +91,4 @@ void **list_to_array(list *l)
     }
     return a;
 }
+#undef new

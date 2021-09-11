@@ -47,9 +47,9 @@ layer make_yolo4_layer(int batch, int w, int h, int n, int total, int *mask, int
     l.class_ids = (int*)calloc(batch*l.w*l.h*l.n, sizeof(int));
     for (i = 0; i < batch*l.w*l.h*l.n; ++i) l.class_ids[i] = -1;
 
-    l.delta = calloc(batch*l.outputs, sizeof(float));
-    l.output = calloc(batch*l.outputs, sizeof(float));
-    l.output_avg = calloc(batch*l.outputs, sizeof(float));
+    l.delta = (float*)calloc(batch * l.outputs, sizeof(float));
+    l.output = (float*)calloc(batch * l.outputs, sizeof(float));
+    l.output_avg = (float*)calloc(batch * l.outputs, sizeof(float));
 
     for(i = 0; i < total*2; ++i){
         l.biases[i] = .5;

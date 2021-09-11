@@ -14,8 +14,8 @@ cl_kernel* opencl_yoloswag420blazeit360noscopemMmMmMonsterKill;
 void dropout_kernel_init(void)
 {
     if (opencl_device_id_t == 0) {
-        opencl_dropout_layer_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-        opencl_yoloswag420blazeit360noscopemMmMmMonsterKill = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_dropout_layer_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+        opencl_yoloswag420blazeit360noscopemMmMmMonsterKill = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
     }
 
     opencl_load_buffer(dropout_layer_kernel_source, strlen(dropout_layer_kernel_source), &opencl_dropout_layer_program[opencl_device_id_t]);
