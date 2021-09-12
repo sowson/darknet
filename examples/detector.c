@@ -1,7 +1,17 @@
 #include "darknet.h"
 #include <stdio.h>
+#ifdef WIN32
+#include "unistd\dirent.h"
+#else
 #include <dirent.h>
+#endif
+
+#ifdef WIN32
+#include "unistd\unistd.h"
+#else
 #include <unistd.h>
+#endif
+
 #include <sys/stat.h>
 #define class temp
 struct stat st;

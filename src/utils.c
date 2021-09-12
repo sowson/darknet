@@ -1,18 +1,33 @@
+#if defined(_WIN32) && !defined(WIN32)
+#define WIN32
+#endif
+
 #include <stdio.h>
 #ifdef WIN32
 #define _CRT_RAND_S
 #endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <assert.h>
-#include <unistd.h>
 #include <float.h>
 #include <limits.h>
-#include <time.h>
+
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
 #include <sys/time.h>
+#endif
 
 #include "utils.h"
+
+#ifdef WIN32
+#include "unistd\unistd.h"
+#else
+#include <unistd.h>
+#endif
+
 
 /*
 // old timing. is it better? who knows!!
@@ -1035,6 +1050,7 @@ unsigned long custom_hash(char *str)
     return hash;
 }
 
+#ifdef WIN32
 void timersub(struct timeval *endPre, struct timeval *beginPre, struct timeval *result)
 {
 	do
@@ -1049,6 +1065,7 @@ void timersub(struct timeval *endPre, struct timeval *beginPre, struct timeval *
 	} while (0);
 
 }
+#endif
 
 int entry_index(layer l, int batch, int location, int entry)
 {

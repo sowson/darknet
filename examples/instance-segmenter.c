@@ -4,9 +4,12 @@
 #ifdef WIN32
 #include "utils.h"
 #endif
-
-#include <sys/time.h>
 #include <assert.h>
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
+#include <sys/time.h>
+#endif
 
 void normalize_image2(image p);
 

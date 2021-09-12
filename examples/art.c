@@ -1,7 +1,11 @@
 #include "darknet.h"
 #include "image.h"
 
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
 #include <sys/time.h>
+#endif
 
 void demo_art(char *cfgfile, char *weightfile, int cam_index)
 {

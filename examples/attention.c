@@ -1,6 +1,9 @@
 #include "darknet.h"
-
+#ifdef WIN32
+#include <time.h>
+#else
 #include <sys/time.h>
+#endif
 #include <assert.h>
 #define class temp
 

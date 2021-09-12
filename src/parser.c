@@ -283,6 +283,7 @@ layer parse_softmax(list *options, size_params params)
     l.c = params.c;
     l.spatial = option_find_float_quiet(options, "spatial", 0);
     l.noloss =  option_find_int_quiet(options, "noloss", 0);
+    l.workspace_size = 0;
     return l;
 }
 
@@ -1007,7 +1008,7 @@ int is_network(section *s)
             || strcmp(s->type, "[network]")==0);
 }
 
-network *parse_network_cfg(char *filename, int batch)
+network *parse_network_cfg(char *filename)
 {
     list *sections = read_cfg(filename);
     node *n = sections->front;
@@ -1020,9 +1021,6 @@ network *parse_network_cfg(char *filename, int batch)
 #endif
     size_params params;
 
-	if (batch > 0) params.train = 0;
-    else params.train = 1;
-
     section *s = (section *)n->val;
     list *options = s->options;
     if(!is_network(s)) error("First section must be [net] or [network]");
@@ -1031,7 +1029,6 @@ network *parse_network_cfg(char *filename, int batch)
     params.h = net->h;
     params.w = net->w;
     params.c = net->c;
-	if (batch > 0) net->batch = batch;
     params.inputs = net->inputs;
     params.batch = net->batch;
     params.time_steps = net->time_steps;
@@ -1130,7 +1127,9 @@ network *parse_network_cfg(char *filename, int batch)
         l.smooth = option_find_float_quiet(options, "smooth", 0);
         option_unused(options);
         net->layers[count] = l;
-        if (l.workspace_size > workspace_size) workspace_size = l.workspace_size;
+        if (l.workspace_size > workspace_size) {
+            workspace_size = l.workspace_size;
+        }
         free_section(s);
         n = n->next;
         ++count;

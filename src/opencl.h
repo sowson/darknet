@@ -1,6 +1,10 @@
 #ifndef OPENCL_H
 #define OPENCL_H
 
+#if defined(_WIN32) && !defined(WIN32)
+#define WIN32
+#endif
+
 #define CL_TARGET_VERSION 120
 
 //#define GPU_STATS

@@ -597,12 +597,6 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
         draw_label(im, 0, 0, ilfps, lrgb);
         free_image(ilfps);
     }
-
-#ifdef OPENCV
-    if(blur_and_save) {
-        blur_image_and_save_cv(im, num, classes, dets, thresh, fname);
-    }
-#endif
 }
 
 void draw_detections_y4(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps)
@@ -1673,6 +1667,7 @@ void test_resize(char *filename)
 
 image load_image_stb(char *filename, int channels)
 {
+    if (filename) filename[strcspn(filename, "\n\r")] = 0;
     int w, h, c;
     unsigned char *data = stbi_load(filename, &w, &h, &c, channels);
     if (!data) {

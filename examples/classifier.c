@@ -4,7 +4,12 @@
 #include "utils.h"
 #endif
 
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
 #include <sys/time.h>
+#endif
+
 #include <assert.h>
 #define class temp
 

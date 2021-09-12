@@ -36,9 +36,9 @@ load_args get_base_args(network *net)
 	return args;
 }
 
-network *load_network(char *cfg, char *weights, int clear, int batch)
+network *load_network(char *cfg, char *weights, int clear)
 {
-	network *net = parse_network_cfg(cfg, batch);
+	network *net = parse_network_cfg(cfg);
 	if(weights && weights[0] != 0){
 		load_weights(net, weights);
 	}
@@ -1342,20 +1342,17 @@ void *train_thread_cgan(void *ptr)
     return 0;
 }
 
-pthread_t train_network_in_thread(network *net, data d, float *err, int *gpus, int ngpus)
+pthread_t train_network_in_thread(network *net, data d, float *err)
 {
 	pthread_t thread;
 	train_args *ptr = (train_args *)calloc(1, sizeof(train_args));
 	ptr->net = net;
 	ptr->d = d;
 	ptr->err = err;
-	if(pthread_create(&thread, 0, train_thread, ptr)) {
-	    error("Thread creation failed");
-		return 0;
-    }
+	if(pthread_create(&thread, 0, train_thread, ptr)) error("Thread creation failed");
 	return thread;
 }
-pthread_t train_network_in_thread_cgan(network *net, data d, data o, float *err, int *gpus, int ngpus)
+pthread_t train_network_in_thread_cgan(network *net, data d, data o, float *err)
 {
     pthread_t thread;
     train_args *ptr = (train_args *)calloc(1, sizeof(train_args));
@@ -1363,8 +1360,6 @@ pthread_t train_network_in_thread_cgan(network *net, data d, data o, float *err,
     ptr->d = d;
     ptr->o = o;
     ptr->err = err;
-    ptr->gpus = gpus;
-    ptr->ngpus = ngpus;
     if(pthread_create(&thread, 0, train_thread_cgan, ptr)) error("Thread creation failed");
     return thread;
 }
@@ -1500,7 +1495,6 @@ void sync_nets(network **nets, int n, int interval)
 
 float train_networks(network **nets, int n, data d, int interval)
 {
-	assert(gpus);
 	int i;
 	int batch = nets[0]->batch;
 	int subdivisions = nets[0]->subdivisions;
@@ -1531,7 +1525,6 @@ float train_networks(network **nets, int n, data d, int interval)
 
 float train_networks_cgan(network **nets, int n, data d, data o, int interval)
 {
-    assert(gpus);
     int i;
     int batch = nets[0]->batch;
     int subdivisions = nets[0]->subdivisions;

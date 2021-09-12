@@ -9,7 +9,11 @@
 #include "demo.h"
 #include "image.h"
 
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
 #include <sys/time.h>
+#endif
 
 #define DEMO 1
 

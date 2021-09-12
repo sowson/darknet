@@ -4,7 +4,15 @@
 //#define DEBUG_KERNELS
 
 #include "opencl.h"
+
+#ifdef WIN32
+#include "unistd\unistd.h"
+#include "unistd\sys\time.h"
+#else
 #include <unistd.h>
+#include <sys/time.h>
+#endif
+
 #include <assert.h>
 
 #ifndef GPU_INDEX
@@ -374,6 +382,7 @@ void opencl_init(int *gpus, int ngpus) {
         printf("Device max group size: %zu\n", cl_native_max_group_size_s[opencl_device_id_t]);
         printf("Device address bits: %zu\n", cl_native_address_bits_s[opencl_device_id_t]);
         free(buffer);
+        sleep(1);
 #endif
         activation_kernel_init();
         blas_kernel_init();
@@ -680,7 +689,10 @@ void opencl_dump_mem_stat()
 
 cl_mem_ext opencl_make_array(float *x, size_t n)
 {
-    assert(x && n);
+    if(!x || !n) {
+        printf("error in cl_mem creation!");
+        assert(1);
+    }
 
     cl_mem_ext buf;
 
@@ -693,9 +705,15 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     cl_int clErr;
 
+#ifdef WIN32
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+                             buf.len * buf.obs, buf.ptr,
+                             &clErr);
+#else
     buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
+#endif
 
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
@@ -710,8 +728,6 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
-    buf.idx = opencl_device_id_t;
-
     opencl_pull_array(buf, x, n);
 
     return buf;
@@ -719,7 +735,10 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
 cl_mem_ext opencl_make_int_array(int *x, size_t n)
 {
-    assert(x && n);
+    if(!x || !n) {
+        printf("error in cl_mem creation!");
+        assert(1);
+    }
 
     cl_mem_ext buf;
 
@@ -732,9 +751,15 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
 
     cl_int clErr;
 
+#ifdef WIN32
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+                             buf.len * buf.obs, buf.ptr,
+                             &clErr);
+#else
     buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
+#endif
 
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
@@ -748,8 +773,6 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
     buf.rem = rem;
 
     buf.que = opencl_queues[opencl_device_id_t];
-
-    buf.idx = opencl_device_id_t;
 
     opencl_pull_int_array(buf, x, n);
 
@@ -835,10 +858,10 @@ void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.obs == sizeof (cl_float)) {
-        opencl_push_array(x_gpu, x, n);
+        opencl_push_array(x_gpu, (float*)x, n);
     }
     if (x_gpu.obs == sizeof (cl_int)) {
-        opencl_push_int_array(x_gpu, x, n);
+        opencl_push_int_array(x_gpu, (int *)x, n);
     }
     /*
     cl_int clErr;
@@ -872,10 +895,10 @@ void opencl_pull_array_map(cl_mem_ext x_gpu, void *x, size_t n)
     t = clock();
 #endif
     if (x_gpu.obs == sizeof (cl_float)) {
-        opencl_pull_array(x_gpu, x, n);
+        opencl_pull_array(x_gpu, (float *)x, n);
     }
     if (x_gpu.obs == sizeof (cl_int)) {
-        opencl_pull_int_array(x_gpu, x, n);
+        opencl_pull_int_array(x_gpu, (int *)x, n);
     }
     /*
     cl_int clErr;

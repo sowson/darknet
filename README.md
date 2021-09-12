@@ -1,3 +1,26 @@
+# Build on Windows, I know! But why not once is so hard?!
+
+### Make all of the artefacts by yourself and figured out more!!
+
+0) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
+1) Install Visual Studio 2019 with C/C++ support
+2) Install Windows 8.1 SDK from https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
+3) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
+4) Clone / Download and Build from: https://github.com/robinrowe/libunistd
+5) Clone / Download and Use from: https://github.com/nothings/stb
+6) Install Python from: https://www.python.org/downloads/windows/
+7) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
+
+### Some advices I learn when I was trying to build this Win32
+
+Put into your PATH in OS the all 3rdparty folders with DLLs
+
+- clBLAS    
+- pthread
+- OpenCV
+
+### Please do not blame me... it is still experimental on Win32
+
 # Take a look 4 x GPUs on macOS (click on img to see video)
 
 [![4 x AMD Radeon RX 6900 XT on macOS 11.5.2](https://iblog.isowa.io/wp-content/uploads/2021/08/moria-scaled.jpeg)](https://www.youtube.com/watch?v=W6VOLjgwKNI)

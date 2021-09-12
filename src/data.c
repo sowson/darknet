@@ -47,9 +47,9 @@ char **get_random_paths_indexes(char **paths, int n, int m, int *indexes)
 
 char **get_random_paths(char **paths, int n, int m)
 {
+    pthread_mutex_lock(&mutex);
     char **random_paths = (char**)calloc(n, sizeof(char*));
     int i;
-    pthread_mutex_lock(&mutex);
     for(i = 0; i < n; ++i){
         int index = rand()%m;
         random_paths[i] = paths[index];
@@ -1192,10 +1192,7 @@ pthread_t load_data(load_args args)
 	pthread_t thread;
 	struct load_args *ptr = (load_args*)calloc(1, sizeof(struct load_args));
 	*ptr = args;
-	if(pthread_create(&thread, 0, load_threads, ptr)) {
-	    error("Thread creation failed");
-        return 0;
-	}
+	if(pthread_create(&thread, 0, load_threads, ptr)) error("Thread creation failed");
 	return thread;
 }
 

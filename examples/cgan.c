@@ -190,7 +190,7 @@ void train_cgan(char *datacfg, char *gcfg, char *gweight, int *gpus, int ngpus, 
             if (ngpus == 1) {
                 loss = train_network_cgan(net, train, trrev);
             } else {
-                loss = train_networks_cgan(nets, ngpus, train, trrev, 4, gpus, ngpus);
+                loss = train_networks_cgan(nets, ngpus, train, trrev, 4);
             }
         }
         else {

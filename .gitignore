@@ -35,6 +35,4 @@ Icon?
 Thumbs.db
 *.swp
 
-3rdparty
 build*
-!Buildx64WinGPU.sh

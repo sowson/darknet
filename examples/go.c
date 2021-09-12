@@ -2,7 +2,12 @@
 
 #include <assert.h>
 #include <math.h>
+
+#ifdef WIN32
+#include "unistd\unistd.h"
+#else
 #include <unistd.h>
+#endif
 
 int inverted = 1;
 int noi = 1;

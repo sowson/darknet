@@ -6,9 +6,17 @@
 #include <iostream>
 
 #ifdef OPENCV
+#ifdef WIN32
+    #include "opencv2\opencv.hpp"
+    #include "opencv2\highgui.hpp"
+    #include "opencv2\highgui\highgui_c.h"
+    #include "opencv2\videoio\videoio_c.h"
+#else
     #include <opencv2/opencv.hpp>
     #include <opencv2/highgui.hpp>
     #include <opencv2/highgui/highgui_c.h>
+    #include <opencv2/videoio/videoio_c.h>
+#endif
 #endif
 
 #include "image.h"
@@ -186,45 +194,6 @@ void make_window_cv(char *name, int w, int h, int fullscreen) {
         resizeWindow(name, w, h);
         if (strcmp(name, "Demo") == 0) moveWindow(name, 0, 0);
     }
-}
-
-void blur_image_and_save_cv(image im, int num, int classes, detection *dets, float thresh, const char *fname) {
-    Mat m = image_to_mat_cv(im);
-
-    int i, j, classi;
-    for (i = 0; i < num; ++i) {
-        classi = -1;
-        for (j = 0; j < classes; ++j) {
-            if (dets[i].prob[j] > thresh) {
-                if (classi < 0) {
-                    classi = j;
-                }
-            }
-        }
-        if (classi >= 0) {
-            box bx = dets[i].bbox;
-
-            int l = (bx.x - bx.w / 2.) * im.w + 1;
-            int r = (bx.x + bx.w / 2.) * im.w - 1;
-            int t = (bx.y - bx.h / 2.) * im.h + 1;
-            int b = (bx.y + bx.h / 2.) * im.h - 1;
-
-            //printf("%i %i %i %i\n", l, t, r, b);
-
-            Point tl = Point(l, t);
-            Point br = Point(r, b);
-            Rect roi = Rect(tl, br);
-
-            GaussianBlur(m(roi), m(roi), Size(27, 27), 0, 0);
-        }
-    }
-
-    im = mat_to_image_cv(m);
-    //if (im.c == 3) rgbgr_image_cv(im);
-    char buff[512];
-    sprintf(buff, "%s.jpg", fname);
-    imwrite(buff, image_to_mat_cv(im));
-    free_image_cv(im);
 }
 
 int cv_wait_key(int k) {

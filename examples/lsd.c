@@ -206,7 +206,7 @@ void train_pix2pix(char *cfg, char *weight, char *acfg, char *aweight, int clear
     char *base = basecfg(cfg);
     char *abase = basecfg(acfg);
     printf("%s\n", base);
-    network net = load_network(cfg, weight, clear);
+    network net = load_network(cfg, weight, clear, 0);
     network anet = load_network(acfg, aweight, clear);
 
     int i, j, k;
@@ -685,7 +685,7 @@ void train_dcgan(char *cfg, char *weight, char *acfg, char *aweight, int clear, 
     //float orig_rate = anet->learning_rate;
 
     int i, j, k;
-    layer imlayer = {0};
+    layer imlayer;
     for (i = 0; i < gnet->n; ++i) {
         if (gnet->layers[i].out_c == 3) {
             imlayer = gnet->layers[i];
@@ -882,7 +882,7 @@ void train_colorizer(char *cfg, char *weight, char *acfg, char *aweight, int cle
     network *anet = load_network(acfg, aweight, clear);
 
     int i, j, k;
-    layer imlayer = {0};
+    layer imlayer;
     for (i = 0; i < net->n; ++i) {
         if (net->layers[i].out_c == 3) {
             imlayer = net->layers[i];
