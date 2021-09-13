@@ -1168,7 +1168,7 @@ void forward_network_gpu(network *netp)
 		}
 	}
 
-    clFlush(opencl_queues[opencl_device_id_t]);
+        // clFlush(opencl_queues[opencl_device_id_t]);
 
 	pull_network_output(netp);
 	if(net.train) calc_network_cost(netp);
@@ -1205,7 +1205,7 @@ void backward_network_gpu(network *netp)
 #endif
 	}
 
-    clFlush(opencl_queues[opencl_device_id_t]);
+        // clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void update_network_gpu(network *netp)
@@ -1241,7 +1241,7 @@ void update_network_gpu(network *netp)
 		}
 	}
 
-    clFlush(opencl_queues[opencl_device_id_t]);
+        // clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void harmless_update_network_gpu(network *netp)
@@ -1423,7 +1423,7 @@ float train_networks(network **nets, int n, data d, int interval)
         sum += errors[i];
     }
     for(i = 0; i < n; ++i){
-        clFinish(opencl_queues[i]);
+        // clFinish(opencl_queues[i]);
     }
     if (get_current_batch(nets[0]) % interval == 0) {
         printf("Syncing... ");
@@ -1432,7 +1432,7 @@ float train_networks(network **nets, int n, data d, int interval)
         printf("Done!\n");
     }
     for(i = 0; i < n; ++i){
-        clFinish(opencl_queues[i]);
+        // clFinish(opencl_queues[i]);
     }
     free(threads);
     free(errors);

@@ -490,7 +490,7 @@ void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, 
 
     clErr = clEnqueueNDRangeKernel(que, kernel, 2, globalOffset, globalItems, NULL, 0, NULL, NULL);
 
-    clFlush(que);
+    // clFlush(que);
 
 #ifdef BENCHMARK
     t = clock() - t;
@@ -582,7 +582,7 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
 
     clErr = clEnqueueNDRangeKernel(que, kernel, 2, globalOffset, globalItems, localItems, 0, NULL, NULL);
 
-    clFlush(que);
+    // clFlush(que);
 
 #ifdef BENCHMARK
     t = clock() - t;
@@ -708,10 +708,6 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
-    buf.idx = opencl_device_id_t;
-
-    opencl_pull_array(buf, x, n);
-
     return buf;
 }
 
@@ -746,10 +742,6 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
     buf.rem = rem;
 
     buf.que = opencl_queues[opencl_device_id_t];
-
-    buf.idx = opencl_device_id_t;
-
-    opencl_pull_int_array(buf, x, n);
 
     return buf;
 }
