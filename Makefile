@@ -74,9 +74,15 @@ endif
 
 ifeq ($(GPU), 1)
 ifeq ($(ARM), 1)
+ifeq ($(GPU), 1)
 COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120 -DARM 
 CFLAGS+= -DGPU -DOPENCL -DARM -I/usr/include/ -I/usr/local/include/
 LDFLAGS+= -L/usr/local/lib -L/usr/lib/arm-linux-gnueabihf -lOpenCL
+LDFLAGS+= -L/usr/lib
+else
+COMMON+= -DCL_TARGET_OPENCL_VERSION=120 -DARM
+CFLAGS+= -DARM -I/usr/include/ -I/usr/local/include/
+LDFLAGS+= -L/usr/local/lib -L/usr/lib/arm-linux-gnueabihf
 LDFLAGS+= -L/usr/lib
 endif
 ifeq ($(AMD), 1)

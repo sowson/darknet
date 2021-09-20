@@ -298,8 +298,10 @@ function (ConfigureBinary target)
     target_compile_options(${target} PRIVATE ${DARKNET_CFLAGS})
 
     if (DARKNET_ARM)
-        target_link_libraries(${target} opencl)
-    elseif (DARKNET_GPU)
+		if (DARKNET_GPU)
+			target_link_libraries(${target} opencl)
+		endif()
+	elseif (DARKNET_GPU)
         target_link_libraries(${target} opencl clblas)
     endif()
 

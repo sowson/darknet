@@ -641,6 +641,7 @@ float *network_predict(network *net, float *input)
 	return out;
 }
 
+#ifdef GPU
 float *get_network_output_layer_gpu(network net, int i)
 {
     layer l = net.layers[i];
@@ -654,6 +655,7 @@ float *get_network_output_gpu(network net)
     for(i = net.n-1; i > 0; --i) if(net.layers[i].type != COST) break;
     return get_network_output_layer_gpu(net, i);
 }
+#endif
 
 float *get_network_output_y4(network net)
 {
