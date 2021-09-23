@@ -34,9 +34,6 @@ set (DARKNET_LIBRARY_STATIC libdarknet_s)
 if (DARKNET_DEBUG OR DARKNET_TESTING)
     list (APPEND DARKNET_CFLAGS "-g")
 else()
-	if (DARKNET_OPENMP)
-		list (APPEND DARKNET_CFLAGS "-openmp")
-	endif()
 	list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
 	list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
 	list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
@@ -309,6 +306,11 @@ function (ConfigureBinary target)
         target_link_libraries(${target} opencv)
     endif()
 
+		if (DARKNET_OPENMP)
+			  find_package(OpenMP)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    endif()
+
 #    if (DARKNET_TESTING)
 #        target_link_libraries(${target} catch)
 #    endif()
@@ -325,6 +327,11 @@ function (ConfigureLibrary target)
         ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+		if (DARKNET_OPENMP)
+			  find_package(OpenMP)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    endif()
 endfunction()
 
 if (DARKNET_SHARED)
