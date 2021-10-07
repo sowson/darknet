@@ -2,14 +2,15 @@
 
 ### Make all of the artefacts by yourself and figured out more!!
 
-0) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
-1) Install Visual Studio 2019 with C/C++ support
-2) Install Windows 8.1 SDK from https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
-3) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
-4) Clone / Download and Build from: https://github.com/robinrowe/libunistd
-5) Clone / Download and Use from: https://github.com/nothings/stb
-6) Install Python from: https://www.python.org/downloads/windows/
-7) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
+0) Clone recursive by command: git clone --recursive https://github.com/sowson/darknet
+1) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
+2) Install Visual Studio 2019 with C/C++ support
+3) Install Windows 8.1 SDK from https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
+4) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
+5) Clone / Download and Build from: https://github.com/robinrowe/libunistd
+6) Clone / Download and Use from: https://github.com/nothings/stb
+7) Install Python from: https://www.python.org/downloads/windows/
+8) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
 
 ### Some advices I learn when I was trying to build this Win32
 

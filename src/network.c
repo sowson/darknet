@@ -696,6 +696,7 @@ float *network_predict(network *net, float *input)
 	return out;
 }
 
+#ifdef GPU
 float *get_network_output_layer_gpu(network net, int i)
 {
     layer l = net.layers[i];
@@ -709,6 +710,7 @@ float *get_network_output_gpu(network net)
     for(i = net.n-1; i > 0; --i) if(net.layers[i].type != COST) break;
     return get_network_output_layer_gpu(net, i);
 }
+#endif
 
 float *get_network_output_y4(network net)
 {
@@ -1232,7 +1234,7 @@ void forward_network_gpu(network *netp)
 		}
 	}
 
-    clFlush(opencl_queues[opencl_device_id_t]);
+	// clFlush(opencl_queues[opencl_device_id_t]);
 
 	pull_network_output(netp);
 	if(net.train) calc_network_cost(netp);
@@ -1268,6 +1270,8 @@ void backward_network_gpu(network *netp)
 		printf("BW %s\t%d\n", layerName[(int)l.type], (int)time_taken);
 #endif
 	}
+
+        // clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void update_network_gpu(network *netp)
@@ -1302,6 +1306,8 @@ void update_network_gpu(network *netp)
 #endif
 		}
 	}
+
+        // clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void harmless_update_network_gpu(network *netp)

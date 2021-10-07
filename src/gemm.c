@@ -230,7 +230,7 @@ void gemm_offset_gpu(
                         C_gpu.mem, offset_C, ldc,
                         1, &que, 0, NULL, NULL);
 
-    clFlush(que);
+    // clFlush(que);
 
 #ifdef BENCHMARK
     t = clock() - t;

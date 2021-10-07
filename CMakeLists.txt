@@ -5,6 +5,23 @@ if(WIN32)
 endif()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_INSTALL_LIBDIR "${PROJECT_SOURCE_DIR}/3rdparty/libs")
+    include(cmake/cable/bootstrap.cmake)
+    include(CableBuildInfo)
+    include(CableBuildType)
+    include(CableToolchains)
+    include(HunterGate)
+    include(defaults/HunterCacheServers)
+    cable_configure_toolchain(DEFAULT cxx14)
+    set(HUNTER_CONFIGURATION_TYPES Release CACHE STRING "Build type of Hunter packages")
+    set(HUNTER_JOBS_NUMBER 6 CACHE STRING "Number of parallel builds used by Hunter")
+    HunterGate(
+            URL "https://github.com/sowson/hunter/archive/v0.23.214-macOS.tar.gz"
+            SHA1 "771b6fdbb9246e27b910e4394ae61bfe834237bd"
+            LOCAL
+    )
+    cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release RelWithDebInfo)
+    set(PROJECT_VERSION 1.0.0)
     project(darknet LANGUAGES CXX)
 else()
     project(darknet LANGUAGES C CXX)
@@ -96,15 +113,17 @@ if (DARKNET_OPENCV)
 	    INTERFACE_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
         set_property(TARGET opencv PROPERTY
         INTERFACE_LINK_LIBRARIES ${OpenCV_LIBRARIES})
+        list (APPEND DARKNET_DEFINITIONS OPENCV)
     endif()
-    list (APPEND DARKNET_DEFINITIONS OPENCV)
 endif()
 
 # Find OpenCL
 if (DARKNET_GPU)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        set(OpenCL_LIBRARY "${PROJECT_SOURCE_DIR}/3rdparty/OpenCL/lib")
+        set(OpenCL_LIBRARY "${PROJECT_SOURCE_DIR}/3rdparty/OpenCL/lib/x86_64/opencl.lib")
         set(OpenCL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/3rdparty/OpenCL/include")
+        cmake_policy(SET CMP0074 OLD)
+        hunter_add_package(OpenCL)
     endif()
     find_package(OpenCL REQUIRED)
     add_library(opencl INTERFACE IMPORTED)
@@ -135,6 +154,11 @@ endif()
 # GPU Training
 if (DARKNET_GPU)
 	list (APPEND DARKNET_DEFINITIONS GPU)
+endif()
+
+# OpenCV Training
+if (DARKNET_OPENCV)
+    list (APPEND DARKNET_DEFINITIONS OPENCV)
 endif()
 
 # Fast Training
@@ -365,11 +389,11 @@ function (ConfigureBinary target)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR "Linux")
         set_target_properties(${target} PROPERTIES OUTPUT_NAME "darknet")
     endif()
-    
+
     target_compile_definitions(${target} PUBLIC ${DARKNET_DEFINITIONS})
     target_compile_options(${target} PRIVATE ${DARKNET_CFLAGS})
 
-    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         target_link_options(${target} PRIVATE ${DARKNET_LINK_CFLAGS})#debug
         target_link_libraries(${target} POSIX)
         target_link_libraries(${target} pthread)
@@ -377,13 +401,20 @@ function (ConfigureBinary target)
     endif()
 
     if (DARKNET_ARM)
-        target_link_libraries(${target} opencl)
-    elseif (DARKNET_GPU)
+		if (DARKNET_GPU)
+			target_link_libraries(${target} opencl)
+		endif()
+	elseif (DARKNET_GPU)
         target_link_libraries(${target} opencl clblas)
     endif()
 
     if (DARKNET_OPENCV)
         target_link_libraries(${target} opencv)
+    endif()
+
+		if (DARKNET_OPENMP)
+			  find_package(OpenMP)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
     endif()
 
 #    if (DARKNET_TESTING)
@@ -404,6 +435,11 @@ function (ConfigureLibrary target)
         ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+		if (DARKNET_OPENMP)
+			  find_package(OpenMP)
+        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    endif()
 endfunction()
 
 if (DARKNET_SHARED)
