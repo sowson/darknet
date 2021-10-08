@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define OUT_TEMP OUT
+#undef OUT
 void reorg_cpu(float *x, int w, int h, int c, int batch, int stride, int forward, float *out)
 {
     int b,i,j,k;
@@ -31,7 +33,7 @@ void reorg_cpu(float *x, int w, int h, int c, int batch, int stride, int forward
 
 void flatten(float *x, int size, int layers, int batch, int forward)
 {
-    float *swap = calloc(size*layers*batch, sizeof(float));
+    float *swap = (float*)calloc(size*layers*batch, sizeof(float));
     int i,c,b;
     for(b = 0; b < batch; ++b){
         for(c = 0; c < layers; ++c){

@@ -15,7 +15,7 @@ opencv/
 convnet/
 decaf/
 submission/
-#!# cfg/
+cfg/
 darknet
 libdarknet.*
 
@@ -34,3 +34,5 @@ ehthumbs.db
 Icon?
 Thumbs.db
 *.swp
+
+build*

@@ -39,20 +39,20 @@ layer make_rnn_layer(int batch, int inputs, int outputs, int steps, ACTIVATION a
     l.steps = steps;
     l.inputs = inputs;
 
-    l.state = calloc(batch*outputs, sizeof(float));
-    l.prev_state = calloc(batch*outputs, sizeof(float));
+    l.state = (float*)calloc(batch*outputs, sizeof(float));
+    l.prev_state = (float*)calloc(batch*outputs, sizeof(float));
 
-    l.input_layer = malloc(sizeof(layer));
+    l.input_layer = (layer*)malloc(sizeof(layer));
     fprintf(stderr, "\t\t");
     *(l.input_layer) = make_connected_layer(batch*steps, inputs, outputs, activation, batch_normalize, adam);
     l.input_layer->batch = batch;
 
-    l.self_layer = malloc(sizeof(layer));
+    l.self_layer = (layer*)malloc(sizeof(layer));
     fprintf(stderr, "\t\t");
     *(l.self_layer) = make_connected_layer(batch*steps, outputs, outputs, activation, batch_normalize, adam);
     l.self_layer->batch = batch;
 
-    l.output_layer = malloc(sizeof(layer));
+    l.output_layer = (layer*)malloc(sizeof(layer));
     fprintf(stderr, "\t\t");
     *(l.output_layer) = make_connected_layer(batch*steps, outputs, outputs, activation, batch_normalize, adam);
     l.output_layer->batch = batch;

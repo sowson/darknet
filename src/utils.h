@@ -56,7 +56,9 @@ int max_int_index_y4(int *a, int n);
 boxabs box_to_boxabs(const box* b, const int img_w, const int img_h, const int bounds_check);
 int make_directory(char *path, int mode);
 unsigned long custom_hash(char *str);
-
+#ifdef WIN32
+void timersub(struct timeval *endPre, struct timeval *beginPre, struct timeval *result);
+#endif
 #define max_val_cmp(a,b) (((a) > (b)) ? (a) : (b))
 #define min_val_cmp(a,b) (((a) < (b)) ? (a) : (b))
 

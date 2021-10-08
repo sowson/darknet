@@ -6,9 +6,17 @@
 #include <iostream>
 
 #ifdef OPENCV
+#ifdef WIN32
+    #include "opencv2\opencv.hpp"
+    #include "opencv2\highgui.hpp"
+    #include "opencv2\highgui\highgui_c.h"
+    #include "opencv2\videoio\videoio_c.h"
+#else
     #include <opencv2/opencv.hpp>
     #include <opencv2/highgui.hpp>
     #include <opencv2/highgui/highgui_c.h>
+    #include <opencv2/videoio/videoio_c.h>
+#endif
 #endif
 
 #include "image.h"
@@ -364,6 +372,21 @@ image load_image_cv(char *filename, int channels) {
     //rgbgr_image_cv(out);
 
     return out;
+}
+
+void flush_stream_buffer_cv(void *cap, int n) {
+    int i;
+    for (i = 0; i < n; ++i) {
+        cvQueryFrame((CvCapture *) cap);
+    }
+}
+
+int fill_image_from_stream_cv(void *cap, image im) {
+    IplImage *src = cvQueryFrame((CvCapture *) cap);
+    if (!src) return 0;
+    ipl_into_image_cv(src, im);
+    //rgbgr_image_cv(im);
+    return 1;
 }
 
 void save_image_jpg_cv(image p, const char *name) {

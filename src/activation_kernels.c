@@ -15,9 +15,9 @@ cl_kernel* opencl_gradient_array_kernel;
 void activation_kernel_init(void)
 {
 	if (opencl_device_id_t == 0) {
-		opencl_activation_kernel_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-		opencl_activate_array_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_gradient_array_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+		opencl_activation_kernel_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+		opencl_activate_array_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_gradient_array_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
 	}
 	opencl_load_buffer(activation_kernels_source, strlen(activation_kernels_source), &opencl_activation_kernel_program[opencl_device_id_t]);
 	opencl_create_kernel(&opencl_activation_kernel_program[opencl_device_id_t],

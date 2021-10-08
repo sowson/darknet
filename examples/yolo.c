@@ -119,7 +119,7 @@ void validate_yolo(char *cfg, char *weights)
     int classes = l.classes;
 
     int j;
-    FILE **fps = calloc(classes, sizeof(FILE *));
+    FILE **fps = (FILE**)calloc(classes, sizeof(FILE *));
     for(j = 0; j < classes; ++j){
         char buff[1024];
         snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);
@@ -135,11 +135,11 @@ void validate_yolo(char *cfg, char *weights)
     float iou_thresh = .5;
 
     int nthreads = 8;
-    image *val = calloc(nthreads, sizeof(image));
-    image *val_resized = calloc(nthreads, sizeof(image));
-    image *buf = calloc(nthreads, sizeof(image));
-    image *buf_resized = calloc(nthreads, sizeof(image));
-    pthread_t *thr = calloc(nthreads, sizeof(pthread_t));
+    image *val = (image*)calloc(nthreads, sizeof(image));
+    image *val_resized = (image*)calloc(nthreads, sizeof(image));
+    image *buf = (image*)calloc(nthreads, sizeof(image));
+    image *buf_resized = (image*)calloc(nthreads, sizeof(image));
+    pthread_t *thr = (pthread_t*)calloc(nthreads, sizeof(pthread_t));
 
     load_args args = {0};
     args.w = net->w;
@@ -202,7 +202,7 @@ void validate_yolo_recall(char *cfg, char *weights)
     int side = l.side;
 
     int j, k;
-    FILE **fps = calloc(classes, sizeof(FILE *));
+    FILE **fps = (FILE**)calloc(classes, sizeof(FILE *));
     for(j = 0; j < classes; ++j){
         char buff[1024];
         snprintf(buff, 1024, "%s%s.txt", base, voc_names[j]);

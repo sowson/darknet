@@ -30,7 +30,7 @@ void gemm_bin(int M, int N, int K, float ALPHA,
 float *random_matrix(int rows, int cols)
 {
     int i;
-    float *m = calloc(rows*cols, sizeof(float));
+    float *m = (float*)calloc(rows*cols, sizeof(float));
     for(i = 0; i < rows*cols; ++i){
         m[i] = (float)rand()/RAND_MAX;
     }
@@ -194,7 +194,7 @@ void gemm_kernel_release(void)
 cl_mem_ext random_matrix_gpu(int rows, int cols)
 {
     int i;
-    float *m = calloc(rows*cols, sizeof(float));
+    float *m = (float*)calloc(rows*cols, sizeof(float));
     for(i = 0; i < rows*cols; ++i){
         m[i] = (float)rand()/RAND_MAX;
     }
@@ -317,6 +317,7 @@ void time_gpu(int TA, int TB, int m, int k, int n)
     clock_t start = clock(), end;
     for(i = 0; i<iter; ++i){
         gemm_gpu(TA,TB,m,n,k,1,a_cl,lda,b_cl,ldb,1,c_cl,n);
+        clFinish(opencl_queues[opencl_device_id_t]);
     }
     double flop = ((double)m)*n*(2.*k + 2.)*iter;
     double gflop = flop/pow(10., 9);

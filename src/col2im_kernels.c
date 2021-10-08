@@ -13,8 +13,8 @@ cl_kernel* opencl_col2im_kernel;
 void col2im_kernel_init(void)
 {
     if (opencl_device_id_t == 0) {
-        opencl_col2im_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-        opencl_col2im_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_col2im_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+        opencl_col2im_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
     }
 
     opencl_load_buffer(col2im_kernel_source, strlen(col2im_kernel_source), &opencl_col2im_program[opencl_device_id_t]);

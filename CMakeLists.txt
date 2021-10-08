@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.7.2 FATAL_ERROR)
 
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
-
-set(CMAKE_CXX_STANDARD 11)
-
-project(darknet LANGUAGES C CXX)
-
 option(DARKNET_CPU "Enable CPU support" OFF)
 option(DARKNET_OPENCV "Enable OpenCV support" ON)
 option(DARKNET_OPENMP "Enable OpenMP support" OFF)
@@ -17,10 +10,45 @@ option(DARKNET_ARM "Enable ARM support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
 option(DARKNET_TESTING "Build the unit tests" OFF)
-option(DARKNET_DEBUG "Enable debug mode" ON)
+option(DARKNET_DEBUG "Enable debug mode" OFF)
 option(DARKNET_STATIC "Build static library" ON)
 option(DARKNET_SHARED "Build shared library" ON)
 option(DARKNET_NO_BINARY "Do not build binary" OFF)
+
+if(WIN32)
+    set (CMAKE_SYSTEM_NAME "Windows")
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_INSTALL_LIBDIR "${PROJECT_SOURCE_DIR}/3rdparty/libs")
+    include(cmake/cable/bootstrap.cmake)
+    include(CableBuildInfo)
+    include(CableBuildType)
+    include(CableToolchains)
+    include(HunterGate)
+    include(defaults/HunterCacheServers)
+    cable_configure_toolchain(DEFAULT cxx14)
+    set(HUNTER_CONFIGURATION_TYPES Release CACHE STRING "Build type of Hunter packages")
+    set(HUNTER_JOBS_NUMBER 6 CACHE STRING "Number of parallel builds used by Hunter")
+    HunterGate(
+            URL "https://github.com/sowson/hunter/archive/v0.23.214-macOS.tar.gz"
+            SHA1 "771b6fdbb9246e27b910e4394ae61bfe834237bd"
+            LOCAL
+    )
+    cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release RelWithDebInfo)
+    set(PROJECT_VERSION 1.0.0)
+    project(darknet LANGUAGES CXX)
+else()
+    project(darknet LANGUAGES C CXX)
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_CXX_STANDARD 14)
+else()
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_C_COMPILER "gcc")
+    set(CMAKE_CXX_COMPILER "g++")
+endif()
 
 include(GNUInstallDirs)
 
@@ -31,31 +59,73 @@ set (DARKNET_BINARY bindarknet)
 set (DARKNET_LIBRARY libdarknet)
 set (DARKNET_LIBRARY_STATIC libdarknet_s)
 
+message(STATUS ${CMAKE_SYSTEM_NAME})
+
 if (DARKNET_DEBUG OR DARKNET_TESTING)
-    list (APPEND DARKNET_CFLAGS "-g")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        list (APPEND DARKNET_DEFINITIONS "WIN32")
+    else ()
+        list (APPEND DARKNET_CFLAGS "-g")
+    endif()
 else()
-	list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
-	list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
-	list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
-	list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
-	list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
-	list (APPEND DARKNET_CFLAGS "-O3")
+	if (DARKNET_OPENMP)
+		list (APPEND DARKNET_CFLAGS "-openmp")
+	endif()
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        add_library(POSIX INTERFACE IMPORTED)
+        set_property(TARGET POSIX PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
+        set_property(TARGET POSIX PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
+        set_property(TARGET POSIX PROPERTY INTERFACE_LINK_LIBRARIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd/lib/libunistd.lib")
+        add_library(pthread INTERFACE IMPORTED)
+        set_property(TARGET pthread PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
+        set_property(TARGET pthread PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
+        set_property(TARGET pthread PROPERTY INTERFACE_LINK_LIBRARIES "pthreads.lib")
+        add_library(stb INTERFACE IMPORTED)
+        set_property(TARGET stb PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/stb")
+    else()
+        list (APPEND DARKNET_CFLAGS "-O3")
+        list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
+        list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
+        list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
+        list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
+        list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
+    endif()
 endif()
 
 # Find OpenCV
 if (DARKNET_OPENCV)
-	find_package(OpenCV REQUIRED)
-	add_library(opencv INTERFACE IMPORTED)
-	set_property(TARGET opencv PROPERTY
-		INTERFACE_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
-    set_property(TARGET opencv PROPERTY
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set(OpenCV_DIR "${PROJECT_SOURCE_DIR}/3rdparty/OpenCV")
+    	#!# find_package(OpenCV REQUIRED PATHS ${OpenCV_DIR})
+        add_library(opencv INTERFACE IMPORTED)
+	    set_property(TARGET opencv PROPERTY
+	    INTERFACE_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
+        set_property(TARGET opencv PROPERTY
         INTERFACE_LINK_LIBRARIES ${OpenCV_LIBRARIES})
-    list (APPEND DARKNET_DEFINITIONS OPENCV)
+        set_property(TARGET opencv PROPERTY INTERFACE_LINK_DIRECTORIES "${OpenCV_LIB_PATH}")
+        set_property(TARGET opencv PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${OpenCV_DIR}/include")
+        set_property(TARGET opencv PROPERTY INTERFACE_LINK_DIRECTORIES "${OpenCV_DIR}/x64/vc15/lib")
+        set_property(TARGET opencv PROPERTY INTERFACE_LINK_LIBRARIES "opencv_world3413.lib opencv_world3413d.lib")
+    else()
+    	find_package(OpenCV REQUIRED)
+	    add_library(opencv INTERFACE IMPORTED)
+	    set_property(TARGET opencv PROPERTY
+	    INTERFACE_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
+        set_property(TARGET opencv PROPERTY
+        INTERFACE_LINK_LIBRARIES ${OpenCV_LIBRARIES})
+        list (APPEND DARKNET_DEFINITIONS OPENCV)
+    endif()
 endif()
 
 # Find OpenCL
 if (DARKNET_GPU)
-	find_package(OpenCL REQUIRED)
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set(OpenCL_LIBRARY "${PROJECT_SOURCE_DIR}/3rdparty/OpenCL/lib/x86_64/opencl.lib")
+        set(OpenCL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/3rdparty/OpenCL/include")
+        cmake_policy(SET CMP0074 OLD)
+        hunter_add_package(OpenCL)
+    endif()
+    find_package(OpenCL REQUIRED)
     add_library(opencl INTERFACE IMPORTED)
     set_property(TARGET opencl PROPERTY
     	INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS})
@@ -66,18 +136,29 @@ if (DARKNET_GPU)
 	if (DARKNET_ARM)
 		list (APPEND DARKNET_DEFINITIONS ARM)
 	else()
-		find_package(clBLAS REQUIRED)
-		add_library(clblas INTERFACE IMPORTED)
-		set_property(TARGET clblas PROPERTY
-			INTERFACE_INCLUDE_DIRECTORIES ${CLBLAS_INCLUDE_DIRS})
-		set_property(TARGET clblas PROPERTY
-			INTERFACE_LINK_LIBRARIES ${CLBLAS_LIBRARIES})
+        if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+            set(clBLAS_DIR "3rdparty/clBLAS")
+	    find_package(clBLAS REQUIRED PATHS "${clBLAS_DIR}")
+        else()
+	    find_package(clBLAS REQUIRED)
+	endif()
+	find_package(clBLAS REQUIRED PATHS "${clBLAS_DIR}")
+	add_library(clblas INTERFACE IMPORTED)
+        set_property(TARGET clblas PROPERTY
+        INTERFACE_INCLUDE_DIRECTORIES ${CLBLAS_INCLUDE_DIRS})
+        set_property(TARGET clblas PROPERTY
+        INTERFACE_LINK_LIBRARIES ${CLBLAS_LIBRARIES})
 	endif()
 endif()
 
 # GPU Training
 if (DARKNET_GPU)
 	list (APPEND DARKNET_DEFINITIONS GPU)
+endif()
+
+# OpenCV Training
+if (DARKNET_OPENCV)
+    list (APPEND DARKNET_DEFINITIONS OPENCV)
 endif()
 
 # Fast Training
@@ -141,13 +222,14 @@ set (DARKNET_SOURCES
     "src/gru_layer.c"
     "src/im2col.c"
     "src/image.c"
-	"src/iseg_layer.c"
-	"examples/instance-segmenter.c"
+    "src/iseg_layer.c"
+    "examples/instance-segmenter.c"
     "src/layer.c"
     "src/list.c"
     "src/local_layer.c"
     "src/lstm_layer.c"
     "examples/lsd.c"
+    "examples/cgan.c"
     "src/matrix.c"
     "src/maxpool_layer.c"
     "src/network.c"
@@ -180,6 +262,10 @@ set (DARKNET_SOURCES
     "src/l2norm_layer.c"
 )
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set_source_files_properties(${DARKNET_SOURCES} PROPERTIES LANGUAGE "CXX")
+endif()
+
 set (DARKNET_PUBLIC_HEADERS
     "include/darknet.h"
     "src/activation_layer.h"
@@ -188,7 +274,6 @@ set (DARKNET_PUBLIC_HEADERS
     "src/batchnorm_layer.h"
     "src/blas.h"
     "src/box.h"
-    "src/bugfixes.h"
     "src/classifier.h"
     "src/col2im.h"
     "src/connected_layer.h"
@@ -226,7 +311,6 @@ set (DARKNET_PUBLIC_HEADERS
     "src/stb_image.h"
     "src/stb_image_write.h"
     "src/tree.h"
-    "src/unit.h"
     "src/utils.h"
     "src/opencl.h"
     "src/yolo_layer.h"
@@ -240,6 +324,10 @@ set (DARKNET_MAIN_SOURCE
     "examples/darknet.c"
 )
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set_source_files_properties(${DARKNET_MAIN_SOURCE} PROPERTIES LANGUAGE "CXX")
+endif()
+
 set (DARKNET_SOURCES_CXX
     "src/image_opencv.cpp"
 )
@@ -247,32 +335,40 @@ set (DARKNET_SOURCES_CXX
 if (DARKNET_CPU)
 	set (DARKNET_CPU_SOURCES
 			"src/cpu.c"
-			)
+		)
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set_source_files_properties(${DARKNET_CPU} PROPERTIES LANGUAGE "CXX")
+    endif()
 endif()
 
 if (DARKNET_GPU)
 	set (DARKNET_GPU_SOURCES
 	    "src/activation_kernels.c"
-	    "src/activation_kernels.cl"
+	   #"src/activation_kernels.cl"
 	    "src/avgpool_layer_kernels.c"
-	    "src/avgpool_layer_kernels.cl"
+	   #"src/avgpool_layer_kernels.cl"
 	    "src/blas_kernels.c"
-	    "src/blas_kernels.cl"
+	   #"src/blas_kernels_1.cl"
+	   #"src/blas_kernels_2.cl"
+	   #"src/blas_kernels_3.cl"
 	    "src/col2im_kernels.c"
-	    "src/col2im_kernels.cl"
+	   #"src/col2im_kernels.cl"
 	    "src/convolutional_kernels.c"
-	    "src/convolutional_kernels.cl"
+	   #"src/convolutional_kernels.cl"
 	    "src/crop_layer_kernels.c"
-	    "src/crop_layer_kernels.cl"
+	   #"src/crop_layer_kernels.cl"
 	    "src/deconvolutional_kernels.c"
 	    "src/dropout_layer_kernels.c"
-	    "src/dropout_layer_kernels.cl"
+	   #"src/dropout_layer_kernels.cl"
 	    "src/im2col_kernels.c"
-	    "src/im2col_kernels.cl"
+	   #"src/im2col_kernels.cl"
 	    "src/maxpool_layer_kernels.c"
-	    "src/maxpool_layer_kernels.cl"
+	   #"src/maxpool_layer_kernels.cl"
 	    "src/opencl.c"
 	)
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set_source_files_properties(${DARKNET_GPU_SOURCES} PROPERTIES LANGUAGE "CXX")
+    endif()
 endif()
 
 if (DARKNET_UNIT)
@@ -290,9 +386,19 @@ if (DARKNET_UNIT)
 endif()
 
 function (ConfigureBinary target)
-    set_target_properties(${target} PROPERTIES OUTPUT_NAME "darknet")    
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR "Linux")
+        set_target_properties(${target} PROPERTIES OUTPUT_NAME "darknet")
+    endif()
+
     target_compile_definitions(${target} PUBLIC ${DARKNET_DEFINITIONS})
     target_compile_options(${target} PRIVATE ${DARKNET_CFLAGS})
+
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        target_link_options(${target} PRIVATE ${DARKNET_LINK_CFLAGS})#debug
+        target_link_libraries(${target} POSIX)
+        target_link_libraries(${target} pthread)
+        target_link_libraries(${target} stb)
+    endif()
 
     if (DARKNET_ARM)
 		if (DARKNET_GPU)
@@ -315,7 +421,9 @@ function (ConfigureBinary target)
 #        target_link_libraries(${target} catch)
 #    endif()
 
-    target_link_libraries(${target} "m" "pthread")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR "Linux")
+        target_link_libraries(${target} "m" "pthread")
+    endif()
 endfunction()
 
 function (ConfigureLibrary target)
@@ -336,7 +444,10 @@ endfunction()
 
 if (DARKNET_SHARED)
     add_library(${DARKNET_LIBRARY} SHARED ${DARKNET_SOURCES} ${DARKNET_CPU_SOURCES}
-	   ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX})
+	   ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX} ${DARKNET_PUBLIC_HEADERS})
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set_target_properties(${DARKNET_LIBRARY} PROPERTIES OUTPUT_NAME "darknet")
+    endif()
     ConfigureBinary(${DARKNET_LIBRARY})
     ConfigureLibrary(${DARKNET_LIBRARY})
 endif()
@@ -344,6 +455,9 @@ endif()
 if (DARKNET_STATIC)
     add_library(${DARKNET_LIBRARY_STATIC} STATIC ${DARKNET_SOURCES} ${DARKNET_CPU_SOURCES}
        ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX})
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set_target_properties(${DARKNET_LIBRARY_STATIC} PROPERTIES OUTPUT_NAME "darknet_s")
+    endif()
     ConfigureBinary(${DARKNET_LIBRARY_STATIC})
     ConfigureLibrary(${DARKNET_LIBRARY_STATIC})
 endif()
@@ -352,8 +466,11 @@ endif()
 if (NOT DARKNET_NO_BINARY)
     add_executable(${DARKNET_BINARY} ${DARKNET_SOURCES} ${DARKNET_CPU_SOURCES}
         ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX}
-        ${DARKNET_MAIN_SOURCE})
-
+        ${DARKNET_MAIN_SOURCE} ${DARKNET_PUBLIC_HEADERS})
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        set_target_properties(${DARKNET_BINARY} PROPERTIES OUTPUT_NAME "darknet")
+        target_compile_definitions(${DARKNET_BINARY} PRIVATE DARKNET_BIN)
+    endif()
     ConfigureBinary(${DARKNET_BINARY})
 endif()
 

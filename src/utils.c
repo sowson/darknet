@@ -1,14 +1,33 @@
+#if defined(_WIN32) && !defined(WIN32)
+#define WIN32
+#endif
+
 #include <stdio.h>
+#ifdef WIN32
+#define _CRT_RAND_S
+#endif
+
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <assert.h>
-#include <unistd.h>
 #include <float.h>
 #include <limits.h>
-#include <time.h>
+
+#ifdef WIN32
+#include "unistd\sys\time.h"
+#else
 #include <sys/time.h>
+#endif
 
 #include "utils.h"
+
+#ifdef WIN32
+#include "unistd\unistd.h"
+#else
+#include <unistd.h>
+#endif
+
 
 /*
 // old timing. is it better? who knows!!
@@ -41,13 +60,13 @@ int *read_intlist(char *gpu_list, int *ngpus, int d)
         for(i = 0; i < len; ++i){
             if (gpu_list[i] == ',') ++*ngpus;
         }
-        gpus = calloc(*ngpus, sizeof(int));
+        gpus = (int*)calloc(*ngpus, sizeof(int));
         for(i = 0; i < *ngpus; ++i){
             gpus[i] = atoi(gpu_list);
             gpu_list = strchr(gpu_list, ',')+1;
         }
     } else {
-        gpus = calloc(1, sizeof(float));
+        gpus = (int*)calloc(1, sizeof(int));
         *gpus = d;
         *ngpus = 1;
     }
@@ -63,7 +82,7 @@ int *read_map(char *filename)
     if(!file) file_error(filename);
     while((str=fgetl(file))){
         ++n;
-        map = realloc(map, n*sizeof(int));
+        map = (int*)realloc(map, n*sizeof(int));
         map[n-1] = atoi(str);
     }
     return map;
@@ -76,7 +95,12 @@ void sorta_shuffle(void *arr, size_t n, size_t size, size_t sections)
         size_t start = n*i/sections;
         size_t end = n*(i+1)/sections;
         size_t num = end-start;
-        shuffle(arr+(start*size), num, size);
+        shuffle(
+#ifdef __cplusplus
+			(char*)
+#else
+#endif
+			arr+(start*size), num, size);
     }
 }
 
@@ -86,15 +110,35 @@ void shuffle(void *arr, size_t n, size_t size)
     void *swp = calloc(1, size);
     for(i = 0; i < n-1; ++i){
         size_t j = i + rand()/(RAND_MAX / (n-i)+1);
-        memcpy(swp,          arr+(j*size), size);
-        memcpy(arr+(j*size), arr+(i*size), size);
-        memcpy(arr+(i*size), swp,          size);
+        memcpy(swp,
+#ifdef __cplusplus
+		(char*)
+#else
+#endif
+			arr+(j*size), size);
+        memcpy(
+#ifdef __cplusplus
+		(char*)
+#else
+#endif
+			arr+(j*size),
+#ifdef __cplusplus
+			(char*)
+#else
+#endif
+			arr+(i*size), size);
+        memcpy(
+#ifdef __cplusplus
+		(char*)
+#else
+#endif
+			arr+(i*size), swp,          size);
     }
 }
 
 int *random_index_order(int min, int max)
 {
-    int *inds = calloc(max-min, sizeof(int));
+    int *inds = (int*)calloc(max-min, sizeof(int));
     int i;
     for(i = min; i < max; ++i){
         inds[i] = i;
@@ -362,11 +406,11 @@ unsigned char *read_file(char *filename)
     FILE *fp = fopen(filename, "rb");
     size_t size;
 
-    fseek(fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END); 
     size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    fseek(fp, 0, SEEK_SET); 
 
-    unsigned char *text = calloc(size+1, sizeof(char));
+    unsigned char *text = (unsigned char*)calloc(size+1, sizeof(unsigned char));
     fread(text, 1, size, fp);
     fclose(fp);
     return text;
@@ -436,7 +480,7 @@ char *fgetl(FILE *fp)
 {
     if(feof(fp)) return 0;
     size_t size = 512;
-    char *line = malloc(size*sizeof(char));
+    char *line = (char*)malloc(size*sizeof(char));
     if(!fgets(line, size, fp)){
         free(line);
         return 0;
@@ -447,7 +491,7 @@ char *fgetl(FILE *fp)
     while((line[curr-1] != '\n') && !feof(fp)){
         if(curr == size-1){
             size *= 2;
-            line = realloc(line, size*sizeof(char));
+            line = (char*)realloc(line, size*sizeof(char));
             if(!line) {
                 printf("%ld\n", size);
                 malloc_error();
@@ -519,11 +563,11 @@ void write_all(int fd, char *buffer, size_t bytes)
     }
 }
 
-inline char *copy_string(char *s)
+
+char *copy_string(char *s)
 {
-    size_t length = strlen(s);
-    char *copy = calloc(sizeof(char), length);
-    memcpy(copy, s, length * sizeof (char));
+    char *copy = (char*)malloc(strlen(s)+1);
+    strncpy(copy, s, strlen(s)+1);
     return copy;
 }
 
@@ -558,7 +602,7 @@ int count_fields(char *line)
 
 float *parse_fields(char *line, int n)
 {
-    float *field = calloc(n, sizeof(float));
+    float *field = (float*)calloc(n, sizeof(float));
     char *c, *p, *end;
     int count = 0;
     int done = 0;
@@ -815,9 +859,9 @@ float rand_scale(float s)
 float **one_hot_encode(float *a, int n, int k)
 {
     int i;
-    float **t = calloc(n, sizeof(float*));
+    float **t = (float**)calloc(n, sizeof(float*));
     for(i = 0; i < n; ++i){
-        t[i] = calloc(k, sizeof(float));
+        t[i] = (float*)calloc(k, sizeof(float));
         int index = (int)a[i];
         t[i][index] = 1;
     }
@@ -1005,6 +1049,23 @@ unsigned long custom_hash(char *str)
 
     return hash;
 }
+
+#ifdef WIN32
+void timersub(struct timeval *endPre, struct timeval *beginPre, struct timeval *result)
+{
+	do
+	{
+		(result)->tv_sec = (endPre)->tv_sec - (beginPre)->tv_sec;
+		(result)->tv_usec = (endPre)->tv_usec - (beginPre)->tv_usec;
+		if ((result)->tv_usec < 0)
+		{
+			--(result)->tv_sec;
+			(result)->tv_usec += 1000000;
+		}
+	} while (0);
+
+}
+#endif
 
 int entry_index(layer l, int batch, int location, int entry)
 {

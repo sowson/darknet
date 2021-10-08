@@ -12,7 +12,7 @@ dropout_layer make_dropout_layer(int batch, int inputs, float probability)
     l.inputs = inputs;
     l.outputs = inputs;
     l.batch = batch;
-    l.rand = calloc(inputs*batch, sizeof(float));
+    l.rand = (float*)calloc(inputs*batch, sizeof(float));
     l.scale = 1./(1.-probability);
     l.forward = forward_dropout_layer;
     l.backward = backward_dropout_layer;
@@ -34,7 +34,7 @@ void resize_dropout_layer(dropout_layer *l, int inputs)
         opencl_free_gpu_only(l->rand_gpu);
     }
 #endif
-    l->rand = realloc(l->rand, l->inputs*l->batch*sizeof(float));
+    l->rand = (float*)realloc(l->rand, l->inputs*l->batch*sizeof(float));
 #ifdef GPU
     if (gpu_index >= 0) {
         l->rand_gpu = opencl_make_array(l->rand, inputs * l->batch);

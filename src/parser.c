@@ -283,6 +283,7 @@ layer parse_softmax(list *options, size_params params)
     l.c = params.c;
     l.spatial = option_find_float_quiet(options, "spatial", 0);
     l.noloss =  option_find_int_quiet(options, "noloss", 0);
+    l.workspace_size = 0;
     return l;
 }
 
@@ -296,7 +297,7 @@ int *parse_yolo_mask(char *a, int *num)
         for(i = 0; i < len; ++i){
             if (a[i] == ',') ++n;
         }
-        mask = calloc(n, sizeof(int));
+        mask = (int*)calloc(n, sizeof(int));
         for(i = 0; i < n; ++i){
             int val = atoi(a);
             mask[i] = val;
@@ -355,7 +356,7 @@ int *parse_yolo4_mask(char *a, int *num)
         for(i = 0; i < len; ++i){
             if (a[i] == ',') ++n;
         }
-        mask = calloc(n, sizeof(int));
+        mask = (int*)calloc(n, sizeof(int));
         for(i = 0; i < n; ++i){
             int val = atoi(a);
             mask[i] = val;
@@ -1126,7 +1127,9 @@ network *parse_network_cfg(char *filename)
         l.smooth = option_find_float_quiet(options, "smooth", 0);
         option_unused(options);
         net->layers[count] = l;
-        if (l.workspace_size > workspace_size) workspace_size = l.workspace_size;
+        if (l.workspace_size > workspace_size) {
+            workspace_size = l.workspace_size;
+        }
         free_section(s);
         n = n->next;
         ++count;
@@ -1143,8 +1146,8 @@ network *parse_network_cfg(char *filename)
     net->truths = out.outputs;
     if(net->layers[net->n-1].truths) net->truths = net->layers[net->n-1].truths;
     net->output = out.output;
-    net->input = calloc(net->inputs*net->batch, sizeof(float));
-    net->truth = calloc(net->truths*net->batch, sizeof(float));
+    net->input = (float*)calloc(net->inputs*net->batch, sizeof(float));
+    net->truth = (float*)calloc(net->truths*net->batch, sizeof(float));
     //TODO: CHECK! (1)
     //net->delta = calloc(net->outputs*net->batch, sizeof(float));
 #ifdef GPU
@@ -1160,10 +1163,10 @@ network *parse_network_cfg(char *filename)
         //printf("%ld\n", workspace_size);
 #ifdef GPU
         if(gpu_index >= 0){
-            net->workspace = calloc(workspace_size, sizeof(float));
+            net->workspace = (float*)calloc(workspace_size, sizeof(float));
             net->workspace_gpu = opencl_make_array(net->workspace, workspace_size);
         }else {
-            net->workspace = calloc(workspace_size, sizeof(float));
+            net->workspace = (float*)calloc(workspace_size, sizeof(float));
         }
 #else
         net->workspace = calloc(workspace_size, sizeof(float));
@@ -1555,7 +1558,7 @@ list *read_cfg(char *filename)
         strip(line);
         switch(line[0]){
             case '[':
-                current = malloc(sizeof(section));
+                current =(section*) malloc(sizeof(section));
                 list_insert(options, current);
                 current->options = make_list();
                 current->type = line;
@@ -1744,7 +1747,7 @@ void save_weights(network *net, char *filename)
 
 void transpose_matrix(float *a, int rows, int cols)
 {
-    float *transpose = calloc(rows*cols, sizeof(float));
+    float *transpose = (float*)calloc(rows*cols, sizeof(float));
     int x, y;
     for(x = 0; x < rows; ++x){
         for(y = 0; y < cols; ++y){

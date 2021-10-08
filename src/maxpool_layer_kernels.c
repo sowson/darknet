@@ -13,9 +13,9 @@ cl_kernel* opencl_backward_maxpool_layer_kernel;
 void maxpool_kernel_init(void)
 {
     if (opencl_device_id_t == 0) {
-        opencl_maxpool_layer_kernels_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-        opencl_forward_maxpool_layer_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_backward_maxpool_layer_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_maxpool_layer_kernels_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+        opencl_forward_maxpool_layer_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_backward_maxpool_layer_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
     }
     opencl_load_buffer(maxpool_kernel_source, strlen(maxpool_kernel_source), &opencl_maxpool_layer_kernels_program[opencl_device_id_t]);
     opencl_create_kernel(&opencl_maxpool_layer_kernels_program[opencl_device_id_t], "forward_maxpool_layer_kernel", &opencl_forward_maxpool_layer_kernel[opencl_device_id_t]);

@@ -24,11 +24,11 @@ cl_kernel* opencl_smooth_kernel;
 void convolutional_kernel_init(void)
 {
     if (opencl_device_id_t == 0) {
-        opencl_convolutional_kernels_program = calloc(opencl_device_ct_t, sizeof(cl_program));
-        opencl_binarize_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_binarize_input_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_binarize_weights_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
-        opencl_smooth_kernel = calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_convolutional_kernels_program = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
+        opencl_binarize_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_binarize_input_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_binarize_weights_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
+        opencl_smooth_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
     }
 
     opencl_load_buffer(convolutional_kernel_source, strlen(convolutional_kernel_source), &opencl_convolutional_kernels_program[opencl_device_id_t]);
