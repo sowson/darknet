@@ -1,6 +1,6 @@
-# EXPERIMENTAL Build on Windows, I know! But why not once is so hard?!
+# EXPERIMENTAL Build on Windows, I know! ;-)
 
-### Make all of the artefacts by yourself and figured out more!!
+### Make all the artefacts by yourself and figured out more!!
 
 0) Clone recursive by command: git clone --recursive https://github.com/sowson/darknet
 1) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
