@@ -1,4 +1,4 @@
-# Build on Windows, I know! But why not once is so hard?!
+# EXPERIMENTAL Build on Windows, I know! But why not once is so hard?!
 
 ### Make all of the artefacts by yourself and figured out more!!
 
@@ -16,7 +16,7 @@
 
 Put into your PATH in OS the all 3rdparty folders with DLLs
 
-- clBLAS    
+- clBLAS
 - pthread
 - OpenCV
 
