@@ -72,7 +72,6 @@ LDFLAGS+= `pkg-config --libs opencv4`
 COMMON+= `pkg-config --cflags opencv4`
 endif
 
-ifeq ($(GPU), 1)
 ifeq ($(ARM), 1)
 ifeq ($(GPU), 1)
 COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120 -DARM 
@@ -85,6 +84,9 @@ CFLAGS+= -DARM -I/usr/include/ -I/usr/local/include/
 LDFLAGS+= -L/usr/local/lib -L/usr/lib/arm-linux-gnueabihf
 LDFLAGS+= -L/usr/lib
 endif
+endif
+
+ifeq ($(GPU), 1)
 ifeq ($(AMD), 1)
 COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120
 CFLAGS+= -DGPU -DOPENCL -I/usr/include/
