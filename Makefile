@@ -81,7 +81,7 @@ LDFLAGS+= -L/usr/lib
 else
 COMMON+= -DCL_TARGET_OPENCL_VERSION=120 -DARM
 CFLAGS+= -DARM -I/usr/include/ -I/usr/local/include/
-LDFLAGS+= -L/usr/local/lib -L/usr/lib/arm-linux-gnueabihf
+LDFLAGS+= -L/usr/local/lib -L/usr/lib/arm-linux-gnueabihf -lOpenCL
 LDFLAGS+= -L/usr/lib
 endif
 endif
