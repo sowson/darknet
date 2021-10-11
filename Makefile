@@ -90,13 +90,13 @@ ifeq ($(GPU), 1)
 ifeq ($(AMD), 1)
 COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120
 CFLAGS+= -DGPU -DOPENCL -I/usr/include/
-LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclBLAS -L/usr/local/lib 
 LDFLAGS+= -L/usr/lib64
 endif
 ifeq ($(NVIDIA), 1)
 COMMON+= -DGPU -DOPENCL
 CFLAGS+= -DGPU -DOPENCL -I/usr/include/ -I/usr/local/cuda/include/
-LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib
 LDFLAGS+= -L/usr/lib64
 endif
 endif
