@@ -95,7 +95,8 @@ void free_layer(layer l)
         if (l.scales_gpu.ptr) opencl_free(l.scales_gpu);
         if (l.scale_updates_gpu.ptr) opencl_free(l.scale_updates_gpu);
         if (l.output_gpu.ptr) opencl_free(l.output_gpu);
-        if (l.delta_gpu.ptr) opencl_free(l.delta_gpu);
+      // BUG FIX!
+      //if (l.delta_gpu.ptr) opencl_free(l.delta_gpu);
         if (l.rand_gpu.ptr) opencl_free(l.rand_gpu);
         if (l.squared_gpu.ptr) opencl_free(l.squared_gpu);
         if (l.norms_gpu.ptr) opencl_free(l.norms_gpu);
