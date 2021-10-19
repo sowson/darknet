@@ -15,6 +15,10 @@
 #
 # Setup VC4CL for RPI
 # https://github.com/doe300/VC4CL/wiki/How-to-get
+#
+# Install OpenCV4 from the Ubuntu 20.04 Repository
+# sudo apt update
+# sudo apt install libopencv-dev
 
 GPU=1
 GPU_FAST=1
