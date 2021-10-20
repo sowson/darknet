@@ -9,6 +9,11 @@
 # cp -r lib64/pkgconfig/* /usr/lib64/pkgconfig/
 # cp -r include/* /usr/include/
 #
+# CLBlast can be installed as follows on Ubuntu 20.04:
+# sudo add-apt-repository ppa:cnugteren/clblast
+# sudo apt-get update
+# sudo apt install libclblast-dev
+#
 # Setup Mali-GPU OpenCL
 # git clone https://github.com/krrishnarraj/libopencl-stub
 # cd libopencl-stub; mkdir b; cd b; cmake ..; make; make install; cd ..; rm -r b;
