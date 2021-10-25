@@ -17,12 +17,13 @@ decaf/
 submission/
 cfg/
 darknet
+darknet.*
 libdarknet.*
-
 .fuse*
 
 # CMake build #
 build/
+3rdparty/_Base
 
 # CLion #
 cmake-build-debug/
@@ -35,4 +36,3 @@ Icon?
 Thumbs.db
 *.swp
 
-build*

@@ -3,7 +3,7 @@
 
 # Relative path conversion top directories.
 set(CMAKE_RELATIVE_PATH_TOP_SOURCE "C:/GitHub/libunistd")
-set(CMAKE_RELATIVE_PATH_TOP_BINARY "C:/GitHub/libunistd/cmake-build-debug")
+set(CMAKE_RELATIVE_PATH_TOP_BINARY "C:/GitHub/libunistd/cmake-build-release")
 
 
 # The C and CXX include file regular expressions for this directory.

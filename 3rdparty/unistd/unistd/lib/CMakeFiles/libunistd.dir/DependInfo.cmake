@@ -4,12 +4,12 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/GitHub/libunistd/unistd/dirent.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/dirent.cpp.obj"
-  "C:/GitHub/libunistd/unistd/getopt.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/getopt.cpp.obj"
-  "C:/GitHub/libunistd/unistd/gettimeofday.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/gettimeofday.cpp.obj"
-  "C:/GitHub/libunistd/unistd/int128/Int128x86.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/int128/Int128x86.cpp.obj"
-  "C:/GitHub/libunistd/unistd/syslog.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/syslog.cpp.obj"
-  "C:/GitHub/libunistd/unistd/uni_signal.cpp" "C:/GitHub/libunistd/cmake-build-debug/unistd/CMakeFiles/libunistd.dir/uni_signal.cpp.obj"
+  "C:/GitHub/libunistd/unistd/dirent.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/dirent.cpp.obj"
+  "C:/GitHub/libunistd/unistd/getopt.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/getopt.cpp.obj"
+  "C:/GitHub/libunistd/unistd/gettimeofday.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/gettimeofday.cpp.obj"
+  "C:/GitHub/libunistd/unistd/int128/Int128x86.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/int128/Int128x86.cpp.obj"
+  "C:/GitHub/libunistd/unistd/syslog.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/syslog.cpp.obj"
+  "C:/GitHub/libunistd/unistd/uni_signal.cpp" "C:/GitHub/libunistd/cmake-build-release/unistd/CMakeFiles/libunistd.dir/uni_signal.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "MSVC")
 
@@ -25,7 +25,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "C:/GitHub/libunistd/cmake-build-debug/portable/CMakeFiles/libportable.dir/DependInfo.cmake"
+  "C:/GitHub/libunistd/cmake-build-release/portable/CMakeFiles/libportable.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.
