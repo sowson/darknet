@@ -2,7 +2,7 @@
 
 ### Make all the artefacts by yourself and figured out more!!
 
-###First got from the Internet:
+#### First got from the Internet:
 
 0) Clone recursive by command: git clone --recursive https://github.com/sowson/darknet
 
@@ -12,7 +12,7 @@
 
 3) Install Windows 8.1 SDK from https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
 
-###If you want to rebuild things from 3rdparty folder on your own:
+#### If you want to rebuild things from 3rdparty folder on your own:
 
 4) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
 
@@ -20,11 +20,11 @@
 
 6) Clone / Download and Use from: https://github.com/nothings/stb
 
-###This is an open issue, I do not know how to build this one:
+#### This is an open issue, I do not know how to build this one:
 
 7) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
 
-###Needed by some build scripts as an interpreters for scripts:
+#### Needed by some build scripts as an interpreters for scripts:
 
 8) Install Python from: https://www.python.org/downloads/windows
 
