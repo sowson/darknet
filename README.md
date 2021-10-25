@@ -1,26 +1,56 @@
-# EXPERIMENTAL Build on Windows, I know! ;-)
+# Build on Windows 10 x64
 
 ### Make all the artefacts by yourself and figured out more!!
 
+#### First got from the Internet:
+
 0) Clone recursive by command: git clone --recursive https://github.com/sowson/darknet
+
 1) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
+
 2) Install Visual Studio 2019 with C/C++ support
+
 3) Install Windows 8.1 SDK from https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
+
+#### If you want to rebuild things from 3rdparty folder on your own:
+
 4) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
+
 5) Clone / Download and Build from: https://github.com/robinrowe/libunistd
+
 6) Clone / Download and Use from: https://github.com/nothings/stb
-7) Install Python from: https://www.python.org/downloads/windows/
-8) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
 
-### Some advices I learn when I was trying to build this Win32
+#### This is an open issue, I do not know how to build this one:
 
-Put into your PATH in OS the all 3rdparty folders with DLLs
+7) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
 
-- clBLAS
-- pthread
-- OpenCV
+#### Needed by some build scripts as an interpreters for scripts:
 
-### Please do not blame me... it is still experimental on Win32
+8) Install Python from: https://www.python.org/downloads/windows
+
+#### Build process on Windows 10 can be done in CLion or Visual Studio 2019
+
+#### Please do not blame me... it is still experimental on Windows 10 x64
+
+#### To build as example in the darknet directory in the Git Command Line:
+
+mkdir build
+
+cd build
+
+cmake -S ../ -B ./
+
+cmake --build ./ --config Release --target darknet
+
+cp Release/darknet.* ..
+
+cp ../3rdparty/clBLAS/clBLAS.dll ..
+
+cp ../3rdparty/pthreads/pthreads.dll ..
+
+cd ..
+
+./darknet.exe # ;-).
 
 # Take a look 4 x GPUs on macOS (click on img to see video)
 

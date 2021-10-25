@@ -55,7 +55,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = C:\GitHub\libunistd
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\GitHub\libunistd\cmake-build-debug
+CMAKE_BINARY_DIR = C:\GitHub\libunistd\cmake-build-release
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -84,18 +84,18 @@ rebuild_cache\fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd C:\GitHub\libunistd\cmake-build-debug
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\GitHub\libunistd\cmake-build-debug\CMakeFiles C:\GitHub\libunistd\cmake-build-debug\unistd\CMakeFiles\progress.marks
+	cd C:\GitHub\libunistd\cmake-build-release
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\GitHub\libunistd\cmake-build-release\CMakeFiles C:\GitHub\libunistd\cmake-build-release\unistd\CMakeFiles\progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) unistd\all
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\GitHub\libunistd\cmake-build-debug\CMakeFiles 0
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\GitHub\libunistd\cmake-build-release\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) unistd\clean
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : clean
 
 # The main clean target
@@ -105,30 +105,30 @@ clean\fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) unistd\preinstall
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall\fast:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) unistd\preinstall
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : preinstall\fast
 
 # clear depends
 depend:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : depend
 
 # Convenience name for target.
 unistd\CMakeFiles\libunistd.dir\rule:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\rule
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : unistd\CMakeFiles\libunistd.dir\rule
 
 # Convenience name for target.
@@ -138,9 +138,9 @@ libunistd: unistd\CMakeFiles\libunistd.dir\rule
 
 # fast build rule for target.
 libunistd\fast:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\build
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : libunistd\fast
 
 dirent.obj: dirent.cpp.obj
@@ -149,9 +149,9 @@ dirent.obj: dirent.cpp.obj
 
 # target to build an object file
 dirent.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\dirent.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : dirent.cpp.obj
 
 dirent.i: dirent.cpp.i
@@ -160,9 +160,9 @@ dirent.i: dirent.cpp.i
 
 # target to preprocess a source file
 dirent.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\dirent.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : dirent.cpp.i
 
 dirent.s: dirent.cpp.s
@@ -171,9 +171,9 @@ dirent.s: dirent.cpp.s
 
 # target to generate assembly for a file
 dirent.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\dirent.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : dirent.cpp.s
 
 getopt.obj: getopt.cpp.obj
@@ -182,9 +182,9 @@ getopt.obj: getopt.cpp.obj
 
 # target to build an object file
 getopt.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\getopt.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : getopt.cpp.obj
 
 getopt.i: getopt.cpp.i
@@ -193,9 +193,9 @@ getopt.i: getopt.cpp.i
 
 # target to preprocess a source file
 getopt.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\getopt.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : getopt.cpp.i
 
 getopt.s: getopt.cpp.s
@@ -204,9 +204,9 @@ getopt.s: getopt.cpp.s
 
 # target to generate assembly for a file
 getopt.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\getopt.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : getopt.cpp.s
 
 gettimeofday.obj: gettimeofday.cpp.obj
@@ -215,9 +215,9 @@ gettimeofday.obj: gettimeofday.cpp.obj
 
 # target to build an object file
 gettimeofday.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\gettimeofday.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : gettimeofday.cpp.obj
 
 gettimeofday.i: gettimeofday.cpp.i
@@ -226,9 +226,9 @@ gettimeofday.i: gettimeofday.cpp.i
 
 # target to preprocess a source file
 gettimeofday.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\gettimeofday.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : gettimeofday.cpp.i
 
 gettimeofday.s: gettimeofday.cpp.s
@@ -237,9 +237,9 @@ gettimeofday.s: gettimeofday.cpp.s
 
 # target to generate assembly for a file
 gettimeofday.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\gettimeofday.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : gettimeofday.cpp.s
 
 int128\Int128x86.obj: int128\Int128x86.cpp.obj
@@ -248,9 +248,9 @@ int128\Int128x86.obj: int128\Int128x86.cpp.obj
 
 # target to build an object file
 int128\Int128x86.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\int128\Int128x86.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : int128\Int128x86.cpp.obj
 
 int128\Int128x86.i: int128\Int128x86.cpp.i
@@ -259,9 +259,9 @@ int128\Int128x86.i: int128\Int128x86.cpp.i
 
 # target to preprocess a source file
 int128\Int128x86.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\int128\Int128x86.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : int128\Int128x86.cpp.i
 
 int128\Int128x86.s: int128\Int128x86.cpp.s
@@ -270,9 +270,9 @@ int128\Int128x86.s: int128\Int128x86.cpp.s
 
 # target to generate assembly for a file
 int128\Int128x86.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\int128\Int128x86.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : int128\Int128x86.cpp.s
 
 syslog.obj: syslog.cpp.obj
@@ -281,9 +281,9 @@ syslog.obj: syslog.cpp.obj
 
 # target to build an object file
 syslog.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\syslog.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : syslog.cpp.obj
 
 syslog.i: syslog.cpp.i
@@ -292,9 +292,9 @@ syslog.i: syslog.cpp.i
 
 # target to preprocess a source file
 syslog.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\syslog.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : syslog.cpp.i
 
 syslog.s: syslog.cpp.s
@@ -303,9 +303,9 @@ syslog.s: syslog.cpp.s
 
 # target to generate assembly for a file
 syslog.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\syslog.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : syslog.cpp.s
 
 uni_signal.obj: uni_signal.cpp.obj
@@ -314,9 +314,9 @@ uni_signal.obj: uni_signal.cpp.obj
 
 # target to build an object file
 uni_signal.cpp.obj:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\uni_signal.cpp.obj
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : uni_signal.cpp.obj
 
 uni_signal.i: uni_signal.cpp.i
@@ -325,9 +325,9 @@ uni_signal.i: uni_signal.cpp.i
 
 # target to preprocess a source file
 uni_signal.cpp.i:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\uni_signal.cpp.i
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : uni_signal.cpp.i
 
 uni_signal.s: uni_signal.cpp.s
@@ -336,9 +336,9 @@ uni_signal.s: uni_signal.cpp.s
 
 # target to generate assembly for a file
 uni_signal.cpp.s:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(MAKE) $(MAKESILENT) -f unistd\CMakeFiles\libunistd.dir\build.make /nologo -$(MAKEFLAGS) unistd\CMakeFiles\libunistd.dir\uni_signal.cpp.s
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : uni_signal.cpp.s
 
 # Help Target
@@ -379,8 +379,8 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd C:\GitHub\libunistd\cmake-build-debug
+	cd C:\GitHub\libunistd\cmake-build-release
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 0
-	cd C:\GitHub\libunistd\cmake-build-debug\unistd
+	cd C:\GitHub\libunistd\cmake-build-release\unistd
 .PHONY : cmake_check_build_system
 
