@@ -16,28 +16,29 @@ option(DARKNET_SHARED "Build shared library" ON)
 option(DARKNET_NO_BINARY "Do not build binary" OFF)
 
 if (WIN32)
-    #set(CMAKE_GENERATOR_PLATFORM x86)
     set(PROJECTNAME_ARCHITECTURE x64)
+    set(CMAKE_SYSTEM_PROCESSOR x64)
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_C_STANDARD 99)
     include(cmake/cable/bootstrap.cmake)
     include(CableBuildInfo)
     include(CableBuildType)
     include(CableToolchains)
+    include(defaults/HunterCacheServers)
     include(HunterGate)
     cable_configure_toolchain(DEFAULT cxx14)
     cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release)
     #cable_set_build_type(DEFAULT Debug CONFIGURATION_TYPES Debug)
     HunterGate(
-            #URL "https://github.com/cpp-pm/hunter/archive/v0.23.314.tar.gz"
-            #SHA1 "95c47c92f68edb091b5d6d18924baabe02a6962a"
-            URL "https://github.com/cpp-pm/hunter/archive/v0.23.315.tar.gz"
-            SHA1 "ea5d72afc0df67f2126e7fd069f20c5f723709e1"
+            URL "https://github.com/cpp-pm/hunter/archive/v0.23.314.tar.gz"
+            SHA1 "95c47c92f68edb091b5d6d18924baabe02a6962a"
+            #URL "https://github.com/cpp-pm/hunter/archive/v0.23.315.tar.gz"
+            #SHA1 "ea5d72afc0df67f2126e7fd069f20c5f723709e1"
             LOCAL
     )
-    include(defaults/HunterCacheServers)
     project(darknet LANGUAGES C CXX)
     set(PROJECT_VERSION 1.0.0)
+    include(GNUInstallDirs)
     #set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     set(CMAKE_INSTALL_LIBDIR "${PROJECT_SOURCE_DIR}/3rdparty")
     set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/3rdparty")
@@ -48,7 +49,6 @@ if (WIN32)
     hunter_add_package(Boost COMPONENTS system filesystem thread)
     find_package(Boost CONFIG REQUIRED COMPONENTS system filesystem thread)
     add_library(Boost INTERFACE IMPORTED)
-    set(CMAKE_SYSTEM_PROCESSOR x64)
     cmake_policy(SET CMP0074 OLD)
 else()
     project(darknet LANGUAGES C CXX)
@@ -108,18 +108,6 @@ else()
 endif()
 
 if (DARKNET_GPU)
-    # Find OpenCL
-    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        hunter_add_package(OpenCL)
-        find_package(OpenCL CONFIG REQUIRED)
-    endif()
-    find_package(OpenCL REQUIRED)
-    add_library(opencl INTERFACE IMPORTED)
-    set_property(TARGET opencl PROPERTY
-        INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS})
-    set_property(TARGET opencl PROPERTY
-        INTERFACE_LINK_LIBRARIES ${OpenCL_LIBRARY})
-    list (APPEND DARKNET_DEFINITIONS GPU CL_TARGET_OPENCL_VERSION=120)
     # Find OpenCV
     if (DARKNET_OPENCV)
         if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -134,6 +122,18 @@ if (DARKNET_GPU)
                 INTERFACE_LINK_LIBRARIES ${OpenCV_LIBRARIES})
         list (APPEND DARKNET_DEFINITIONS OPENCV)
     endif()
+    # Find OpenCL
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        hunter_add_package(OpenCL)
+        find_package(OpenCL CONFIG REQUIRED)
+    endif()
+    find_package(OpenCL REQUIRED)
+    add_library(opencl INTERFACE IMPORTED)
+    set_property(TARGET opencl PROPERTY
+        INTERFACE_INCLUDE_DIRECTORIES ${OpenCL_INCLUDE_DIRS})
+    set_property(TARGET opencl PROPERTY
+        INTERFACE_LINK_LIBRARIES ${OpenCL_LIBRARY})
+    list (APPEND DARKNET_DEFINITIONS GPU CL_TARGET_OPENCL_VERSION=120)
     # Raspberry PI
 	if (DARKNET_ARM)
 		list (APPEND DARKNET_DEFINITIONS ARM)
