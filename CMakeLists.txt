@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 option(DARKNET_CPU "Enable CPU support" OFF)
 option(DARKNET_OPENCV "Enable OpenCV support" ON)
-option(DARKNET_OPENMP "Enable OpenMP support" OFF)
+option(DARKNET_OPENMP "Enable OpenMP support" ON)
 option(DARKNET_GPU "Enable OpenCL support" ON)
 option(DARKNET_GPU_FAST "Enable OpenCL fast kernels support" ON)
 option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" OFF)
@@ -66,7 +66,7 @@ endif()
 include_directories("include" "src")
 
 set (DARKNET_DEFINITIONS "")
-set (DARKNET_BINARY darknet)
+set (DARKNET_BINARY bindarknet)
 set (DARKNET_LIBRARY libdarknet)
 set (DARKNET_LIBRARY_STATIC libdarknet_s)
 
