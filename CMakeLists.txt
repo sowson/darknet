@@ -415,9 +415,9 @@ function (ConfigureBinary target)
         target_link_libraries(${target} opencv)
     endif()
 
-		if (DARKNET_OPENMP)
-			  find_package(OpenMP)
-        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    if (DARKNET_OPENMP)
+        find_package(OpenMP)
+        target_link_libraries(${target} OpenMP)
     endif()
 
 #    if (DARKNET_TESTING)
@@ -439,9 +439,9 @@ function (ConfigureLibrary target)
         LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-		if (DARKNET_OPENMP)
-			  find_package(OpenMP)
-        target_link_libraries(${target} OpenMP::OpenMP_C OpenMP::OpenMP_CXX)
+    if (DARKNET_OPENMP)
+       find_package(OpenMP)
+       target_link_libraries(${target} OpenMP)
     endif()
 endfunction()
 
