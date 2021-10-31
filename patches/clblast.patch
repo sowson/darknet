@@ -1,68 +1,72 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3d6334f..cfb3ef2 100755
+index 2c7c550..3eccf21 100755
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -69,12 +69,12 @@ if (DARKNET_GPU)
- 	if (DARKNET_ARM)
- 		list (APPEND DARKNET_DEFINITIONS ARM)
- 	else()
--		find_package(clBLAS REQUIRED)
--		add_library(clblas INTERFACE IMPORTED)
--		set_property(TARGET clblas PROPERTY
--			INTERFACE_INCLUDE_DIRECTORIES ${CLBLAS_INCLUDE_DIRS})
--		set_property(TARGET clblas PROPERTY
--			INTERFACE_LINK_LIBRARIES ${CLBLAS_LIBRARIES})
-+		find_package(clblast REQUIRED)
-+		add_library(CLBlast INTERFACE IMPORTED)
-+		set_property(TARGET CLBlast PROPERTY
-+			INTERFACE_INCLUDE_DIRECTORIES ${CLBLAST_INCLUDE_DIRS})
-+		set_property(TARGET CLBlast PROPERTY
-+			INTERFACE_LINK_LIBRARIES ${CLBLAST_LIBRARIES})
- 	endif()
+@@ -144,12 +144,12 @@ if (DARKNET_GPU)
+             #hunter_add_package(clBLAS)
+             #find_package(clBLAS CONFIG REQUIRED)
+         else()
+-  	        find_package(clBLAS REQUIRED PATHS ${clBLAS_DIR})
+-            add_library(clblas INTERFACE IMPORTED)
+-            set_property(TARGET clblas PROPERTY
+-                INTERFACE_INCLUDE_DIRECTORIES ${CLBLAS_INCLUDE_DIRS})
+-            set_property(TARGET clblas PROPERTY
+-                INTERFACE_LINK_LIBRARIES ${CLBLAS_LIBRARIES})
++            find_package(clblast REQUIRED)
++            add_library(CLBlast INTERFACE IMPORTED)
++            set_property(TARGET CLBlast PROPERTY
++                INTERFACE_INCLUDE_DIRECTORIES ${CLBLAST_INCLUDE_DIRS})
++            set_property(TARGET CLBlast PROPERTY
++                INTERFACE_LINK_LIBRARIES ${CLBLAST_LIBRARIES})
+         endif()
+     endif()
  endif()
- 
-@@ -302,7 +302,7 @@ function (ConfigureBinary target)
-     if (DARKNET_ARM)
-         target_link_libraries(${target} opencl)
-     elseif (DARKNET_GPU)
+@@ -408,7 +408,7 @@ function (ConfigureBinary target)
+ 			target_link_libraries(${target} opencl)
+ 		endif()
+ 	elseif (DARKNET_GPU)
 -        target_link_libraries(${target} opencl clblas)
 +        target_link_libraries(${target} opencl clblast)
      endif()
  
      if (DARKNET_OPENCV)
 diff --git a/Makefile b/Makefile
-index cd2c139..3fe0a79 100644
+index d091cf8..11e498e 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -11,6 +11,10 @@
+@@ -14,6 +14,14 @@
+ # sudo apt-get update
+ # sudo apt install libclblast-dev
  #
- # Setup VC4CL for RPI
- # https://github.com/doe300/VC4CL/wiki/How-to-get
-+#
-+# Setup CLBlast for LINUX
++# CLBlast can be installed from sources as follows:
++# Setup CLBlast for Linux
 +# git clone https://github.com/CNugteren/CLBlast.git
 +# cd CLBlast; mkdir b; cd b; cmake ..; make; make install; cd ..; rm -r b;
- 
- GPU=1
- GPU_FAST=1
-@@ -78,13 +82,13 @@ endif
++#
++# For CLBlast apply patch in darknet directory:
++# git apply patches/clblast.patch
++#
+ # Setup Mali-GPU OpenCL
+ # git clone https://github.com/krrishnarraj/libopencl-stub
+ # cd libopencl-stub; mkdir b; cd b; cmake ..; make; make install; cd ..; rm -r b;
+@@ -99,13 +107,13 @@ ifeq ($(GPU), 1)
  ifeq ($(AMD), 1)
  COMMON+= -DGPU -DOPENCL -DCL_TARGET_OPENCL_VERSION=120
  CFLAGS+= -DGPU -DOPENCL -I/usr/include/
--LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
-+LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclblast -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+-LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclBLAS -L/usr/local/lib 
++LDFLAGS+= -L/usr/lib/x86_64-linux-gnu/ -lOpenCL -lclblast -L/usr/local/lib
  LDFLAGS+= -L/usr/lib64
  endif
  ifeq ($(NVIDIA), 1)
  COMMON+= -DGPU -DOPENCL
  CFLAGS+= -DGPU -DOPENCL -I/usr/include/ -I/usr/local/cuda/include/
--LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
-+LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lcblast -L/usr/local/lib -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+-LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclBLAS -L/usr/local/lib
++LDFLAGS+= -L/usr/local/cuda/lib64 -lOpenCL -L/usr/lib64 -lclblast -L/usr/local/lib
  LDFLAGS+= -L/usr/lib64
  endif
  endif
 diff --git a/src/gemm.c b/src/gemm.c
-index 77e724f..1094e89 100644
+index 04428e9..28a91e7 100644
 --- a/src/gemm.c
 +++ b/src/gemm.c
 @@ -168,12 +168,13 @@ void gemm_cpu(int TA, int TB, int M, int N, int K, float ALPHA,
@@ -97,7 +101,7 @@ index 77e724f..1094e89 100644
  #endif
  }
  
-@@ -215,22 +219,20 @@ void gemm_offset_gpu(
+@@ -215,32 +219,32 @@ void gemm_offset_gpu(
      t = clock();
  #endif
  
@@ -119,18 +123,22 @@ index 77e724f..1094e89 100644
                          BETA,
                          C_gpu.mem, offset_C, ldc,
 -                        1, &que, 0, NULL, NULL);
--
--    clFlush(que);
 +                        &que, NULL);
+ 
+     // clFlush(que);
  
  #ifdef BENCHMARK
      t = clock() - t;
-@@ -238,7 +240,7 @@ void gemm_offset_gpu(
-     printf("%s\t%d\n", "clblasSgemm", (int)time_taken);
+     double time_taken = ((double)t);
+-    printf("%s\t%d\n", "clblasSgemm", (int)time_taken);
++    printf("%s\t%d\n", "CLBlastSgemm", (int)time_taken);
  #endif
  
 -    if (clErr != CL_SUCCESS)
 +    if (clErr != CLBlastSuccess)
      {
-         printf("gemm_gpu: clblasSgemm failed. Errorcode: %d\n", clErr);
+-        printf("gemm_gpu: clblasSgemm failed. Errorcode: %d\n", clErr);
++        printf("gemm_gpu: CLBlastSgemm failed. Errorcode: %d\n", clErr);
      }
+ }
+ #endif
