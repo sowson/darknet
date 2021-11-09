@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+#include "darknet.h"
 #include "network.h"
 #include "data.h"
-
+#include "opencl.h"
 #include "crop_layer.h"
 #include "convolutional_layer.h"
 #include "region_layer.h"
