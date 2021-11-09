@@ -1452,7 +1452,7 @@ void sync_layer(network **nets, int n, int j)
 	for (i = 0; i < n; ++i) {
 		opencl_set_device(nets[i]->gpu_index);
 		layer l = nets[i]->layers[j];
-		distribute_weights(l, base);
+        push_weights(l);
 	}
 }
 
