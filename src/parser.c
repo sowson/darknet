@@ -1018,6 +1018,9 @@ network *parse_network_cfg(char *filename)
     if (gpu_index >= 0) {
         net->gpu_index = opencl_device_id_t;
     }
+    else {
+        net->gpu_index = -1;
+    }
 #endif
     size_params params;
 
@@ -1547,7 +1550,6 @@ network parse_network_cfg_custom(char *filename, int batch, int time_steps)
 
 list *read_cfg(char *filename)
 {
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *file = fopen(filename, "r");
     if(file == 0) file_error(filename);
     char *line;
@@ -1672,7 +1674,6 @@ void save_weights_upto(network *net, char *filename, int cutoff)
 #if !defined(BENCHMARK) && !defined(LOSS_ONLY)
     fprintf(stderr, "Saving weights to %s\n", filename);
 #endif
-    if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "wb");
     if(!fp) file_error(filename);
 
@@ -1889,7 +1890,6 @@ void load_weights_upto(network *net, char *filename, int start, int cutoff)
 #endif
     fprintf(stderr, "Loading weights from %s...", filename);
     fflush(stdout);
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "rb");
     if(!fp) file_error(filename);
 

@@ -78,7 +78,6 @@ int *read_map(char *filename)
     int n = 0;
     int *map = 0;
     char *str;
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *file = fopen(filename, "r");
     if(!file) file_error(filename);
     while((str=fgetl(file))){
@@ -404,8 +403,6 @@ void error(const char *s)
 
 unsigned char *read_file(char *filename)
 {
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
-	
     FILE *fp = fopen(filename, "rb");
     size_t size;
 

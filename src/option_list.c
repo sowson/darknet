@@ -6,7 +6,6 @@
 
 list *read_data_cfg(char *filename)
 {
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *file = fopen(filename, "r");
     if(file == 0) file_error(filename);
     char *line;

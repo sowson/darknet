@@ -83,7 +83,6 @@ int hierarchy_top_prediction(float *predictions, tree *hier, float thresh, int s
 tree *read_tree(char *filename)
 {
     tree t = {0};
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "r");
 
     char *line;
@@ -220,7 +219,6 @@ int hierarchy_top_prediction_y4(float *predictions, tree *hier, float thresh, in
 tree *read_tree_y4(char *filename)
 {
     tree t = {0};
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "r");
 
     char *line;

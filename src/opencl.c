@@ -13,13 +13,12 @@
 #include <sys/time.h>
 #endif
 
-#include <assert.h>
-
 #ifndef GPU_INDEX
 #define GPU_INDEX
 int gpu_index = 1;
 #endif
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
