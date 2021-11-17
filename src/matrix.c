@@ -132,6 +132,7 @@ float *pop_column(matrix *m, int c)
 
 matrix csv_to_matrix(char *filename)
 {
+	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "r");
     if(!fp) file_error(filename);
 

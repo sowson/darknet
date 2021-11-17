@@ -12,6 +12,8 @@ __kernel void weighted_delta_kernel(int n, __global float *a, __global float *b,
         ds[i] += dc[i] * a[i] + dc[i] * -b[i];
     }
 }
+
+
 __kernel void mult_add_into_kernel(int n, __global float *a, __global float *b, __global float *c)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -19,6 +21,8 @@ __kernel void mult_add_into_kernel(int n, __global float *a, __global float *b, 
         c[i] += a[i]*b[i];
     }
 }
+
+
 __kernel void deinter_kernel(int NX, __global float *X, int NY, __global float *Y, int B, __global float *OUT)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -32,6 +36,8 @@ __kernel void deinter_kernel(int NX, __global float *X, int NY, __global float *
         }
     }
 }
+
+
 __kernel void inter_kernel(int NX, __global float *X, int NY, __global float *Y, int B, __global float *OUT)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -45,6 +51,8 @@ __kernel void inter_kernel(int NX, __global float *X, int NY, __global float *Y,
         }
     }
 }
+
+
 __kernel void softmax_device(__global float *input, int n, float temp, int stride, __global float *output)
 {
     int i;
@@ -63,6 +71,8 @@ __kernel void softmax_device(__global float *input, int n, float temp, int strid
         output[i*stride] /= sum;
     }
 }
+
+
 __kernel void softmax_kernel(__global float *input, int offset, int n, int batch, int batch_offset, int groups, int group_offset, int stride, float temp, __global float *output)
 {
     int id = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -71,6 +81,8 @@ __kernel void softmax_kernel(__global float *input, int offset, int n, int batch
     int g = id % groups;
     softmax_device(input + b*batch_offset + g*group_offset + offset, n, temp, stride, output + b*batch_offset + g*group_offset + offset);
 }
+
+
 __kernel void softmax_tree_kernel(__global float *input, int offset, int index, int spatial, int batch, int stride, float temp, __global float *output, int groups, __global float *group_size, __global float *group_offset)
 {
     int id = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -83,11 +95,15 @@ __kernel void softmax_tree_kernel(__global float *input, int offset, int index, 
     int boff = b*stride;
     softmax_device(input + offset + goff + boff + s, group_size[g], temp, spatial, output + offset + goff + boff + s);
 }
+
+
 __kernel void scale_mask_kernel(int n, __global float *x, float mask_num, __global float *mask, float scale)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
     if(i < n && mask[i] == mask_num) x[i] *= scale;
 }
+
+
 __kernel void dot_kernel(__global float *output, float scale, int batch, int n, int size, __global float *delta)
 {
     int index = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -122,6 +138,8 @@ __kernel void dot_kernel(__global float *output, float scale, int batch, int n, 
         }
     }
 }
+
+
 __kernel void upsample_kernel(int N, __global float *x, int w, int h, int c, int batch, int stride, int forward, float scale, __global float *out)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -146,6 +164,8 @@ __kernel void upsample_kernel(int N, __global float *x, int w, int h, int c, int
     if(forward) out[out_index] += scale * x[in_index];
     else x[in_index] += scale * out[out_index];
 }
+
+
 __kernel void gemm_kernel(
         int tuning, __local float* sums,
         int TA, int TB,
@@ -182,9 +202,9 @@ __kernel void gemm_kernel(
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE);
+    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
 
-    if (td == tuning-1) {
+    if (td == 0) {
         for(ts = 0; ts < tuning; ++ts) {
             if (TA==0 && TB==0) {
                 C[iM * ldc + jN + offset_C] += sums[ts];
@@ -198,6 +218,8 @@ __kernel void gemm_kernel(
         }
     }
 }
+
+
 __kernel void scal_add_kernel(int N, float ALPHA, float BETA, __global float *X, int OFFX, int INCX)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -206,6 +228,7 @@ __kernel void scal_add_kernel(int N, float ALPHA, float BETA, __global float *X,
         X[i*INCX + OFFX] += BETA;
     }
 }
+
 __kernel void mean_array_kernel(int N, float alpha, __global float *s, __global float *a)
 {
     int i = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -214,5 +237,6 @@ __kernel void mean_array_kernel(int N, float alpha, __global float *s, __global 
     a[i] *= alpha;
     s[i] = a[i];
 }
+
 );
 #endif
