@@ -30,11 +30,8 @@ if (WIN32)
     cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release)
     #cable_set_build_type(DEFAULT Debug CONFIGURATION_TYPES Debug)
     HunterGate(
-            URL "https://github.com/cpp-pm/hunter/archive/v0.23.314.tar.gz"
-            SHA1 "95c47c92f68edb091b5d6d18924baabe02a6962a"
-            #URL "https://github.com/cpp-pm/hunter/archive/v0.23.315.tar.gz"
-            #SHA1 "ea5d72afc0df67f2126e7fd069f20c5f723709e1"
-            LOCAL
+        URL "https://github.com/cpp-pm/hunter/archive/v0.23.317.tar.gz"
+        SHA1 "fbdd94b1966d351384e27b02c8d134915b1131d6"
     )
     project(darknet LANGUAGES C CXX)
     set(PROJECT_VERSION 1.0.0)
