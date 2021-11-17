@@ -122,23 +122,17 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n);
 dim2 opencl_gridsize(const int n);
 void opencl_dump_mem_stat();
 
+void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n);
+void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n);
+
+void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n);
+void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n);
+
+void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
+void opencl_push_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
+
+void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n);
+void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n);
+
 #endif // GPU
-#else
-//#ifdef GPU
-//extern int *gpusg;
-//extern int ngpusg;
-//#ifdef WIN32
-//extern __declspec(thread) int opencl_device_id_t;
-//extern __declspec(thread) int opencl_device_ct_t;
-//#else
-//extern __thread int opencl_device_id_t;
-//extern __thread int opencl_device_ct_t;
-//#endif
-//extern cl_int *cl_native_double_width_s;
-//extern size_t *cl_native_max_group_size_s;
-//extern size_t *cl_native_address_bits_s;
-//extern cl_context opencl_context;
-//extern cl_command_queue* opencl_queues;
-//extern cl_device_id* opencl_devices;
-//#endif
 #endif // OPENCL_H

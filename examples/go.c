@@ -38,6 +38,7 @@ moves load_go_moves(char *filename)
     moves m;
     m.n = 128;
     m.data = (char**)calloc(128, sizeof(char*));
+	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     FILE *fp = fopen(filename, "rb");
     int count = 0;
     char *line = 0;

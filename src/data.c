@@ -15,8 +15,8 @@ list *get_paths(char *filename)
 {
 	if (filename) filename[strcspn(filename, "\n\r")] = 0;
     char *pos;
-    if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
-    if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
+    //if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
+    //if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
     char *path;
 	FILE *file = fopen(filename, "r");
 	if(!file) file_error(filename);
@@ -144,10 +144,10 @@ matrix load_image_augment_paths(char **paths, int n, int min, int max, int size,
 
 box_label *read_boxes(char *filename, int *n)
 {
-    //if (filename) filename[strcspn(filename, "\n\r")] = 0;
+    if (filename) filename[strcspn(filename, "\n\r")] = 0;
     char *pos;
-    if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
-    if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
+    //if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
+    //if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
 	FILE *file = fopen(filename, "r");
 	if(!file) file_error(filename);
 	float x, y, h, w;
@@ -1440,6 +1440,7 @@ data load_cifar10_data(char *filename)
 	d.X = X;
 	d.y = y;
 
+    if (filename) filename[strcspn(filename, "\n\r")] = 0;
 	FILE *fp = fopen(filename, "rb");
 	if(!fp) file_error(filename);
 	for(i = 0; i < 10000; ++i){
@@ -1524,6 +1525,7 @@ data load_all_cifar10()
 
 data load_go(char *filename)
 {
+	if (filename) filename[strcspn(filename, "\n\r")] = 0;
 	FILE *fp = fopen(filename, "rb");
 	matrix X = make_matrix(3363059, 361);
 	matrix y = make_matrix(3363059, 361);
