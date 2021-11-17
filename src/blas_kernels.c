@@ -17,7 +17,6 @@
 
 #include "opencl.h"
 #include "layer.h"
-#define OUT OUT_TEMP
 
 cl_program* opencl_blas_kernel_program1;
 cl_program* opencl_blas_kernel_program2;
@@ -143,15 +142,19 @@ void blas_kernel_init(void)
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "backward_scale_kernel", &opencl_backward_scale_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "add_bias_kernel", &opencl_add_bias_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "backward_bias_kernel", &opencl_backward_bias_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "adam_kernel", &opencl_adam_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "normalize_kernel", &opencl_normalize_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "normalize_delta_kernel", &opencl_normalize_delta_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "l2norm_kernel", &opencl_l2norm_kernel[opencl_device_id_t]);
+	opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mean_kernel", &opencl_mean_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "variance_kernel", &opencl_variance_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mean_delta_kernel", &opencl_mean_delta_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "variance_delta_kernel", &opencl_variance_delta_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "accumulate_kernel", &opencl_accumulate_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mean_delta_kernel", &opencl_mean_delta_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mean_kernel", &opencl_mean_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "variance_kernel", &opencl_variance_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_mean_kernel", &opencl_fast_mean_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_variance_kernel", &opencl_fast_variance_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_mean_delta_kernel", &opencl_fast_mean_delta_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_variance_delta_kernel", &opencl_fast_variance_delta_kernel[opencl_device_id_t]);
+	opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "adam_kernel", &opencl_adam_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "normalize_kernel", &opencl_normalize_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "normalize_delta_kernel", &opencl_normalize_delta_kernel[opencl_device_id_t]);
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "l2norm_kernel", &opencl_l2norm_kernel[opencl_device_id_t]);    
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "reorg_kernel", &opencl_reorg_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "axpy_kernel", &opencl_axpy_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "pow_kernel", &opencl_pow_kernel[opencl_device_id_t]);
@@ -164,10 +167,6 @@ void blas_kernel_init(void)
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mask_kernel", &opencl_mask_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "copy_kernel", &opencl_copy_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "mul_kernel", &opencl_mul_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_mean_kernel", &opencl_fast_mean_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_variance_kernel", &opencl_fast_variance_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_mean_delta_kernel", &opencl_fast_mean_delta_kernel[opencl_device_id_t]);
-    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "fast_variance_delta_kernel", &opencl_fast_variance_delta_kernel[opencl_device_id_t]);
 
     opencl_create_kernel(&opencl_blas_kernel_program2[opencl_device_id_t], "flatten_kernel", &opencl_flatten_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program2[opencl_device_id_t], "shortcut_kernel", &opencl_shortcut_kernel[opencl_device_id_t]);
@@ -930,5 +929,4 @@ void gemm_offset_gpu(
     );
 }
 #endif
-#undef OUT
 #endif // GPU

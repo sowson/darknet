@@ -907,8 +907,8 @@ void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n);
 void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n);
 float opencl_mag_array(cl_mem_ext x_gpu, size_t n);
 void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n);
-void opencl_pull_array_map(cl_mem_ext x_gpu, void *x, size_t n);
-void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n);
+void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
+void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n);
 
 float opencl_mag_array(cl_mem_ext x_gpu, size_t n);
 

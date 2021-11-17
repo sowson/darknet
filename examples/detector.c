@@ -155,7 +155,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
            }
          */
 #ifndef LOSS_ONLY
-        printf("Loaded: %lf seconds\n", what_time_is_it_now()-time);
+        printf("Loaded: %lf seconds\n", sec(what_time_is_it_now()-time));
 #endif
 #ifndef LOSS_ONLY
         time=what_time_is_it_now();
@@ -180,9 +180,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
 
         i = get_current_batch(net);
 #ifdef LOSS_ONLY
-        printf("%lf\t%f\n", what_time_is_it_now()-time, loss);
+        printf("%lf\t%f\n", sec(what_time_is_it_now()-time), loss);
 #else
-        printf("%ld: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), what_time_is_it_now()-time, i*imgs);
+        printf("%ld: %f, %f avg, %f rate, %lf seconds, %d images\n", get_current_batch(net), loss, avg_loss, get_current_rate(net), sec(what_time_is_it_now()-time), i*imgs);
 #endif
 #ifdef GPU
         if (loss != loss && gpu_index >= 0) {
@@ -440,7 +440,7 @@ void validate_detector_flip(char *datacfg, char *cfgfile, char *weightfile, char
         fprintf(fp, "\n]\n");
         fclose(fp);
     }
-    fprintf(stderr, "Total Detection Time: %f Seconds\n", what_time_is_it_now() - start);
+    fprintf(stderr, "Total Detection Time: %f Seconds\n", sec(what_time_is_it_now()-start));
 }
 
 
@@ -569,7 +569,7 @@ void validate_detector(char *datacfg, char *cfgfile, char *weightfile, char *out
         fprintf(fp, "\n]\n");
         fclose(fp);
     }
-    fprintf(stderr, "Total Detection Time: %f Seconds\n", what_time_is_it_now() - start);
+    fprintf(stderr, "Total Detection Time: %f Seconds\n", sec(what_time_is_it_now()-start));
 }
 
 void validate_detector_recall(char *datacfg, char *cfgfile, char *weightfile)
@@ -694,7 +694,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
             network_predict_y4(net, X);
         }
 
-        printf("%s: Predicted in %f seconds.\n", input, ((double)(clock() - time)) / CLOCKS_PER_SEC);
+        printf("%s: Predicted in %f seconds.\n", input, sec((double)(clock() - time)));
         int nboxes = 0;
         detection *dets = 0;
         if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
@@ -825,7 +825,7 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
             float *X = sized.data;
             time = what_time_is_it_now();
             network_predict(net, X);
-            printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now() - time);
+            printf("%s: Predicted in %f seconds.\n", input, sec(what_time_is_it_now()-time));
             int nboxes = 0;
             detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
             //printf("%d\n", nboxes);

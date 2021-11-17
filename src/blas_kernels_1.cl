@@ -1,6 +1,8 @@
 #ifndef __BLAS_KERNELS_1_CL__
 #define __BLAS_KERNELS_1_CL__
 
+static const char* const blas_kernel_source_1 = CONVERT_KERNEL_TO_STRING(
+
 /*
 static void atomicAdd(volatile __global float *a, float v) {
     //float s = v;
@@ -27,8 +29,6 @@ static void atomicAdd(volatile __global float *a, float v) {
     } while (atom_cmpxchg((__global unsigned int *)a, o.i, n.i) != o.i);
 }
 */
-
-static const char* const blas_kernel_source_1 = CONVERT_KERNEL_TO_STRING(
 
 __kernel void scale_bias_kernel(int N, __global float *output, __global float *biases, int batch, int n, int size)
 {
@@ -103,8 +103,7 @@ __kernel void backward_bias_kernel(int tuning, __local float* sums, int batch, i
     }
 }
 
-
-__kernel void mean_kernel(int N, __global float *x, int batch, int filters, int spatial, __global float *mean)
+__kernel void  mean_kernel(int N, __global float *x, int batch, int filters, int spatial, __global float *mean)
 {
     float scale = 1.f/(batch * spatial);
 
@@ -244,7 +243,7 @@ __kernel void fast_variance_kernel(int tuning, __local float *sums, int filters,
 }
 
 
-__kernel void fast_mean_delta_kernel(int tuning, __local float *sums, int filters, int batch, int spatial, __global float *variance, __global float *delta, __global float *mean_delta)
+ __kernel void fast_mean_delta_kernel(int tuning, __local float *sums, int filters, int batch, int spatial, __global float *variance, __global float *delta, __global float *mean_delta)
 {
     int t = get_global_id(0);
     if (t >= tuning) return;
@@ -269,7 +268,6 @@ __kernel void fast_mean_delta_kernel(int tuning, __local float *sums, int filter
     }
     mean_delta[i] *= (-1.f/sqrt(variance[i] + .000001f));
 }
-
 
 __kernel void fast_variance_delta_kernel(int tuning, __local float *sums, int filters, int batch, int spatial, __global float *x, __global float *variance, __global float *delta, __global float *mean, __global float *variance_delta)
 {
@@ -297,7 +295,6 @@ __kernel void fast_variance_delta_kernel(int tuning, __local float *sums, int fi
     variance_delta[i] *= -.5f * pow(variance[i] + .000001f, (float)(-3.f/2.f));
 }
 
-
 __kernel void adam_kernel(int N, __global float *x, __global float *m, __global float *v, float B1, float B2, float rate, float eps, int t)
 {
     int index = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -319,6 +316,7 @@ __kernel void normalize_kernel(int N, __global float *x, __global float *mean, _
     int index = b*filters*spatial + f*spatial + i;
     x[index] = (x[index] - mean[f])/(sqrt(variance[f] + .00001f));
 }
+
 
 
 __kernel void normalize_delta_kernel(int N, __global float *x, __global float *mean, __global float *variance, __global float *mean_delta, __global float *variance_delta, int batch, int filters, int spatial, __global float *delta)
@@ -355,7 +353,6 @@ __kernel void l2norm_kernel(int N, __global float *x, __global float *dx, int ba
         dx[index] = (1 - x[index]) / sum;
     }
 }
-
 
 __kernel void reorg_kernel(int N, __global float *x, int w, int h, int c, int batch, int stride, int forward, __global float *out)
 {
