@@ -1,64 +1,12 @@
 # Build on macOS or Ubuntu 20.04
 
-0) Step by step in command prompt guide: https://iblog.isowa.io/2018/05/26/darknet-training
+Step by step in command prompt guide: https://iblog.isowa.io/2018/05/26/darknet-training
 
 # Build on Windows 10 or 11 x64
 
-### Make all the artefacts by yourself and figured out more!!
+Step by step experimental guide: https://iblog.isowa.io/2021/11/20/darknet-on-opencl-on-windows-11-x64
 
-#### First got from the Internet:
-
-0) Clone recursive by command: git clone --recursive https://github.com/sowson/darknet
-
-1) Install MSVC++ from: https://aka.ms/vs/16/release/vc_redist.x64.exe
-
-2) Install Windows 10 or 11 SDK from: https://developer.microsoft.com/en-us/windows/downloads/sdk-archive
-
-3) Install Visual Studio 2019 with C/C++ support (optional but useful)
-
-#### If you want to rebuild things from 3rdparty folder on your own:
-
-4) Clone / Download and Build from: https://github.com/BrianGladman/pthreads
-
-5) Clone / Download and Build from: https://github.com/robinrowe/libunistd
-
-6) Clone / Download and Use from: https://github.com/nothings/stb
-
-#### This is an open issue, I do not know how to build this one:
-
-7) Clone / Download and Build clBLAS from: https://github.com/sowson/clBLAS
-
-#### Needed by some build scripts as an interpreters for scripts:
-
-8) Install Python from: https://www.python.org/downloads/windows
-
-9) Install CMake for Windows from: https://cmake.org/download
-
-#### Build process on Windows 10 can be done in CLion or Visual Studio 2019
-
-#### Please do not blame me... it is still experimental on Windows 10 x64
-
-#### To build as example in the darknet directory in the Git Command Line:
-
-mkdir build
-
-cd build
-
-cmake -S ../ -B ./
-
-cmake --build ./ --config Release --target darknet
-
-cp Release/darknet.exe ../darknet.exe
-
-cp ../3rdparty/clBLAS/clBLAS.dll ..
-
-cp ../3rdparty/pthreads/pthreads.dll ..
-
-cd ..
-
-./darknet.exe # ;-).
-
-# Take a look 4 x GPUs on macOS (click on img to see video)
+# Take a look 4 x GPUs on macOS (click to see video)
 
 [![4 x AMD Radeon RX 6900 XT on macOS 11.5.2](https://iblog.isowa.io/wp-content/uploads/2021/08/moria-scaled.jpeg)](https://www.youtube.com/watch?v=W6VOLjgwKNI)
 
