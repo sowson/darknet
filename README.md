@@ -1,3 +1,7 @@
+# Project Status: Freeze!
+
+From now on, I will not push anymore my commits to this repository, however, I will be open to your pull requests to approve those and increase the contributors' list, enjoy! ;-). I think OpenCL has a bright future, I am leaving some open issues, and I hope community will be able to solve them if needed. Thank you! ;-).
+
 # Build on macOS or Ubuntu 20.04
 
 Step by step in command prompt guide: https://iblog.isowa.io/2018/05/26/darknet-training
