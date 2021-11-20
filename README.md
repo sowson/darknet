@@ -14,7 +14,7 @@ Step by step experimental guide: https://iblog.isowa.io/2021/11/20/darknet-on-op
 
 git apply patches/clblast.patch
 
-# Darknet-vNext
+# Darknet-vNext (Improved CUDA DarkNet)
 
 [DarkNet-vNext Link](https://github.com/sowson/darknet-vNext) If you are looking for engine that has all the same functions, but it is FASTER!
 
