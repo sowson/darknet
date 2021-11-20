@@ -13,7 +13,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 list *get_paths(char *filename)
 {
-	if (filename) filename[strcspn(filename, "\n\r")] = 0;
+    //if (filename) filename[strcspn(filename, "\n\r")] = 0;
     char *pos;
     if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
     if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
@@ -22,7 +22,9 @@ list *get_paths(char *filename)
 	if(!file) file_error(filename);
 	list *lines = make_list();
 	while((path=fgetl(file))){
-		list_insert(lines, path);
+            if ((pos=strchr(filename, '\r')) != NULL) *pos = '\0';
+            if ((pos=strchr(filename, '\n')) != NULL) *pos = '\0';
+            list_insert(lines, path);
 	}
 	fclose(file);
 	return lines;
