@@ -34,7 +34,7 @@ static void interruption_handler(const int s)
     interrupted = 1;
 }
 
-int monitor_directory(const char *directory, const char **patterns, const size_t pattern_count)
+int monitor_directory(const char *directory, const char **patterns, int (*process_file) (const char* file_name), const size_t pattern_count)
 {
   int notifyfd = -1;
   int watchfd = -1;
@@ -80,7 +80,7 @@ int monitor_directory(const char *directory, const char **patterns, const size_t
         {
           case 0:
           strncpy(fname, event_ptr->name, event_ptr->len);
-          if (system_notified_file_name(fname) != 0) {
+          if (process_file(fname) != 0) {
               errmsg = "system_notified_file_name";
               goto catch;
           }
@@ -137,7 +137,7 @@ int exists(const char *fname, const char* ext)
 
 #if defined(__linux__)
 
-int init_notified_file_name(char *dirname) {
+int init_notified_file_name(char *dirname, int (*process_file) (const char* file_name)) {
   if (!initialized) {
     struct sigaction sa;
     sa.sa_handler = interruption_handler;
@@ -147,7 +147,7 @@ int init_notified_file_name(char *dirname) {
     initialized = 1;
   }
   const char* patterns[] = {"*.jpg"};
-  if(monitor_directory(dirname, patterns, 1) == 0)
+  if(monitor_directory(dirname, patterns, process_file, 1) == 0)
     return 0;
   else
     return 1;

@@ -1,8 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-int (*system_notified_file_name) (const char* file_name);
-int init_notified_file_name(char *dirname);
+int init_notified_file_name(char *dirname, int (*process_file) (const char* file_name));
 
 #ifdef __linux__
 //struct inotify_event {
@@ -14,7 +13,7 @@ int init_notified_file_name(char *dirname);
 //  char     name[];   /* Optional null-terminated name */
 //};
 
-int monitor_directory(const char *directory, const char **patterns, const size_t pattern_count);
+int monitor_directory(const char *directory, const char **patterns, int (*process_file) (const char* file_name), const size_t pattern_count);
 #endif
 
 int exists(const char *fname, const char* ext);

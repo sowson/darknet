@@ -940,9 +940,7 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
     lin_out_dir     = out_dir;
     lin_margin      = margin;
 
-    system_notified_file_name = process_file;
-
-    while (!init_notified_file_name(in_dir));
+    while (!init_notified_file_name(in_dir, process_file));
 }
 #endif
 
