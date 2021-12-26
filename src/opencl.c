@@ -249,7 +249,7 @@ void opencl_load_buffer(const char *buffer, const size_t size, cl_program *outpu
             1,
             &opencl_devices[opencl_device_id_t],
             "-Werror "
-          //"-cl-std=CL1.2 "
+            "-cl-std=CL1.2 "
             "-cl-opt-disable "
           //"-cl-denorms-are-zero "
           //"-cl-fp32-correctly-rounded-divide-sqrt "
@@ -721,7 +721,7 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 #else
     buf.ptr = x;
 
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
 #endif
@@ -767,7 +767,7 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
 #else
     buf.ptr = x;
 
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
 #endif
