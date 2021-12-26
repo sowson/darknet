@@ -32,6 +32,7 @@ layer make_shortcut_layer(int batch, int index, int w, int h, int c, int w2, int
     if (gpu_index >= 0) {
         l.forward_gpu = forward_shortcut_layer_gpu;
         l.backward_gpu = backward_shortcut_layer_gpu;
+        l.update_gpu = 0;
         l.delta_gpu = opencl_make_array(l.delta, l.outputs*batch);
         l.output_gpu = opencl_make_array(l.output, l.outputs*batch);
     }

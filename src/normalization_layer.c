@@ -29,6 +29,7 @@ layer make_normalization_layer(int batch, int w, int h, int c, int size, float a
     if (gpu_index >= 0) {
         layer.forward_gpu = forward_normalization_layer_gpu;
         layer.backward_gpu = backward_normalization_layer_gpu;
+        layer.update_gpu = 0;
         layer.output_gpu = opencl_make_array(layer.output, h * w * c * batch);
         layer.delta_gpu = opencl_make_array(layer.delta, h * w * c * batch);
         layer.squared_gpu = opencl_make_array(layer.squared, h * w * c * batch);

@@ -1356,6 +1356,7 @@ network parse_network_cfg_custom(char *filename, int batch, int time_steps)
             l.keep_delta_gpu = 1;
             l.forward_gpu = 0;
             l.backward_gpu = 0;
+            l.update_gpu = 0;
 #endif
             fprintf(stderr, "empty \n");
         }else{

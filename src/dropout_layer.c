@@ -20,6 +20,7 @@ dropout_layer make_dropout_layer(int batch, int inputs, float probability)
     if (gpu_index >= 0) {
         l.forward_gpu = forward_dropout_layer_gpu;
         l.backward_gpu = backward_dropout_layer_gpu;
+        l.update_gpu = 0;
         l.rand_gpu = opencl_make_array(l.rand, inputs * batch);
     }
 #endif

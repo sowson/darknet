@@ -46,6 +46,7 @@ layer make_iseg_layer(int batch, int w, int h, int classes, int ids)
     if (gpu_index >= 0) {
         l.forward_gpu = forward_iseg_layer_gpu;
         l.backward_gpu = backward_iseg_layer_gpu;
+        l.update_gpu = 0;
         l.output_gpu = opencl_make_array(l.output, batch * l.outputs);
         l.delta_gpu = opencl_make_array(l.delta, batch * l.outputs);
     }
