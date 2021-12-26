@@ -5,9 +5,9 @@
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
-      <config projectName="darknet" targetName="bindarknet" />
       <config projectName="darknet" targetName="libdarknet_s" />
       <config projectName="darknet" targetName="libdarknet" />
+      <config projectName="darknet" targetName="darknet" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -17,27 +17,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c1f2602-dc6e-4bd5-b03e-d07ee3b8a66f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/activation_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/activation_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/avgpool_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/avgpool_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/batchnorm_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/batchnorm_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cost_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/cost_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/crop_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/crop_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/detection_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/detection_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dropout_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/dropout_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/iseg_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/iseg_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/l2norm_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/l2norm_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logistic_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/logistic_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/maxpool_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/maxpool_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/normalization_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/normalization_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/parser.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/region_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/region_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/reorg_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/reorg_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/route_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/route_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/shortcut_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/shortcut_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/softmax_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/softmax_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/upsample_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/upsample_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/yolo4_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/yolo4_layer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/yolo_layer.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/yolo_layer.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -261,7 +241,12 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="bindarknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="bindarknet">
+    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="darknet" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -317,6 +302,7 @@
       <item itemvalue="CMake Application.bindarknet (tcifar) (d19)" />
       <item itemvalue="CMake Application.bindarknet (tcifar) (valid)" />
       <item itemvalue="CMake Application.bindarknet (tcifar)" />
+      <item itemvalue="CMake Application.darknet" />
       <item itemvalue="CMake Application.libdarknet" />
       <item itemvalue="CMake Application.libdarknet_s" />
     </list>
@@ -790,7 +776,7 @@
       <workItem from="1631446448409" duration="387000" />
       <workItem from="1631439920843" duration="549000" />
       <workItem from="1631448016560" duration="6438000" />
-      <workItem from="1640526352917" duration="539000" />
+      <workItem from="1640526352917" duration="903000" />
     </task>
     <servers />
   </component>
