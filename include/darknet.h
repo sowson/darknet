@@ -909,7 +909,7 @@ void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n);
 float opencl_mag_array(cl_mem_ext x_gpu, size_t n);
 void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n);
 void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
-void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n);
+void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n);
 
 float opencl_mag_array(cl_mem_ext x_gpu, size_t n);
 
@@ -1037,11 +1037,10 @@ detection *avg_predictions(network *net, int *nboxes);
 extern "C" {
 #endif
 void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps);
+void draw_ddetections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps, int blur_and_save, const char* fname, int margin);
 #ifdef __cplusplus
 }
 #endif
-#else
-void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps);
 #endif
 
 void draw_detections_y4(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps);

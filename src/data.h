@@ -1,6 +1,5 @@
 #ifndef DATA_H
 #define DATA_H
-#include <pthread.h>
 
 #include "darknet.h"
 #include "matrix.h"

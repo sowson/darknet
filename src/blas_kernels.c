@@ -22,6 +22,7 @@ cl_program* opencl_blas_kernel_program1;
 cl_program* opencl_blas_kernel_program2;
 cl_program* opencl_blas_kernel_program3;
 
+cl_kernel* opencl_test_kernel;
 cl_kernel* softmax_device_kernel;
 cl_kernel* opencl_scale_bias_kernel;
 cl_kernel* opencl_backward_scale_kernel;
@@ -81,6 +82,7 @@ void blas_kernel_init(void)
         opencl_blas_kernel_program2 = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
         opencl_blas_kernel_program3 = (cl_program*)calloc(opencl_device_ct_t, sizeof(cl_program));
 
+        opencl_test_kernel= (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
         softmax_device_kernel = (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
         opencl_scale_bias_kernel= (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
         opencl_backward_scale_kernel= (cl_kernel*)calloc(opencl_device_ct_t, sizeof(cl_kernel));
@@ -138,6 +140,7 @@ void blas_kernel_init(void)
     opencl_load_buffer(blas_kernel_source_2, strlen(blas_kernel_source_2), &opencl_blas_kernel_program2[opencl_device_id_t]);
     opencl_load_buffer(blas_kernel_source_3, strlen(blas_kernel_source_3), &opencl_blas_kernel_program3[opencl_device_id_t]);
 
+    opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "test_kernel", &opencl_test_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "scale_bias_kernel", &opencl_scale_bias_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "backward_scale_kernel", &opencl_backward_scale_kernel[opencl_device_id_t]);
     opencl_create_kernel(&opencl_blas_kernel_program1[opencl_device_id_t], "add_bias_kernel", &opencl_add_bias_kernel[opencl_device_id_t]);
@@ -195,6 +198,7 @@ void blas_kernel_init(void)
 
 void blas_kernel_release(void)
 {
+    clReleaseKernel(opencl_test_kernel[opencl_device_id_t]); opencl_test_kernel[opencl_device_id_t] = 0;
     clReleaseKernel(softmax_device_kernel[opencl_device_id_t]); softmax_device_kernel[opencl_device_id_t] = 0;
     clReleaseKernel(opencl_scale_bias_kernel[opencl_device_id_t]); opencl_scale_bias_kernel[opencl_device_id_t] = 0;
     clReleaseKernel(opencl_backward_scale_kernel[opencl_device_id_t]); opencl_backward_scale_kernel[opencl_device_id_t] = 0;
@@ -306,9 +310,22 @@ void blas_kernel_release(void)
         free(opencl_gemm_kernel);
         free(opencl_mean_array_kernel);
         free(opencl_scal_add_kernel);
+        free(opencl_test_kernel);
     }
 }
 
+void test_kernel_gpu(int N, cl_mem_ext input, cl_mem_ext output, cl_mem_ext expected)
+{
+    dim2 dimGrid;
+    dimGrid = dim2_create(1, 1);
+
+    opencl_kernel(opencl_test_kernel[opencl_device_id_t], dimGrid, 8,
+                  &N, sizeof(cl_int),
+                  &input.mem, sizeof(cl_mem),
+                  &output.mem, sizeof(cl_mem),
+                  &expected.mem, sizeof(cl_mem)
+    );
+}
 
 void scale_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int size)
 {
@@ -322,7 +339,7 @@ void scale_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int 
 
 void backward_scale_gpu(cl_mem_ext x_norm, cl_mem_ext delta, int batch, int n, int size, cl_mem_ext scale_updates)
 {
-    int tuning = (int)ceil(sqrt(n));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, n);
     dim2 dimGridL1;
@@ -343,7 +360,7 @@ void add_bias_gpu(cl_mem_ext output, cl_mem_ext biases, int batch, int n, int si
 
 void backward_bias_gpu(cl_mem_ext bias_updates, cl_mem_ext delta, int batch, int n, int size)
 {
-    int tuning = (int)ceil(sqrt(n));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, n);
     dim2 dimGridL1;
@@ -429,7 +446,7 @@ void l2normalize_gpu(cl_mem_ext x, cl_mem_ext dx, int batch, int filters, int sp
 
 void fast_mean_gpu(cl_mem_ext x, int batch, int filters, int spatial, cl_mem_ext mean)
 {
-    int tuning = (int)ceil(sqrt(filters));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -440,7 +457,7 @@ void fast_mean_gpu(cl_mem_ext x, int batch, int filters, int spatial, cl_mem_ext
 
 void fast_variance_gpu(cl_mem_ext x, cl_mem_ext mean, int batch, int filters, int spatial, cl_mem_ext variance)
 {
-    int tuning = (int)ceil(sqrt(filters));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -451,7 +468,7 @@ void fast_variance_gpu(cl_mem_ext x, cl_mem_ext mean, int batch, int filters, in
 
 void fast_mean_delta_gpu(cl_mem_ext delta, cl_mem_ext variance, int batch, int filters, int spatial, cl_mem_ext mean_delta)
 {
-    int tuning = (int)ceil(sqrt(filters));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -462,7 +479,7 @@ void fast_mean_delta_gpu(cl_mem_ext delta, cl_mem_ext variance, int batch, int f
 
 void fast_variance_delta_gpu(cl_mem_ext x, cl_mem_ext delta, cl_mem_ext mean, cl_mem_ext variance, int batch, int filters, int spatial, cl_mem_ext variance_delta)
 {
-    int tuning = (int)ceil(sqrt(filters));
+    int tuning = 32;
     dim2 dimGridG1;
     dimGridG1 = dim2_create(tuning, filters);
     dim2 dimGridL1;
@@ -897,17 +914,16 @@ void gemm_offset_gpu(
         cl_mem_ext A_gpu, int offset_A, int lda,
         cl_mem_ext B_gpu, int offset_B, int ldb,
         float BETA,
-        cl_mem_ext C_gpu, int offset_C, int ldc)
-{
+        cl_mem_ext C_gpu, int offset_C, int ldc) {
     //printf("gemm gpu: %d %d %d %d %d %f %d %d %f %d\n",TA, TB, M, N, K, ALPHA, lda, ldb, BETA, ldc);
 
-    int tuning = 32;
-    dim2 dimGridG1;
-    dimGridG1 = dim2_create(tuning, M*N);
-    dim2 dimGridL1;
-    dimGridL1 = dim2_create(tuning, 1);
+    int tuning = 8;
+    dim3 dimGridG1;
+    dimGridG1 = dim3_create(tuning, N, M);
+    dim3 dimGridL1;
+    dimGridL1 = dim3_create(tuning, 1, 1);
 
-    opencl_kernel_local(opencl_gemm_kernel[opencl_device_id_t], dimGridG1, dimGridL1, 36,
+    opencl_kernel_local3(opencl_gemm_kernel[opencl_device_id_t], dimGridG1, dimGridL1, 36,
                   &tuning, sizeof(cl_int),
                   NULL, tuning*sizeof(cl_float),
                   &TA, sizeof(cl_int),

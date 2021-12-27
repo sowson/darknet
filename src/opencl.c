@@ -2,6 +2,7 @@
 
 #define DARKNET_VERBOSE_GPU
 //#define DEBUG_KERNELS
+//#define DARKNET_TEST_CPU_AND_GPU
 
 #include "opencl.h"
 
@@ -148,6 +149,157 @@ const char* clCheckError(int errorCode) {
     return error;
 }
 
+#ifdef DARKNET_TEST_CPU_AND_GPU
+#include "blas.h"
+
+void opencl_cpu_gpu_test()
+{
+    sleep(1);
+
+    int N = 1;
+    int s = 7;
+
+    float* input = (float*)calloc(s, sizeof(float));
+    float* output = (float*)calloc(s, sizeof(float));
+    float* expected = (float*)calloc(s, sizeof(float));
+
+    ///*
+    input[0] = 2.f;
+    output[0] = 0;
+    expected[0] = 1.4142135381698608398438f;
+    expected[1] = 0.3465735614299774169922f;
+    expected[2] = 0.2234459370374679565430f;
+    expected[3] = -1.2503780126571655273438f;
+    expected[4] = 1.2503780126571655273438f;
+    expected[5] = 0.9491037726402282714844f;
+    expected[6] = 0.5824118852615356445312f;
+    //*/
+
+    /*
+    input[0] = 5.f;
+    output[0] = 0;
+    expected[0] = 2.2360680103302001953125f;
+    expected[1] = 0.8047189712524414062500f;
+    expected[2] = 0.6151968240737915039062f;
+    expected[3] = -1.8500206470489501953125f;
+    expected[4] = 1.8500206470489501953125f;
+    expected[5] = 0.9612694978713989257812f;
+    expected[6] = 0.5724795460700988769531f;
+    */
+
+    cl_mem_ext input_gpu = opencl_make_array(input, s);
+    cl_mem_ext output_gpu = opencl_make_array(output, s);
+    cl_mem_ext expected_gpu = opencl_make_array(expected, s);
+
+    printf("\n");
+
+    printf("TEST CPU:\n");
+    int index = 0;
+    output[index] = sqrtf(input[index]);
+    printf("sqrt(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = logf(input[index]);
+    printf("log(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = powf(input[index], output[index-2]);
+    printf("pow(%.22f, %.22f) = %.22f", input[index], output[index-2], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = -expf(input[index]);
+    printf("exp(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = fabsf(input[index]);
+    printf("fabs(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = sinf(input[index]);
+    printf("sin(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    input[index] = output[index-1];
+    output[index] = cosf(input[index]);
+    printf("cos(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    sleep(1);
+
+    printf("\n");
+
+    index = 0;
+    output[0] = 0;
+    output[1] = 0;
+    printf("TEST GPU:\n");
+    test_kernel_gpu(N, input_gpu, output_gpu, expected_gpu);
+    opencl_pull_array(input_gpu, input, s);
+    opencl_pull_array(output_gpu, output, s);
+    printf("sqrt(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("log(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("pow(%.22f, %.22f) = %.22f", input[index], output[index-2], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("exp(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("fabs(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("sin(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    index += 1;
+    printf("cos(%.22f) = %.22f", input[index], output[index]);
+    printf(" %s\n", output[index] == expected[index] ? "PASS" : "FAIL");
+    sleep(1);
+
+    printf("\n");
+
+    opencl_free(input_gpu);
+    opencl_free(output_gpu);
+    opencl_free(expected_gpu);
+
+    // TODO: REMEMBER!
+    /*
+    int im = 7;
+    int jm = 3;
+    int km = 5;
+
+    printf("CPU\n");
+    int i,j,k;
+    for (k = 0; k < km; ++k) {
+        for (j = 0; j < jm; ++j) {
+            for (i = 0; i < im; ++i) {
+                int id = i + j*im + k*jm*im;
+                printf("%d %d %d (%d)\n", k, j, i, id);
+            }
+        }
+    }
+
+    printf("GPU\n");
+    int iN = im*jm*km;
+    int id;
+    for(id = 0; id < iN; ++id) {
+        k = (id / (jm*im));
+        j = (id % (jm*im) / im);
+        i = (id % im);
+        int index = i + j*im + k*jm*im;
+        printf("%d %d %d (%d)\n", k, j, i, index);
+    }
+    */
+
+    sleep(5);
+}
+#endif
+
 dim2 dim2_create(const int x, const int y)
 {
     dim2 ret;
@@ -161,6 +313,17 @@ dim2 dim2_create(const int x, const int y)
 dim2 opencl_gridsize(const int n)
 {
     dim2 ret = dim2_create(n, 1);
+
+    return ret;
+}
+
+dim3 dim3_create(const int x, const int y, const int z)
+{
+    dim3 ret;
+
+    ret.x = x;
+    ret.y = y;
+    ret.z = z;
 
     return ret;
 }
@@ -237,27 +400,12 @@ void opencl_load_buffer(const char *buffer, const size_t size, cl_program *outpu
         exit(-1);
     }
 
-#ifdef ARM
     clErr = clBuildProgram(
             *output,
             1,
             &opencl_devices[opencl_device_id_t],
-            NULL, NULL, NULL);
-#else
-    clErr = clBuildProgram(
-            *output,
-            1,
-            &opencl_devices[opencl_device_id_t],
-            "-Werror "
-          //"-cl-std=CL1.2 "
-            "-cl-opt-disable "
-          //"-cl-denorms-are-zero "
-          //"-cl-fp32-correctly-rounded-divide-sqrt "
-            "-cl-no-signed-zeros "
-            "-cl-mad-enable "
-          //"-cl-fast-relaxed-math "
+            " -cl-fast-relaxed-math "
             , NULL, NULL);
-#endif
 
     if (clErr != CL_SUCCESS)
     {
@@ -396,6 +544,12 @@ void opencl_init(int *gpus, int ngpus) {
 #endif
         dropout_kernel_init();
     }
+
+#if defined(DARKNET_TEST_CPU_AND_GPU)
+    opencl_cpu_gpu_test();
+    opencl_deinit(gpus, ngpus);
+    exit(0);
+#endif
 }
 
 void opencl_deinit(int *gpus, int ngpus)
@@ -637,6 +791,112 @@ void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2
 #endif
 }
 
+void opencl_kernel_local3(cl_kernel kernel, const dim3 globalItemSize, const dim3 localItemSize, const int argc, ...)
+{
+    cl_int clErr;
+
+    cl_command_queue que = opencl_queues[opencl_device_id_t];
+
+    va_list vl;
+    va_start(vl, argc);
+
+    size_t argSize = 0;
+    void *argValue = NULL;
+
+#ifdef DEBUG_KERNELS
+    {
+        const size_t bufferSize = 2048;
+        char *kernelName = (char*) calloc(bufferSize, sizeof(char));
+        clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
+        printf("opencl %s : ", kernelName);
+        free(kernelName);
+        printf("\n");
+    }
+#endif
+
+    int i, j;
+    for (i = 0, j = 0; i < argc; i+=2, ++j)
+    {
+        argValue = va_arg(vl, void*);
+        argSize = va_arg(vl, size_t);
+
+        // I need NULL to __local arrays
+        // assert(argValue);
+
+        clErr = clSetKernelArg(kernel, j, argSize, argValue);
+
+        if (clErr != CL_SUCCESS)
+        {
+            const size_t bufferSize = 2048;
+            char *kernelName = (char*) calloc(bufferSize, sizeof(char));
+
+            clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
+            printf("opencl_kernel %s could not set kernel argument. error: %s\n", kernelName, clCheckError(clErr));
+
+            free(kernelName);
+            exit(-1);
+        }
+    }
+
+    va_end(vl);
+
+    size_t globalOffset[3];
+    globalOffset[0] = 0;
+    globalOffset[1] = 0;
+    globalOffset[2] = 0;
+
+    size_t globalItems[3];
+    globalItems[0] = globalItemSize.x;
+    globalItems[1] = globalItemSize.y;
+    globalItems[2] = globalItemSize.z;
+
+    size_t localItems[3];
+    localItems[0] = localItemSize.x;
+    localItems[1] = localItemSize.y;
+    localItems[2] = localItemSize.z;
+
+#ifdef BENCHMARK
+    clock_t t;
+    t = clock();
+#endif
+
+    clErr = clEnqueueNDRangeKernel(que, kernel, 3, globalOffset, globalItems, localItems, 0, NULL, NULL);
+
+    //clFlush(que);
+
+#ifdef BENCHMARK
+    t = clock() - t;
+    double time_taken = ((double)t);
+    const size_t bufferSize = 2048;
+    char *kernelName = (char*) calloc(bufferSize, sizeof(char));
+    clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
+    printf("%s\t%d\n", kernelName, (int)time_taken);
+    free(kernelName);
+#endif
+
+    if (clErr != CL_SUCCESS)
+    {
+        const size_t bufferSize = 2048;
+        char *kernelName = (char*) calloc(bufferSize, sizeof(char));
+
+        clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
+        printf("opencl %s error: %s\n", kernelName, clCheckError(clErr));
+
+        free(kernelName);
+        exit(-1);
+    }
+#ifdef DEBUG_KERNELS
+    else {
+        const size_t bufferSize = 2048;
+        char *kernelName = (char*) calloc(bufferSize, sizeof(char));
+        clGetKernelInfo(kernel, CL_KERNEL_FUNCTION_NAME, bufferSize, kernelName, NULL);
+        printf("opencl %s : ", kernelName);
+        free(kernelName);
+        printf("OK \n");
+    }
+#endif
+}
+
 cl_mem_ext opencl_random(cl_mem_ext x_gpu, size_t n)
 {
     int i;
@@ -712,19 +972,11 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     cl_int clErr;
 
-#ifdef WIN32
-    buf.ptr = NULL;
-
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE,
-                             buf.len * buf.obs, buf.ptr,
-                             &clErr);
-#else
     buf.ptr = x;
 
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
-#endif
 
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
@@ -739,6 +991,7 @@ cl_mem_ext opencl_make_array(float *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
+    buf.chk = buf.ptr;
     return buf;
 }
 
@@ -758,19 +1011,11 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
 
     cl_int clErr;
 
-#ifdef WIN32
-    buf.ptr = NULL;
-
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE,
-                             buf.len * buf.obs, buf.ptr,
-                             &clErr);
-#else
     buf.ptr = x;
 
-    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR | CL_MEM_COPY_HOST_PTR,
+    buf.org = clCreateBuffer(opencl_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                              buf.len * buf.obs, buf.ptr,
                              &clErr);
-#endif
 
     if (clErr != CL_SUCCESS)
         printf("could create buffer on device. error: %s\n", clCheckError(clErr));
@@ -785,11 +1030,13 @@ cl_mem_ext opencl_make_int_array(int *x, size_t n)
 
     buf.que = opencl_queues[opencl_device_id_t];
 
+    buf.chk = buf.ptr;
     return buf;
 }
 
 void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -811,6 +1058,7 @@ void opencl_push_int_array(cl_mem_ext x_gpu, int *x, size_t n)
 
 void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -832,6 +1080,7 @@ void opencl_pull_int_array(cl_mem_ext x_gpu, int *x, size_t n)
 
 void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -853,6 +1102,7 @@ void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n)
 
 void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -874,6 +1124,7 @@ void opencl_pull_array(cl_mem_ext x_gpu, float *x, size_t n)
 
 void opencl_push_int_array_map(cl_mem_ext x_gpu, int *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -900,6 +1151,7 @@ void opencl_push_int_array_map(cl_mem_ext x_gpu, int *x, size_t n)
 
 void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -924,8 +1176,9 @@ void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n)
 #endif
 }
 
-void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n)
+void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -950,8 +1203,9 @@ void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n)
 #endif
 }
 
-void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n)
+void opencl_pull_array_map(cl_mem_ext x_gpu, void *x, size_t n)
 {
+    if (x_gpu.chk == NULL) return;
 #ifdef BENCHMARK
     clock_t t;
     t = clock();
@@ -978,7 +1232,9 @@ void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n)
 
 void opencl_free(cl_mem_ext x_gpu)
 {
-    if(!x_gpu.ptr) return;
+    if (x_gpu.chk == NULL) return;
+    x_gpu.chk = NULL;
+    if (x_gpu.len) clReleaseMemObject(x_gpu.org);
     x_gpu.len = 0;
     x_gpu.obs = 0;
     x_gpu.mem = 0;
@@ -989,7 +1245,6 @@ void opencl_free(cl_mem_ext x_gpu)
     x_gpu.dec = 0;
     x_gpu.add = 0;
     x_gpu.rem = 0;
-    clReleaseMemObject(x_gpu.org);
     x_gpu.org = 0;
     x_gpu.map = 0;
     x_gpu.que = 0;
@@ -999,7 +1254,9 @@ void opencl_free(cl_mem_ext x_gpu)
 
 void opencl_free_gpu_only(cl_mem_ext x_gpu)
 {
-    if(!x_gpu.ptr) return;
+    if (x_gpu.chk == NULL) return;
+    x_gpu.chk = NULL;
+    if (x_gpu.len) clReleaseMemObject(x_gpu.org);
     x_gpu.len = 0;
     x_gpu.obs = 0;
     x_gpu.mem = 0;
@@ -1010,7 +1267,6 @@ void opencl_free_gpu_only(cl_mem_ext x_gpu)
     x_gpu.dec = 0;
     x_gpu.add = 0;
     x_gpu.rem = 0;
-    clReleaseMemObject(x_gpu.org);
     x_gpu.org = 0;
     x_gpu.map = 0;
     x_gpu.que = 0;

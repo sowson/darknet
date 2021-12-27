@@ -22,9 +22,9 @@ typedef struct {
 image ipl_to_image(void *src);
 image load_image_cv(char *filename, int channels);
 image get_image_from_stream_cv(void *cap);
-void blur_image_and_save_cv(image im, int num, int classes, detection *dets, float thresh, const char *fname);
 void save_image_jpg_cv(image p, const char *name);
 void *open_video_stream(const char *f, int c, int w, int h, int fps);
+void mark_image_and_save_cv(image im, int num, int classes, detection *dets, float thresh, const char *fname, int margin);
 int cv_wait_key(int key);
 void *cv_capture_from_file(const char* filename);
 void *cv_capture_from_camera(int cam_index, int w, int h, int frames);

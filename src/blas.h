@@ -48,6 +48,7 @@ void get_embedding(float *src, int src_w, int src_h, int src_c, int embedding_si
 #ifdef GPU
 #include "opencl.h"
 #include "tree.h"
+void test_kernel_gpu(int N, cl_mem_ext input, cl_mem_ext output, cl_mem_ext expected);
 
 void constrain_gpu(int N, float ALPHA, cl_mem_ext X, int INCX);
 

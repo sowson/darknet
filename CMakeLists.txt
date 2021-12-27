@@ -10,7 +10,7 @@ option(DARKNET_ARM "Enable ARM support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
 option(DARKNET_TESTING "Build the unit tests" OFF)
-option(DARKNET_DEBUG "Enable debug mode" OFF)
+option(DARKNET_DEBUG "Enable debug mode" ON)
 option(DARKNET_STATIC "Build static library" ON)
 option(DARKNET_SHARED "Build shared library" ON)
 option(DARKNET_NO_BINARY "Do not build binary" OFF)
@@ -53,8 +53,10 @@ else()
     project(darknet LANGUAGES C CXX)
     set(PROJECT_VERSION 1.0.0)
     set(CMAKE_CXX_STANDARD 11)
+    #set(CMAKE_C_STANDARD 99)
     set(CMAKE_C_COMPILER "gcc")
     set(CMAKE_CXX_COMPILER "g++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     include(GNUInstallDirs)
 endif()
 
@@ -71,9 +73,9 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set (DARKNET_LIBRARY libdarknet)
     set (DARKNET_LIBRARY_STATIC libdarknet_s)
 else()
-    set (DARKNET_BINARY bindarknet)
-    set (DARKNET_LIBRARY libdarknet)
-    set (DARKNET_LIBRARY_STATIC libdarknet_s)
+    set (DARKNET_BINARY darknet)
+    set (DARKNET_LIBRARY darknet_l)
+    set (DARKNET_LIBRARY_STATIC darknet_s)
 endif()
 
 message(STATUS ${CMAKE_SYSTEM_NAME})
@@ -84,33 +86,34 @@ if (DARKNET_DEBUG OR DARKNET_TESTING)
     else ()
         list (APPEND DARKNET_CFLAGS "-g")
     endif()
+endif()
+
+if (DARKNET_OPENMP)
+    list (APPEND DARKNET_CFLAGS "-openmp")
+endif()
+
+if (WIN32)
+    add_library(POSIX INTERFACE IMPORTED)
+    set_property(TARGET POSIX PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
+    set_property(TARGET POSIX PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
+    set_property(TARGET POSIX PROPERTY INTERFACE_LINK_LIBRARIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd/lib/libunistd.lib")
+    add_library(pthread INTERFACE IMPORTED)
+    set_property(TARGET pthread PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
+    set_property(TARGET pthread PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
+    set_property(TARGET pthread PROPERTY INTERFACE_LINK_LIBRARIES "pthreads.lib")
+    add_library(stb INTERFACE IMPORTED)
+    set_property(TARGET stb PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/stb")
+    add_library(clblas INTERFACE IMPORTED)
+    set_property(TARGET clblas PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/clBLAS")
+    set_property(TARGET clblas PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/clBLAS")
+    set_property(TARGET clblas PROPERTY INTERFACE_LINK_LIBRARIES "clBLAS.lib")
 else()
-	if (DARKNET_OPENMP)
-		list (APPEND DARKNET_CFLAGS "-openmp")
-	endif()
-    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        add_library(POSIX INTERFACE IMPORTED)
-        set_property(TARGET POSIX PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
-        set_property(TARGET POSIX PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd")
-        set_property(TARGET POSIX PROPERTY INTERFACE_LINK_LIBRARIES "${PROJECT_SOURCE_DIR}/3rdparty/unistd/unistd/lib/libunistd.lib")
-        add_library(pthread INTERFACE IMPORTED)
-        set_property(TARGET pthread PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
-        set_property(TARGET pthread PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/pthreads")
-        set_property(TARGET pthread PROPERTY INTERFACE_LINK_LIBRARIES "pthreads.lib")
-        add_library(stb INTERFACE IMPORTED)
-        set_property(TARGET stb PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/stb")
-        add_library(clblas INTERFACE IMPORTED)
-        set_property(TARGET clblas PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/clBLAS")
-        set_property(TARGET clblas PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/clBLAS")
-        set_property(TARGET clblas PROPERTY INTERFACE_LINK_LIBRARIES "clBLAS.lib")
-    else()
-        list (APPEND DARKNET_CFLAGS "-O3")
-        list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
-        list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
-        list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
-        list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
-        list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
-    endif()
+    list (APPEND DARKNET_CFLAGS "-O3")
+    list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
+    list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
+    list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
+    list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
+    list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
 endif()
 
 if (DARKNET_GPU)
@@ -258,6 +261,7 @@ set (DARKNET_SOURCES
     "examples/segmenter.c"
     "examples/super.c"
     "examples/swag.c"
+    "src/system.c"
     "examples/tag.c"
     "src/tree.c"
     "src/utils.c"
@@ -319,6 +323,7 @@ set (DARKNET_PUBLIC_HEADERS
     "src/softmax_layer.h"
     "src/stb_image.h"
     "src/stb_image_write.h"
+    "src/system.h"
     "src/tree.h"
     "src/utils.h"
     "src/opencl.h"
@@ -423,7 +428,7 @@ function (ConfigureBinary target)
 
     if (DARKNET_OPENMP)
         find_package(OpenMP)
-        target_link_libraries(${target} OpenMP)
+        #!#target_link_libraries(${target} OpenMP)
     endif()
 
 #    if (DARKNET_TESTING)
@@ -447,7 +452,7 @@ function (ConfigureLibrary target)
 
     if (DARKNET_OPENMP)
        find_package(OpenMP)
-       target_link_libraries(${target} OpenMP)
+       #!#target_link_libraries(${target} OpenMP)
     endif()
 endfunction()
 

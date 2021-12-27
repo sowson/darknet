@@ -30,6 +30,41 @@ static void atomicAdd(volatile __global float *a, float v) {
 }
 */
 
+
+__kernel void test_kernel(int N, __global float *input, __global float *output, __global float *expected)
+{
+        int index = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
+
+        if (index >= N) return;
+
+        output[index] = sqrt(input[index]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = log(input[index]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = pow(input[index], output[index-2]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = -exp(input[index]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = fabs(input[index]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = sin(input[index]);
+
+        index += 1;
+        input[index] = output[index-1];
+        output[index] = cos(input[index]);
+}
+
+
 __kernel void scale_bias_kernel(int N, __global float *output, __global float *biases, int batch, int n, int size)
 {
     int index = (get_group_id(0) + get_group_id(1)*get_num_groups(0)) * get_local_size(0) + get_local_id(0);
@@ -59,7 +94,7 @@ __kernel void backward_scale_kernel(int tuning, __local float* sums, int batch, 
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     for(s = 0; s < tuning; ++s) {
         scale_updates[i] += sums[s];
@@ -96,7 +131,7 @@ __kernel void backward_bias_kernel(int tuning, __local float* sums, int batch, i
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     for(s = 0; s < tuning; ++s) {
         bias_updates[i] += sums[s];
@@ -206,7 +241,7 @@ __kernel void fast_mean_kernel(int tuning, __local float *sums, int filters, int
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     mean[i] = 0;
     for (s = 0; s < tuning; ++s) {
@@ -233,7 +268,7 @@ __kernel void fast_variance_kernel(int tuning, __local float *sums, int filters,
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     variance[i] = 0;
     for (s = 0; s < tuning; ++s) {
@@ -260,7 +295,7 @@ __kernel void fast_variance_kernel(int tuning, __local float *sums, int filters,
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     mean_delta[i] = 0;
     for (s = 0; s < tuning; ++s) {
@@ -286,7 +321,7 @@ __kernel void fast_variance_delta_kernel(int tuning, __local float *sums, int fi
         }
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     variance_delta[i] = 0;
     for (s = 0; s < tuning; ++s) {

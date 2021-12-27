@@ -5,7 +5,7 @@
 #define WIN32
 #endif
 
-#define CL_TARGET_VERSION 120
+#define CL_TARGET_OPENCL_VERSION 120
 
 //#define GPU_STATS
 
@@ -65,6 +65,7 @@ typedef struct _cl_mem_ext {
     void* ptr;
     void* map;
     cl_command_queue que;
+    void* chk;
 } cl_mem_ext;
 
 cl_mem_ext cln(cl_mem_ext buf);
@@ -98,14 +99,21 @@ void avgpool_kernel_release(void);
 void crop_kernel_release(void);
 void dropout_kernel_release(void);
 
-typedef struct dim2_
+typedef struct _dim2
 {
     size_t x;
     size_t y;
 } dim2;
 dim2 dim2_create(const int x, const int y);
+typedef struct _dim3
+{
+    size_t x;
+    size_t y;
+    size_t z;
+} dim3;
+dim3 dim3_create(const int x, const int y, const int z);
 
-#define CONVERT_KERNEL_TO_STRING(...) #__VA_ARGS__
+#define CONVERT_KERNEL_TO_STRING(...) # __VA_ARGS__
 
 void opencl_load(const char *fileName, cl_program *output);
 void opencl_load_buffer(const char *bufferName, const size_t size, cl_program *output);
@@ -114,6 +122,7 @@ void opencl_init(int *gpus, int ngpus);
 void opencl_deinit(int *gpus, int ngpus);
 void opencl_kernel(cl_kernel kernel, const dim2 globalItemSize, const int argc, ...);
 void opencl_kernel_local(cl_kernel kernel, const dim2 globalItemSize, const dim2 localItemSize, const int argc, ...);
+void opencl_kernel_local3(cl_kernel kernel, const dim3 globalItemSize, const dim3 localItemSize, const int argc, ...);
 
 cl_mem_ext opencl_random(cl_mem_ext x_gpu, size_t n);
 
@@ -131,8 +140,8 @@ void opencl_push_array(cl_mem_ext x_gpu, float *x, size_t n);
 void opencl_pull_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
 void opencl_push_int_array_map(cl_mem_ext x_gpu, int *x, size_t n);
 
-void opencl_pull_array_map(cl_mem_ext x_gpu, float *x, size_t n);
-void opencl_push_array_map(cl_mem_ext x_gpu, float *x, size_t n);
+void opencl_pull_array_map(cl_mem_ext x_gpu, void *x, size_t n);
+void opencl_push_array_map(cl_mem_ext x_gpu, void *x, size_t n);
 
 #endif // GPU
 #endif // OPENCL_H

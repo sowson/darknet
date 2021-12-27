@@ -49,7 +49,7 @@ layer make_reorg_layer(int batch, int w, int h, int c, int stride, int reverse, 
     if (gpu_index >= 0) {
         l.forward_gpu = forward_reorg_layer_gpu;
         l.backward_gpu = backward_reorg_layer_gpu;
-
+        l.update_gpu = 0;
         l.output_gpu = opencl_make_array(l.output, output_size);
         l.delta_gpu = opencl_make_array(l.delta, output_size);
     }

@@ -1,4 +1,6 @@
 #include "darknet.h"
+#include "system.h"
+#include "image.h"
 #include <stdio.h>
 #ifdef WIN32
 #include "unistd\dirent.h"
@@ -729,36 +731,8 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         if (filename) break;
     }
 }
-
-int exists(const char *fname, const char* ext)
-{
-    FILE *file;
-    if (strstr(fname, ext) && (file = fopen(fname, "r")))
-    {
-        fclose(file);
-        return 1;
-    }
-    return 0;
-}
-
-int empty(char *dirname) {
-    int n = 0;
-    struct dirent *d;
-    DIR *dir = opendir(dirname);
-    if (dir == NULL) // not a dir or doesn't exist
-        return 1;
-    while ((d = readdir(dir)) != NULL) {
-        if(++n > 2)
-            break;
-    }
-    closedir(dir);
-    if (n <= 2) //dir empty
-        return 1;
-    else
-        return 0;
-}
-
-void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir)
+#ifndef __linux__
+void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir, int margin)
 {
     list *options = read_data_cfg(datacfg);
     char *name_list = option_find_str(options, "names", "data/names.list");
@@ -772,7 +746,7 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
     char buff[256];
     char *input = buff;
     float nms=.45;
-    char fname[256];
+    char fname[1024];
     char ffname[1024];
     char ffoname[1024];
 
@@ -784,7 +758,7 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
         }
         DIR *dr = opendir(in_dir);
         while ((de = readdir(dr)) != NULL) {
-            printf("%s\n", de->d_name);
+            //printf("%s\n", de->d_name);
             strcpy(fname, de->d_name);
             strcpy(ffname, in_dir);
             strcat(ffname, "/");
@@ -813,6 +787,10 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
                 if (offs != size) usleep(10); else break;
             } while (1);
             image im = load_image_color(input, 0, 0);
+            if (im.w == 0 || im.h == 0) {
+                remove(input);
+                continue;
+            }
             int resize = im.w != net->w || im.h != net->h;
             image sized = resize ? letterbox_image(im, net->w, net->h) : im;
             //image sized = resize_image(im, net->w, net->h);
@@ -823,17 +801,32 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
 
             float *X = sized.data;
             time = what_time_is_it_now();
-            network_predict(net, X);
-            printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now() - time);
+            if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+                network_predict(net, X);
+            }
+            if (l.type == YOLO4) {
+                network_predict(net, X);
+            }
+            printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now()-time);
             int nboxes = 0;
-            detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+            detection *dets = 0;
+            if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+                dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+            }
+            if (l.type == YOLO4) {
+                dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
+            }
             //printf("%d\n", nboxes);
-            //if (nms) do_nms_obj(boxes, probs, l.w*l.h*l.n, l.classes, nms);
             if (nms) {
                 if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, nms);
                 else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
             }
-            draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+                draw_ddetections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0, 1, ffoname, margin);
+            }
+            if (l.type == YOLO4) {
+                draw_ddetections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0, 1, ffoname, margin);
+            }
             free_detections(dets, nboxes);
             free_image(im);
             if (resize) free_image(sized);
@@ -843,6 +836,115 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
         closedir(dr);
     }
 }
+#else
+static char *lin_in_dir;
+static float lin_thresh;
+static float lin_hier_thresh;
+static char *lin_out_dir;
+static int   lin_margin;
+char       **lin_names;
+image      **lin_alphabet;
+network     *lin_net;
+float        lin_nms;
+
+int process_file(const char *file_name) {
+    //printf("fn: %s\n", file_name);
+
+    double time = 0;
+
+    char fname[1024];
+    char ffiname[1024];
+    char ffoname[1024];
+
+    strcpy(fname, file_name);
+
+    strcpy(ffiname, lin_in_dir);
+    strcat(ffiname, "/");
+    strcat(ffiname, fname);
+    //printf("fi: %s\n", ffiname);
+
+    strcpy(ffoname, lin_out_dir);
+    strcat(ffoname, "/");
+    strcat(ffoname, fname);
+    ffoname[strlen(ffoname)-4] = '\0';
+    //printf("fo: %s\n", ffoname);
+
+    image im = load_image_color(ffiname, 0, 0);
+    if (im.w == 0 || im.h == 0) {
+        remove(ffiname);
+        return 1;
+    }
+
+    int resize = im.w != lin_net->w || im.h != lin_net->h;
+    image sized = resize ? letterbox_image(im, lin_net->w, lin_net->h) : im;
+    layer l = lin_net->layers[lin_net->n - 1];
+
+    float *X = sized.data;
+    time = what_time_is_it_now();
+    if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+        network_predict(lin_net, X);
+    }
+    if (l.type == YOLO4) {
+        network_predict(lin_net, X);
+    }
+
+    int nboxes = 0;
+    detection *dets = 0;
+    if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+        dets = get_network_boxes(lin_net, im.w, im.h, lin_thresh, lin_hier_thresh, 0, 1, &nboxes);
+    }
+    if (l.type == YOLO4) {
+        dets = get_network_boxes(lin_net, im.w, im.h, lin_thresh, lin_hier_thresh, 0, 1, &nboxes);
+    }
+    if (lin_nms) {
+        if (l.nms_kind == DEFAULT_NMS) do_nms_sort(dets, nboxes, l.classes, lin_nms);
+        else diounms_sort_y4(dets, nboxes, l.classes, lin_nms, l.nms_kind, l.beta_nms);
+    }
+    if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
+        draw_ddetections(im, dets, nboxes, lin_thresh, lin_names, lin_alphabet, l.classes, 0, 1, ffoname, lin_margin);
+    }
+    if (l.type == YOLO4) {
+        draw_ddetections(im, dets, nboxes, lin_thresh, lin_names, lin_alphabet, l.classes, 0, 1, ffoname, lin_margin);
+    }
+
+    free_detections(dets, nboxes);
+    free_image(im);
+    if (resize) free_image(sized);
+
+    remove(ffiname);
+
+    printf("%s: Predicted in %f seconds.\n", fname, what_time_is_it_now() - time);
+
+    return 0;
+}
+
+void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir, int margin)
+{
+    list *options = read_data_cfg(datacfg);
+    char *name_list = option_find_str(options, "names", "data/names.list");
+    char **names = get_labels(name_list);
+
+    image **alphabet = load_alphabet();
+    network *net = load_network(cfgfile, weightfile, 0);
+    set_batch_network(net, 1);
+    srand(2222222);
+    float nms = .45;
+
+    lin_names       = names;
+    lin_alphabet    = alphabet;
+    lin_net         = net;
+    lin_nms         = nms;
+    lin_in_dir      = in_dir;
+    lin_thresh      = thresh;
+    lin_hier_thresh = hier_thresh;
+    lin_out_dir     = out_dir;
+    lin_margin      = margin;
+
+    system_notified_file_name = process_file;
+
+    while (!init_notified_file_name(in_dir));
+}
+#endif
 
 /*
 void censor_detector(char *datacfg, char *cfgfile, char *weightfile, int cam_index, const char *filename, int class, float thresh, int skip)

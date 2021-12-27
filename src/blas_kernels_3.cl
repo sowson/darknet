@@ -167,7 +167,8 @@ __kernel void upsample_kernel(int N, __global float *x, int w, int h, int c, int
 
 
 __kernel void gemm_kernel(
-        int tuning, __local float* sums,
+        int tuning,
+        __local float* sums,
         int TA, int TB,
         int M, int N, int K,
         __const float ALPHA,
@@ -177,44 +178,51 @@ __kernel void gemm_kernel(
         __global float *C, int offset_C, int ldc) {
 
     int td = get_global_id(0);
-    if (td > tuning) return;
-    int id = get_global_id(1);
-    if (id > N*M) return;
+    int jN = get_global_id(1);
+    int iM = get_global_id(2);
 
-    int iM = id / N;
-    int jN = id % N;
+    __global float *a = &A[offset_A];
+    __global float *b = &B[offset_B];
+    __global float *c = &C[iM * ldc + jN + offset_C];
+
+    c[0] *= BETA;
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     int kK = 0;
-    int ts = 0;
-
-    C[iM * ldc + jN + offset_C] *= BETA;
-
-    sums[td] = 0;
-
-    for(kK = td; kK < K; kK += tuning) {
-        if (TA==0 && TB==0) {
-            sums[td] += ALPHA * A[iM * lda + kK + offset_A] * B[kK * ldb + jN + offset_B];
-        } else if (TA==1 && TB==0) {
-            sums[td] += ALPHA * A[kK * lda + iM + offset_A] * B[kK * ldb + jN + offset_B];
-        } else if (TA==0 && TB==1) {
-            sums[td] += ALPHA * A[iM * lda + kK + offset_A] * B[jN * ldb + kK + offset_B];
-        } else {
-            sums[td] += ALPHA * A[iM + kK * lda + offset_A] * B[kK + jN * ldb + offset_B];
+    float sum = 0;
+    if (TA == 0 && TB == 0) {
+        __global float *aK = &a[iM * lda + kK];
+        __global float *bK = &b[jN + ldb * kK];
+        for (int kK = td; kK < K; kK += tuning) {
+            sum += ALPHA * aK[kK] * bK[ldb * kK];
+        }
+    } else if (TA == 1 && TB == 0) {
+        __global float *aK = &a[iM + lda * kK];
+        __global float *bK = &b[jN + ldb * kK];
+        for (int kK = td; kK < K; kK += tuning) {
+            sum += ALPHA * aK[lda * kK] * bK[ldb * kK];
+        }
+    } else if (TA == 0 && TB == 1) {
+        __global float *aK = &a[iM * lda + kK];
+        __global float *bK = &b[jN * ldb + kK];
+        for (int kK = td; kK < K; kK += tuning) {
+            sum += ALPHA * aK[kK] * bK[kK];
+        }
+    } else {
+        __global float *aK = &a[iM + lda * kK];
+        __global float *bK = &b[jN * ldb + kK];
+        for (int kK = td; kK < K; kK += tuning) {
+            sum += ALPHA * aK[lda * kK] * bK[kK];
         }
     }
+    sums[td] = sum;
 
-    barrier(CLK_GLOBAL_MEM_FENCE | CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     if (td == 0) {
-        for(ts = 0; ts < tuning; ++ts) {
-            if (TA==0 && TB==0) {
-                C[iM * ldc + jN + offset_C] += sums[ts];
-            } else if (TA==1 && TB==0) {
-                C[iM * ldc + jN + offset_C] += sums[ts];
-            } else if (TA==0 && TB==1) {
-                C[iM * ldc + jN + offset_C] += sums[ts];
-            } else {
-                C[iM * ldc + jN + offset_C] += sums[ts];
-            }
+        for (int ts = 0; ts < tuning; ++ts) {
+            c[0] += sums[ts];
         }
     }
 }

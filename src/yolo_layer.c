@@ -52,6 +52,7 @@ layer make_yolo_layer(int batch, int w, int h, int n, int total, int *mask, int 
     if (gpu_index >= 0) {
         l.forward_gpu = forward_yolo_layer_gpu;
         l.backward_gpu = backward_yolo_layer_gpu;
+        l.update_gpu = 0;
         l.output_gpu = opencl_make_array(l.output, batch * l.outputs);
         l.delta_gpu = opencl_make_array(l.delta, batch * l.outputs);
     }

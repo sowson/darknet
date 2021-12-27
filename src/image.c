@@ -508,6 +508,117 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
     free(selected_detections);
 }
 
+void draw_ddetections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps, int blur_and_save, const char* fname, int margin)
+{
+    int i,j;
+    char percent[32];
+    char lfps[32];
+
+    FILE* json;
+    char jsonn[512];
+    int jsonC = 0;
+
+    sprintf(jsonn, "%s.json", fname);
+    json = fopen(jsonn, "w");
+    fprintf(json, "{ \"detections\": [\r\n");
+
+    for(i = 0; i < num; ++i) {
+        char labelstr[4096] = {0};
+        int class = -1;
+        for (j = 0; j < classes; ++j) {
+            if (dets[i].prob[j] > thresh) {
+                if (class < 0) {
+                    strcat(labelstr, names[j]);
+                    class = j;
+                } else {
+                    strcat(labelstr, ", ");
+                    strcat(labelstr, names[j]);
+                }
+                //TODO: CHANGE!!!
+                //printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                strcat(labelstr, " ");
+                gcvt(dets[i].prob[j] * 100, 5, percent);
+                strcat(labelstr, percent);
+            }
+        }
+
+        if(class >= 0) {
+            int width = im.h * .002;
+
+            //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
+            int offset = class * 123457 % classes;
+            float red = get_color(2, offset, classes);
+            float green = get_color(1, offset, classes);
+            float blue = get_color(0, offset, classes);
+            float rgb[3];
+
+            rgb[0] = red;
+            rgb[1] = green;
+            rgb[2] = blue;
+
+            box b = dets[i].bbox;
+
+            // printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
+
+            int left = (b.x - b.w / 2.) * im.w;
+            int right = (b.x + b.w / 2.) * im.w;
+            int top = (b.y - b.h / 2.) * im.h;
+            int bot = (b.y + b.h / 2.) * im.h;
+
+            if (left < 0) left = 0;
+            if (right > im.w - 1) right = im.w - 1;
+            if (top < 0) top = 0;
+            if (bot > im.h - 1) bot = im.h - 1;
+
+            if (jsonC++ > 0) fprintf(json, ",\r\n");
+            fprintf(json, "    { \"class\":\"%s\", \"percent\":\"%.0f\", ", names[class], dets[i].prob[class] * 100);
+            fprintf(json, "\"l\":\"%i\", \"r\":\"%i\", \"t\":\"%i\", \"b\":\"%i\" }", left, right, top, bot);
+
+            draw_box_width(im, left, top, right, bot, width, red, green, blue);
+
+            if (alphabet) {
+                image label = get_label(alphabet, labelstr, (im.h * .002));
+                draw_label(im, top + width, left, label, rgb);
+                free_image(label);
+            }
+
+            if (dets[i].mask) {
+                image mask = float_to_image(14, 14, 1, dets[i].mask);
+                image resized_mask = resize_image(mask, b.w * im.w, b.h * im.h);
+                image tmask = threshold_image(resized_mask, .5);
+                embed_image(tmask, im, left, top);
+                free_image(mask);
+                free_image(resized_mask);
+                free_image(tmask);
+            }
+        }
+
+        int offset = 0;
+        float red = get_color(2, offset, classes);
+        float green = get_color(1, offset, classes);
+        float blue = get_color(0, offset, classes);
+    }
+
+    fprintf(json, "\r\n  ]\r\n");
+    fprintf(json, "}\r\n");
+    fclose(json);
+
+    if (fps > 0) {
+        float lrgb[3];
+        lrgb[0] = 0;
+        lrgb[1] = 255;
+        lrgb[2] = 0;
+
+        image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h * .03));
+        draw_label(im, 0, 0, ilfps, lrgb);
+        free_image(ilfps);
+    }
+
+#ifdef OPENCV
+    mark_image_and_save_cv(im, num, classes, dets, thresh, fname, margin);
+#endif
+}
+
 void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps)
 {
     int i,j;

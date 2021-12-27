@@ -1441,14 +1441,14 @@ void sync_layer(network **nets, int n, int j)
 	int i;
 	network *net = nets[0];
 	layer base = net->layers[j];
-	scale_weights(base, 0);
+	scale_weights(base, 0.0f);
 	for (i = 0; i < n; ++i) {
 		opencl_set_device(nets[i]->gpu_index);
 		layer l = nets[i]->layers[j];
 		pull_weights(l);
 		merge_weights(l, base);
 	}
-	scale_weights(base, 1./n);
+	scale_weights(base, 1.0f/n);
 	for (i = 0; i < n; ++i) {
 		opencl_set_device(nets[i]->gpu_index);
 		layer l = nets[i]->layers[j];
