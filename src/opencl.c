@@ -317,7 +317,7 @@ void opencl_init(int *gpus, int ngpus) {
     cl_uint num = 32;
     cl_uint all = 0;
     cl_device_id devices[32];
-    clErr = clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_GPU, num, devices, &all);
+    clErr = clGetDeviceIDs(clPlatform, CL_DEVICE_TYPE_ALL, num, devices, &all);
 
     if (clErr != CL_SUCCESS) {
         printf("opencl_init: Could not get device IDs.\n");
