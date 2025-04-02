@@ -14,8 +14,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: libchess install
-      run: git clone https://github.com/sowson/libchess {{github.workspace}}/cmake/libchess
+    - uses: actions/checkout@v2
 
     - name: libchess build
       run: cmake -B {{github.workspace}}/cmake/libchess -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
@@ -28,8 +27,6 @@ jobs:
       
     - name: brew install
       run: brew install opencv clblas
-
-    - uses: actions/checkout@v2
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
