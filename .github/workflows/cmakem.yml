@@ -15,10 +15,13 @@ jobs:
 
     steps:
     - name: libchess install
-      run: git clone https://github.com/sowson/libchess libchess && cmake -B libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: git clone https://github.com/sowson/libchess {{github.workspace}}/cmake/libchess
 
-    - name: libchess use
-      run: cp libchess/build/shared/libchess/*.* {{github.workspace}}/darknet/3rdparty/libchess/
+    - name: libchess build
+      run: cmake -B {{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: libchess copy
+      run: cp {{github.workspace}}/cmake/libchess/build/shared/*.* {{github.workspace}}/3rdparty/libchess/
       
     - name: brew
       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
