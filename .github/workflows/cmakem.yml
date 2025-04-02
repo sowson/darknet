@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: brew install
+      run: brew install opencv clblas
+
     - name: libchess configure
       run: cmake -B {{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} && make -j
 
@@ -25,9 +28,6 @@ jobs:
     - name: brew
       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       
-    - name: brew install
-      run: brew install opencv clblas
-
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
