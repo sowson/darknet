@@ -159,7 +159,7 @@ void train_attention(char *datacfg, char *cfgfile, char *weightfile, int *gpus, 
                 free_matrix(deltas);
             }
         }
-        int *inds = (int*)calloc(resized.y.rows, sizeof(int));
+        int *inds = (int*)calloc((unsigned int)resized.y.rows, sizeof(int));
         for(z = 0; z < resized.y.rows; ++z){
             int index = max_index(resized.y.vals[z] + train.y.cols, divs*divs);
             inds[z] = index;

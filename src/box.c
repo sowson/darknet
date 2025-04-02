@@ -763,7 +763,7 @@ dbox diou(box a, box b)
     dbox du = dunion(a,b);
     dbox dd = {0,0,0,0};
 
-    if(i <= 0 || 1) {
+    if((i <= 0) | 1) {
         dd.dx = b.x - a.x;
         dd.dy = b.y - a.y;
         dd.dw = b.w - a.w;
@@ -1468,7 +1468,7 @@ dbox diou_y4(box a, box b)
     dbox du = dunion(a, b);
     dbox dd = { 0,0,0,0 };
 
-    if (i <= 0 || 1) {
+    if ((i <= 0) | 1) {
         dd.dx = b.x - a.x;
         dd.dy = b.y - a.y;
         dd.dw = b.w - a.w;

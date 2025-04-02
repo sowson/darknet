@@ -1380,5 +1380,3 @@ void run_go(int argc, char **argv)
     else if(0==strcmp(argv[2], "test")) test_go(cfg, weights, multi);
     else if(0==strcmp(argv[2], "engine")) engine_go(cfg, weights, iters, time, temp, cpuct, anon, resign);
 }
-
-

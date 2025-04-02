@@ -1,8 +1,17 @@
-# THE LAST COMMIT, ALL THE BEST FOR YOU!
+# Project Status: Work in progress!
+- Many ideas I used and focused on https://iChess.io Chess and Chess960 Gameplay! Not yet fully Integrated! :D.
 
-# Project Status: Freeze!
+# iChess.io v7.27 Engine and AI/ML
+- UCI engine to use build as fallows:
+mkdir build && cd build && cmake -DDARKNET_ENG_CHESS=1 .. && make && cp darknet /your/engine/path
+- in the engine path you have to put chess.cfg and chess.weights in the Linux or macOS may use RAMDisk.
+- Linux: sudo mount -t tmpfs -o rw,size=4096M tmpfs /your/disk.ram/
+- macOS: diskutil erasevolume HFS+ "/your/disk.ram" `hdiutil attach -nomount ram://8388608`
+Using RAM disk in general is good to safe your HDD or SDD with often transactions :D.
 
-From now on, I will not push anymore my commits to this repository, however, I will be open to your pull requests to approve those and increase the contributors' list, Enjoy! ;-). I think OpenCL has a bright future, I am leaving some open issues, and I hope community will be able to solve them if needed. Thank you! ;-).
+# Dependencies:
+- json (https://github.com/nlohmann/json) 
+- libchess (https://github.com/sowson/libchess)
 
 # Build on macOS or Ubuntu 20.04
 
