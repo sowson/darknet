@@ -16,11 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: libchess build
-      run: cmake -B {{github.workspace}}/cmake/libchess -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: libchess configure
+      run: cmake -B {{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} && make -j
 
-    - name: libchess copy
-      run: cp {{github.workspace}}/cmake/libchess/shared/*.* {{github.workspace}}/3rdparty/libchess/
+    - name: libchess build
+      run: cp {{github.workspace}}/cmake/libchess/build/shared/*.* {{github.workspace}}/3rdparty/libchess/
       
     - name: brew
       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
