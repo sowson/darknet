@@ -19,6 +19,12 @@ jobs:
       
     - name: brew install
       run: brew install opencv clblas
+
+    - name: libchess install
+      run: git clone https://github.com/sowson/libchess ${{github.workspace}}/libchess && cmake -B ${{github.workspace}}/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: libchess use
+      run: cp ${{github.workspace}}/libchess/build/shared/libchess/*.* ${{github.workspace}}../3rdparty/libchess/
       
     - uses: actions/checkout@v2
 
