@@ -808,8 +808,7 @@ float* ch_moves_similarity(network* net, char** moves, int n, float *board, char
     char* valid_fen = ch_board_to_fen(board);
     float pow = 0;
     float* pows = NULL;
-    int counter = 0;
-    int index = ch_eval_best_trivial_move(sfen, valid_fen, 4, &pow, &pows, &counter);
+    int index = ch_eval_best_trivial_move(sfen, valid_fen, 4, &pow, &pows, &n);
     int player = (int)board[8*8] != 0 ? 1 : 0;
     float* similarities = (float *) CALLOC(n, sizeof(float));
     for (int i = 0; i < n; ++i) {
