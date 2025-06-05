@@ -1,0 +1,83 @@
+Yv1Demo: $ ./darknet yolo demo cfg/yolov1.cfg ../../../weights/yolov1.weights -c 0 -i 0
+
+Yv1: $ ./darknet yolo test cfg/yolov1.cfg ../../../weights/yolov1.weights data/dog.jpg -thresh 0.15 -i 0
+
+Yv2Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog.mp4 -thresh .35 -i 1
+
+Yv2Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights -c 0 -i 0
+
+Yv2: $ ./darknet detect cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights data/dog.jpg -i 0
+
+Yv3-sppDemo: $ ./darknet detector demo cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights -c 0 -i 0
+
+Yv3-spp: $ ./darknet detect cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights data/dog.jpg -i 0
+
+Yv3Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights ../../../car_vlog.mp4 -thresh .35 -i 0
+
+Yv3Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights -c 0 -i 0
+
+Yv3: $ ./darknet detect cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights data/dog.jpg -i 0
+
+Yv4CX: $ ./darknet detect cfg/coco.data cfg/yolov4-csp-x-swish.cfg ../../../weights/yolov4-csp-x-swish.weights data/dog.jpg -i 0
+
+Yv4C: $ ./darknet detect cfg/coco.data cfg/yolov4-csp.cfg ../../../weights/yolov4-csp.weights data/dog.jpg -i 0
+
+Yv4Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights ../../../car_vlog.mp4 -i 0
+
+Yv4Demo-dir: $ ./darknet ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights $USER_HOME$/yolo4In -out $USER_HOME$/yolo4Out -i 0 -thresh .25 -margin 2
+
+Yv4Demo: $ ./darknet detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights -c 0 -i 0
+
+Yv4P5: $ ./darknet detect cfg/coco.data cfg/yolov4-p5.cfg ../../../weights/yolov4-p5.weights data/dog.jpg -i 0
+
+Yv4P6: $ ./darknet detect cfg/coco.data cfg/yolov4-p6.cfg ../../../weights/yolov4-p6.weights data/dog.jpg -i 0
+
+Yv4TDemo: $ ./darknet detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights ../../../car_vlog.mp4 -i 0
+
+Yv4TDemo: $ ./darknet detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights -c 0 -i 0
+
+Yv4T: $ ./darknet detect cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights data/dog.jpg -i 0
+
+Yv4XM: $ ./darknet detect cfg/coco.data cfg/yolov4x-mish.cfg ../../../weights/yolov4x-mish.weights data/dog.jpg -i 0
+
+Yv4: $ ./darknet detect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights data/dog.jpg -i 0
+
+Yv5L: $ ./darknet detect cfg/coco.data cfg/yolov5l_v4.cfg ../../../weights/yolov5l_v4.weights data/dog.jpg -thresh .35 -i 0
+
+cifar-try1: $ ./darknet classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/6298_cat.png -i 0
+
+cifar-try2: $ ./darknet classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/4882_frog.png -i 0
+
+cifar-try3: $ ./darknet classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/2568_truck.png -i 0
+
+cifar-try4: $ ./darknet classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/5238_bird.png -i 0
+
+cifar-try5: $ ./darknet classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/train/35728_automobile.png -i 0
+
+tYv1-cnt.: $ ./darknet yolo train yolov1.cfg voc.data backup1/yolov1.backup -gpus 0,1,2,3
+
+tYv1: $ ./darknet yolo train yolov1.cfg voc.data darknet.conv.weights -gpus 1,2,3,4
+
+tYv2-cnt.: $ ./darknet detector train voc.data yolov2-voc.cfg backup/yolov2-voc.backup -gpus 1,2,3,4
+
+tYv2: $ ./darknet detector train coco.data yolov2-voc.cfg -gpus 1,2,3,4
+
+tYv3-cnt: $ ./darknet detector train voc.data yolov3-voc.cfg backup/yolov3-voc.backup -gpus 1,2,3,4
+
+tYv3: $ ./darknet detector train voc.data yolov3-voc.cfg -gpus 1,2,3,4
+
+tYv4-T: $ ./darknet detector train coco.data yolov4-tiny.cfg -i 0
+
+tYv4-cnt-T: $ ./darknet detector train coco.data yolov4-tiny.cfg backup/yolov4-tiny.backup -gpus 1,2,3,4
+
+tYv4-cnt: $ ./darknet detector train coco.data yolov4.cfg backup/yolov4.backup -gpus 1,2,3,4
+
+tYv4: $ ./darknet detector train coco.data yolov4.cfg -gpus 1,2,3,4
+
+tYv5l-T: $ ./darknet detector train coco.data yolov5l_v4.cfg -i 0
+
+tcifar-d19: $ ./darknet classifier train cfg/cifar.data cfg/darknet19.cfg -gpus 1,2,3,4
+
+tcifar-valid: $ ./darknet classifier valid cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights -i 1
+
+tcifar: $ ./darknet classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 0

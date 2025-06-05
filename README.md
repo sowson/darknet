@@ -1,8 +1,82 @@
-# THE LAST COMMIT, ALL THE BEST FOR YOU!
+# Project Status: Work in progress!
 
-# Project Status: Freeze!
+- Many ideas I used and focused on https://iChess.io Chess and Chess960 Gameplay! Not yet fully Integrated! :D.
 
-From now on, I will not push anymore my commits to this repository, however, I will be open to your pull requests to approve those and increase the contributors' list, Enjoy! ;-). I think OpenCL has a bright future, I am leaving some open issues, and I hope community will be able to solve them if needed. Thank you! ;-).
+# iChess.io v7.27 Engine Portable (UCI)
+![](images/chess/engine.png)
+
+# iChess.io v7.27 Engine Portable (UCI) Build
+```
+mkdir iChess.io.en && cd iChess.io.en && echo OK                               
+OK
+
+git clone --recursive https://github.com/sowson/darknet 2> /dev/null && echo OK
+Submodule path 'cmake/cable': checked out '0372b82f8f6148850898affe717157ca4c1b1574'
+Submodule path 'cmake/libchess': checked out '9fe73fcfe810be772d234025407dfa145fab3f7d'
+OK
+
+cd darknet/cmake/libchess && echo OK
+OK
+
+mkdir build && cd build && echo OK
+OK
+
+cmake .. 1> /dev/null && echo OK
+OK
+
+make -j 1> /dev/null && echo OK
+OK
+
+cp shared/libchess.* ../../../3rdparty/libchess/ && echo OK
+OK
+
+cd ../../../.. && echo OK
+OK
+
+mkdir -p darknet/build && cd darknet/build && echo OK                          
+OK
+
+cmake -DDARKNET_ENG_CHESS=1 .. 1> /dev/null && echo OK                         
+OK
+
+make -j 1> /dev/null && echo OK                         
+OK
+
+cd ../.. && echo OK
+OK
+
+cp darknet/cfg/chess.cfg ./ && echo OK
+OK
+
+cp darknet/weights/chess.weights ./ && echo OK                                 
+OK
+```
+
+# iChess.io v7.27 Engine Portable (UCI) Test
+```
+% ./iChess.io.en 
+iChess.io by Piotr Sowa v7.27
+
+position startpos moves e2e4 b8c6 d2d4
+go
+
+info depth 1 pv e7e5
+bestmove e7e5 ponder e7e5
+
+quit
+```
+
+# iChess.io v7.27 Engine and AI/ML
+- UCI engine to use build as fallows:
+mkdir build && cd build && cmake -DDARKNET_ENG_CHESS=1 .. && make && cp darknet /your/engine/path
+- in the engine path you have to put chess.cfg and chess.weights in the Linux or macOS may use RAMDisk.
+- Linux: sudo mount -t tmpfs -o rw,size=4096M tmpfs /your/disk.ram/
+- macOS: diskutil erasevolume HFS+ "/your/disk.ram" `hdiutil attach -nomount ram://8388608`
+Using RAM disk in general is good to safe your HDD or SDD with often transactions :D.
+
+# Dependencies:
+- json (https://github.com/nlohmann/json) 
+- libchess (https://github.com/sowson/libchess)
 
 # Build on macOS or Ubuntu 20.04
 

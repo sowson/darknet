@@ -7,17 +7,6 @@
 *.pyc
 *.dll
 *.lib
-old/
-mnist/
-data/
-caffe/
-grasp/
-images/
-opencv/
-convnet/
-decaf/
-submission/
-cfg/
 darknet
 darknet.*
 libdarknet.*
@@ -38,4 +27,3 @@ ehthumbs.db
 Icon?
 Thumbs.db
 *.swp
-

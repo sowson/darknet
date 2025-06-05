@@ -115,6 +115,7 @@ void test_voxel(char *cfgfile, char *weightfile, char *filename)
     }
 }
 
+#ifdef OPENCV
 void extract_voxel_cv(char *lfile, char *rfile, char *prefix, int w, int h) {
     int shift = 0;
     int count = 0;
@@ -141,6 +142,7 @@ void extract_voxel_cv(char *lfile, char *rfile, char *prefix, int w, int h) {
         free_image(rs);
     }
 }
+#endif
 
 void run_voxel(int argc, char **argv)
 {

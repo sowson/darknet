@@ -710,7 +710,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
             else diounms_sort_y4(dets, nboxes, l.classes, nms, l.nms_kind, l.beta_nms);
         }
         if (l.type == DETECTION || l.type == REGION || l.type == YOLO) {
-            draw_detections(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
+            draw_detections_y4(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
         }
         if (l.type == YOLO4) {
             draw_detections_v3(im, dets, nboxes, thresh, names, alphabet, l.classes, 0);
@@ -731,6 +731,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         if (filename) break;
     }
 }
+
 #ifndef __linux__
 void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir, int margin)
 {
@@ -763,7 +764,7 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
             strcpy(ffname, in_dir);
             strcat(ffname, "/");
             strcat(ffname, fname);
-            if (!exists(ffname, ".jpg")) continue;
+            if (!exists(ffname)) continue;
             if (1) {
                 strcpy(ffoname, out_dir);
                 strcat(ffoname, "/");
@@ -847,7 +848,7 @@ image      **lin_alphabet;
 network     *lin_net;
 float        lin_nms;
 
-int process_file(const char *file_name) {
+int process_file(char *file_name) {
     //printf("fn: %s\n", file_name);
 
     double time = 0;
@@ -940,7 +941,8 @@ void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir
     lin_out_dir     = out_dir;
     lin_margin      = margin;
 
-    while (!init_notified_file_name(in_dir, process_file));
+    const char* patterns[] = {"*.jpg"};
+    while (!init_notified_file_name(in_dir, patterns, process_file));
 }
 #endif
 

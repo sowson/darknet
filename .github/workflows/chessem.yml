@@ -1,0 +1,63 @@
+name: ChessEM
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: macos
+
+    steps:
+    - name: brew
+      run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: brew install
+      run: brew install opencv clblas
+
+    - name: Configure LibChess CMake
+      run: cd cmake/libchess && cmake -B ${{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} && cd ../..
+
+    - name: Build LibChess
+      run: cd cmake/libchess && cmake --build ${{github.workspace}}/cmake/libchess/build --config ${{env.BUILD_TYPE}} && cd ../..
+
+    - name: Update LibChess 3rdParty
+      run: cp ${{github.workspace}}/cmake/libchess/build/shared/libchess.* ${{github.workspace}}/3rdparty/libchess/
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDARKNET_ENG_CHESS=1
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Bundle Binary and .dylibs
+      run: |
+        mkdir release
+        mv build/darknet release/iChess.io.en.mac
+        cp cmake/libchess/build/shared/libchess.dylib release/
+
+    - name: Zip Release Files
+      run: zip -j iChess.io.en.mac.zip release/*
+
+    - name: Upload GitHub Release
+      if: github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        name: iChess.io Release ${{ github.run_number }}
+        tag_name: ichess-v${{ github.run_number }}
+        files: iChess.io.en.mac.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    #- name: Test
+    #  working-directory: ${{github.workspace}}/build
+    #  run: ctest -C ${{env.BUILD_TYPE}}

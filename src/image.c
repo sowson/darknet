@@ -537,7 +537,7 @@ void draw_ddetections(image im, detection *dets, int num, float thresh, char **n
                 //TODO: CHANGE!!!
                 //printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
                 strcat(labelstr, " ");
-                gcvt(dets[i].prob[j] * 100, 5, percent);
+                sprintf(percent, "%.2f", dets[i].prob[j] * 100);
                 strcat(labelstr, percent);
             }
         }
@@ -609,7 +609,8 @@ void draw_ddetections(image im, detection *dets, int num, float thresh, char **n
         lrgb[1] = 255;
         lrgb[2] = 0;
 
-        image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h * .03));
+        sprintf(lfps, "%.2f", fps);
+        image ilfps = get_label(alphabet, lfps, (im.h * .03));
         draw_label(im, 0, 0, ilfps, lrgb);
         free_image(ilfps);
     }
@@ -640,7 +641,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                 //TODO: CHANGE!!!
                 //printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
                 strcat(labelstr, " ");
-                gcvt(dets[i].prob[j] * 100, 5, percent);
+                sprintf(percent, "%.2f", dets[i].prob[j] * 100);
                 strcat(labelstr, percent);
             }
         }
@@ -704,7 +705,8 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
         lrgb[1] = 255;
         lrgb[2] = 0;
 
-        image ilfps = get_label(alphabet, gcvt(fps, 5, lfps), (im.h * .03));
+        sprintf(lfps, "%.2f", fps);
+        image ilfps = get_label(alphabet, lfps, (im.h * .03));
         draw_label(im, 0, 0, ilfps, lrgb);
         free_image(ilfps);
     }
@@ -752,9 +754,9 @@ void draw_detections_y4(image im, detection *dets, int num, float thresh, char *
 
             if (alphabet) {
                 char label_txt[512];
-                char percent[5];
+                char percent[7];
                 strcat(label_txt, names[class_id]);
-                gcvt(prob * 100, 5, percent);
+                sprintf(percent, "%.2f", prob * 100);
                 strcat(label_txt, " ");
                 strcat(label_txt, percent);
                 image label = get_label_y4(alphabet, label_txt, (im.h*.0002));
@@ -763,7 +765,8 @@ void draw_detections_y4(image im, detection *dets, int num, float thresh, char *
 
             if (alphabet && i == 0 && fps != 0) {
                 char lfps[5];
-                image ilfps = get_label_y4(alphabet, gcvt(fps, 5, lfps), (im.h*0.0002));
+                sprintf(lfps, "%.2f", fps);
+                image ilfps = get_label_y4(alphabet, lfps, (im.h*0.0002));
                 draw_label(im, 0, 0, ilfps, rgb);
                 free_image(ilfps);
             }
@@ -1257,7 +1260,7 @@ void composite_3d(char *f1, char *f2, char *out, int delta)
     image c2 = crop_image(b, -10, shift, b.w, b.h);
     float d2 = dist_array(c2.data, a.data, a.w*a.h*a.c, 100);
 
-    if(d2 < d1 && 0){
+    if((d2 < d1) & 0){
         image swap = a;
         a = b;
         b = swap;
