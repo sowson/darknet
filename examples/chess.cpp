@@ -462,8 +462,8 @@ std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess
 
 std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libchess::Position& pos) {
     // return pos.legal_moves();
-    int n = 8;
-    int d = 4;
+    int n = 16;
+    int d = 3;
     int c = 0;
     return ch_calculate_top_n_moves(n, sfen, pos, d);
 }
@@ -757,11 +757,11 @@ void ch_split(const std::string& str, std::vector<std::string>& v) {
     char ws_delim;
     while(true) {
         if( ss >> field )
-            v.push_back(field);
+            v.emplace_back(field);
         else if (ss.eof())
             break;
         else
-            v.push_back("");
+            v.emplace_back("");
         ss.clear();
         ss >> ws_delim;
     }
