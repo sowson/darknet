@@ -1150,7 +1150,7 @@ int ch_board_after_move(const char* sfen, char* valid_fen, char* valid_move, cha
 float* ch_fen_to_board(char *valid_fen);
 char* ch_board_to_fen(float *board);
 char* ch_get_fen_960();
-int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level, float *best_move, float **best_moves, int* counter);
+int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level, float *best_move, float **best_moves, int *counter);
 float ch_eval_the_move(const char* sfen, const char* valid_prev_fen, const char* valid_fen);
 int ch_is_legal(char* sfen, char* fen, int indext);
 char* ch_do_legal(char* sfen, char* fen, int indext);

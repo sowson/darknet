@@ -808,7 +808,8 @@ float* ch_moves_similarity(network* net, char** moves, int n, float *board, char
     char* valid_fen = ch_board_to_fen(board);
     float pow = 0;
     float* pows = NULL;
-    int index = ch_eval_best_trivial_move(sfen, valid_fen, 4, &pow, &pows, &n);
+    int counter = 0;
+    int index = ch_eval_best_trivial_move(sfen, valid_fen, 4, &pow, &pows, &counter);
     int player = (int)board[8*8] != 0 ? 1 : 0;
     float* similarities = (float *) CALLOC(n, sizeof(float));
     for (int i = 0; i < n; ++i) {
@@ -1026,14 +1027,16 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
     int player = strstr(valid_fen, " w ") ? 0 : 1;
 
     int counter = 0;
+
     if (level < 0) level = 0;
     if (level > 6) level = 6;
 
     if (level <= 0 || trivial_player == player) {
         *solver = 2; // ML
+        if (valid_moves == NULL) return 0;
         // *solver = 1; // AI
         float *pows = NULL;
-        int idx = ch_eval_best_trivial_move(sfen, valid_fen, level, pow, &pows, &n);
+        int idx = n == 1 ? 0 : ch_eval_best_trivial_move(sfen, valid_fen, level, pow, &pows, &counter);
         *value = pows[idx];
         fprintf(stderr, "pick (%s): %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i) move: (%s) value: (%.8g)\n", *solver == 1 ? "ai" : "ml", net->nsteps, player == 0 ? "w" : "b", n, counter, *pow, idx, valid_moves[idx], *value);
         FREE(pows);
