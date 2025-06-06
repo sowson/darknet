@@ -44,6 +44,8 @@ jobs:
         mkdir release
         mv build/darknet release/iChess.io.en.mac
         cp cmake/libchess/build/shared/libchess.dylib release/
+        cp cfg/chess.cfg release/
+        cp weights/chess.weights release/
 
     - name: Zip Release Files
       run: zip -j iChess.io.en.mac.zip release/*
