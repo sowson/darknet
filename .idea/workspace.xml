@@ -3,29 +3,44 @@
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexRemoved" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
   <component name="CMakeReloadState">
     <option name="reloaded" value="true" />
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="darknet" targetName="darknet_l" />
-      <config projectName="darknet" targetName="darknet_s" />
       <config projectName="darknet" targetName="darknet" />
     </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="RelWithDebInfo" ENABLED="true" CONFIG_NAME="RelWithDebInfo" BUILD_OPTIONS="-v" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c1f2602-dc6e-4bd5-b03e-d07ee3b8a66f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/blas_kernels.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/blas_kernels.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/blas_kernels_3.cl" beforeDir="false" afterPath="$PROJECT_DIR$/src/blas_kernels_3.cl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/opencl.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/opencl.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/opencl.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/opencl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/3rdparty/libchess/libchess.dylib" beforeDir="false" afterPath="$PROJECT_DIR$/3rdparty/libchess/libchess.dylib" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cfg/chess.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/cfg/chess.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/chess.c" beforeDir="false" afterPath="$PROJECT_DIR$/examples/chess.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/chess.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/examples/chess.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/darknet.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/darknet.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/weights/chess.weights" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ichess/3d.aiChess.io/wwwroot/js/ichess.io.js" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/3d.aiChess.io/wwwroot/js/ichess.io.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/Properties/launchSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/js/ichess.io.js" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/js/ichess.io.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/io.isowa.web.api.darknet.src/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../server/io.isowa.web.api.darknet.src/Properties/launchSettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,283 +48,364 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:RelWithDebInfo" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="OCFindUsagesOptions" text="false" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="1SYpmm00EtxGNgVFxYjyIi0e8EC" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;CMake Application.bindarknet (Yv2).executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.bindarknet (Yv3).executor&quot;: &quot;Debug&quot;,
+    &quot;CMake Application.bindarknet (dchess)  (local).executor&quot;: &quot;Debug&quot;,
+    &quot;CMake Application.bindarknet (echess) (local).executor&quot;: &quot;Debug&quot;,
+    &quot;CMake Application.bindarknet (tchess) (local).executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;cmake.loaded.for.project&quot;: &quot;true&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/piotr/github/sowson/isowa.io/darknet/cfg&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;,
+    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/CLion.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/data" />
-      <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/cfg" />
+      <recent name="$PROJECT_DIR$/.github/workflows" />
+      <recent name="$PROJECT_DIR$/3rdparty/libchess" />
+      <recent name="$PROJECT_DIR$/3rdparty/libchess/libchess" />
+      <recent name="$PROJECT_DIR$/3rdparty/libchess/libchess/libchess" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\GitHub\sowson\darknet\3rdparty\OpenCV\include\opencv2\highgui" />
+      <recent name="$PROJECT_DIR$/3rdparty/libchess/libchess" />
+      <recent name="$PROJECT_DIR$/3rdparty/libchess" />
+      <recent name="$PROJECT_DIR$/cfg" />
+      <recent name="$PROJECT_DIR$/cfg/save" />
+      <recent name="$PROJECT_DIR$/weights/save" />
+    </key>
+    <key name="CidrLocalAttachDebugger.recentlyUsed">
+      <recent name="com.jetbrains.cidr.cpp.execution.debugger.backend.CLionLLDBDriverConfiguration" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.bindarknet (tcifar)">
+  <component name="RunManager" selected="CMake Application.bindarknet (tchess) (local)">
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet" EXPLICIT_BUILD_TARGET_NAME="all">
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet" EXPLICIT_BUILD_TARGET_NAME="all">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="bindarknet (Yv1Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo demo cfg/yolov1.cfg ../../../weights/yolov1.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv1Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo demo cfg/yolov1.cfg ../../../weights/yolov1.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo test cfg/yolov1.cfg ../../../weights/yolov1.weights data/dog.jpg -thresh 0.15 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo test cfg/yolov1.cfg ../../../weights/yolov1.weights data/dog.jpg -thresh 0.15 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv2Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog.mp4 -thresh .35  -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights ../../../car_vlog.mp4 -thresh .35 -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv2Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov2.cfg ../../../../weights/yolov2.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov2.cfg ../../../weights/yolov2.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv3-sppDemo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3-sppDemo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv3-spp)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3-spp)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3-spp.cfg ../../../weights/yolov3-spp.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv3Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights ../../../car_vlog.mp4 -thresh .35  -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights ../../../car_vlog.mp4 -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv3Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3Demo)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3.cfg ../../../../weights/yolov3.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov3.cfg ../../../weights/yolov3.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4CX)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-csp-x-swish.cfg ../../../weights/yolov4-csp-x-swish.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4CX)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-csp-x-swish.cfg ../../../weights/yolov4-csp-x-swish.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4C)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-csp.cfg ../../../weights/yolov4-csp.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4C)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-csp.cfg ../../../weights/yolov4-csp.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights ../../../car_vlog.mp4 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights ../../../car_vlog.mp4 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights $PROJECT_DIR$/../yolo4In -out  $PROJECT_DIR$/../yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights $USER_HOME$/yolo4In -out $USER_HOME$/yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4Demo) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4P5)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-p5.cfg ../../../weights/yolov4-p5.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4P5)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-p5.cfg ../../../weights/yolov4-p5.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4P6)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-p6.cfg ../../../weights/yolov4-p6.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4P6)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-p6.cfg ../../../weights/yolov4-p6.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4TDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights ../../../car_vlog.mp4  -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4TDemo) (car)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights ../../../car_vlog.mp4 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4TDemo)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4TDemo)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector demo cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights -c 0 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4-tiny.cfg ../../../weights/yolov4-tiny.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4XM)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4x-mish.cfg ../../../weights/yolov4x-mish.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4XM)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4x-mish.cfg ../../../weights/yolov4x-mish.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights data/dog.jpg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv5L)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov5l_v4.cfg ../../../weights/yolov5l_v4.weights data/dog.jpg -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv5L)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detect cfg/coco.data cfg/yolov5l_v4.cfg ../../../weights/yolov5l_v4.weights data/dog.jpg -thresh .35 -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (cifar) (try1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights  data/cifar/test/6298_cat.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/6298_cat.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (cifar) (try2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights  data/cifar/test/4882_frog.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/4882_frog.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (cifar) (try3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights  data/cifar/test/2568_truck.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/2568_truck.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (cifar) (try4)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights  data/cifar/test/5238_bird.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try4)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/test/5238_bird.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (cifar) (try5)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights  data/cifar/train/35728_automobile.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (cifar) (try5)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier predict cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights data/cifar/train/35728_automobile.png -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (dchess)  (local)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg weights/chess.weights -in /Volumes/v1.ram/io.isowa.web.api.darknet/chessIn -out  /Volumes/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv1) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data backup1/yolov1.backup -gpus 0,1,2,3" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (dchess) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg $USER_HOME$/v1.ram/io.isowa.darknet.weights/chess.weights -in  $USER_HOME$/v1.ram/io.isowa.web.api.darknet/chessIn -out $USER_HOME$/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data darknet.conv.weights -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (echess) (local)" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$USER_HOME$/iChess.io" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2-voc.cfg backup/yolov2-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv1) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data backup1/yolov1.backup -gpus 0,1,2,3" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train coco.data yolov2-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv1)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="yolo train yolov1.cfg voc.data darknet.conv.weights -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv3) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg backup/yolov3-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv2) (cnt.)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov2-voc.cfg backup/yolov2-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv2)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train coco.data yolov2-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv3) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg backup/yolov3-voc.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4) (cnt) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg backup/yolov4-tiny.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv3)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="detector train voc.data yolov3-voc.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../voc" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg backup/yolov4.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv4) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv4) (cnt) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4-tiny.cfg backup/yolov4-tiny.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tYv5l) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov5l_v4.cfg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv4) (cnt)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg backup/yolov4.backup -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar) (d19)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/darknet19.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv4)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov4.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar) (valid)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier valid cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights -i 1" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tYv5l) (T)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="detector train coco.data yolov5l_v4.cfg -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../coco" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://$USER_HOME$/cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tchess) (local)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="tchess cfg/chess.cfg weights/chess.weights -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+      <envs>
+        <env name="MallocScribble" value="1 MallocPreScribble=1 " />
+      </envs>
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="darknet" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (tchess)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="tchess cfg/chess.cfg $USER_HOME$/v1.ram/io.isowa.darknet.weights/chess.weights -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="darknet_l" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet_l" CONFIG_NAME="RelWithDebInfo">
+    <configuration name="bindarknet (tcifar) (d19)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/darknet19.cfg -gpus 1,2,3,4" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="darknet_s" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet_s" CONFIG_NAME="RelWithDebInfo">
+    <configuration name="bindarknet (tcifar) (valid)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier valid cfg/cifar.data cfg/cifar_small_test.cfg backup/cifar_small.weights -gpus  0,2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="bindarknet (tcifar)" type="CMakeRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="classifier train cfg/cifar.data cfg/cifar_small.cfg -gpus 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$/../cifar" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -324,43 +420,45 @@
       <item itemvalue="CMake Application.bindarknet (Yv3-sppDemo)" />
       <item itemvalue="CMake Application.bindarknet (Yv3-spp)" />
       <item itemvalue="CMake Application.bindarknet (Yv3Demo) (car)" />
-      <item itemvalue="CMake Application.bindarknet (Yv3)" />
       <item itemvalue="CMake Application.bindarknet (Yv3Demo)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4Demo) (car)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4TDemo) (car)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4Demo) " />
-      <item itemvalue="CMake Application.bindarknet (Yv4TDemo)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4T)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4C)" />
+      <item itemvalue="CMake Application.bindarknet (Yv3)" />
       <item itemvalue="CMake Application.bindarknet (Yv4CX)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4XM)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4C)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4Demo) " />
+      <item itemvalue="CMake Application.bindarknet (Yv4Demo) (car)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4Demo) (odir)" />
       <item itemvalue="CMake Application.bindarknet (Yv4P5)" />
       <item itemvalue="CMake Application.bindarknet (Yv4P6)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4TDemo) (car)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4TDemo)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4T)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4XM)" />
+      <item itemvalue="CMake Application.bindarknet (Yv4)" />
       <item itemvalue="CMake Application.bindarknet (Yv5L)" />
       <item itemvalue="CMake Application.bindarknet (cifar) (try1)" />
       <item itemvalue="CMake Application.bindarknet (cifar) (try2)" />
       <item itemvalue="CMake Application.bindarknet (cifar) (try3)" />
       <item itemvalue="CMake Application.bindarknet (cifar) (try4)" />
       <item itemvalue="CMake Application.bindarknet (cifar) (try5)" />
+      <item itemvalue="CMake Application.bindarknet (dchess)  (local)" />
+      <item itemvalue="CMake Application.bindarknet (dchess) " />
+      <item itemvalue="CMake Application.bindarknet (echess) (local)" />
       <item itemvalue="CMake Application.bindarknet (tYv1) (cnt.)" />
       <item itemvalue="CMake Application.bindarknet (tYv1)" />
       <item itemvalue="CMake Application.bindarknet (tYv2) (cnt.)" />
       <item itemvalue="CMake Application.bindarknet (tYv2)" />
-      <item itemvalue="CMake Application.bindarknet (tYv3)" />
       <item itemvalue="CMake Application.bindarknet (tYv3) (cnt)" />
+      <item itemvalue="CMake Application.bindarknet (tYv3)" />
+      <item itemvalue="CMake Application.bindarknet (tYv4) (T)" />
+      <item itemvalue="CMake Application.bindarknet (tYv4) (cnt) (T)" />
       <item itemvalue="CMake Application.bindarknet (tYv4) (cnt)" />
       <item itemvalue="CMake Application.bindarknet (tYv4)" />
-      <item itemvalue="CMake Application.bindarknet (tYv4) (cnt) (T)" />
-      <item itemvalue="CMake Application.bindarknet (tYv4) (T)" />
       <item itemvalue="CMake Application.bindarknet (tYv5l) (T)" />
-      <item itemvalue="CMake Application.bindarknet (Yv4Demo) (odir)" />
+      <item itemvalue="CMake Application.bindarknet (tchess) (local)" />
+      <item itemvalue="CMake Application.bindarknet (tchess)" />
       <item itemvalue="CMake Application.bindarknet (tcifar) (d19)" />
       <item itemvalue="CMake Application.bindarknet (tcifar) (valid)" />
       <item itemvalue="CMake Application.bindarknet (tcifar)" />
-      <item itemvalue="CMake Application.darknet" />
-      <item itemvalue="CMake Application.darknet_l" />
-      <item itemvalue="CMake Application.darknet_s" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -878,6 +976,363 @@
       <workItem from="1656956502859" duration="3770000" />
       <workItem from="1656967040258" duration="2802000" />
       <workItem from="1656969928756" duration="899000" />
+      <workItem from="1666193650274" duration="1560000" />
+      <workItem from="1666207398431" duration="3419000" />
+      <workItem from="1666210861297" duration="10959000" />
+      <workItem from="1666228890030" duration="4763000" />
+      <workItem from="1666233675587" duration="7359000" />
+      <workItem from="1666331733382" duration="15913000" />
+      <workItem from="1666365879094" duration="7769000" />
+      <workItem from="1666381403187" duration="1235000" />
+      <workItem from="1666415835580" duration="1000" />
+      <workItem from="1666419792692" duration="1662000" />
+      <workItem from="1666694576455" duration="4467000" />
+      <workItem from="1667112336950" duration="9295000" />
+      <workItem from="1668261250698" duration="1908000" />
+      <workItem from="1668271216982" duration="7442000" />
+      <workItem from="1668279115736" duration="3509000" />
+      <workItem from="1668865496406" duration="1560000" />
+      <workItem from="1669551043867" duration="9425000" />
+      <workItem from="1669561986092" duration="15417000" />
+      <workItem from="1669579949565" duration="440000" />
+      <workItem from="1669581102873" duration="1000" />
+      <workItem from="1669581762396" duration="353000" />
+      <workItem from="1669721661580" duration="1000" />
+      <workItem from="1669722132776" duration="680000" />
+      <workItem from="1669723569439" duration="449000" />
+      <workItem from="1669807169799" duration="130000" />
+      <workItem from="1669807619617" duration="936000" />
+      <workItem from="1669808902769" duration="1000" />
+      <workItem from="1669810118339" duration="4711000" />
+      <workItem from="1670067466268" duration="2095000" />
+      <workItem from="1670069818602" duration="306000" />
+      <workItem from="1670070577621" duration="1000" />
+      <workItem from="1670084699099" duration="1000" />
+      <workItem from="1670085439270" duration="550000" />
+      <workItem from="1670086553891" duration="141000" />
+      <workItem from="1670087232119" duration="4089000" />
+      <workItem from="1670091910119" duration="1000" />
+      <workItem from="1670092407526" duration="700000" />
+      <workItem from="1670093826946" duration="2357000" />
+      <workItem from="1670097429086" duration="760000" />
+      <workItem from="1670267721360" duration="8000" />
+      <workItem from="1670681204592" duration="38069000" />
+      <workItem from="1671025768582" duration="168000" />
+      <workItem from="1671026009259" duration="249000" />
+      <workItem from="1671026319995" duration="367000" />
+      <workItem from="1671026701069" duration="20127000" />
+      <workItem from="1671130697692" duration="17909000" />
+      <workItem from="1671224739923" duration="13793000" />
+      <workItem from="1671280870984" duration="5531000" />
+      <workItem from="1671288386228" duration="7545000" />
+      <workItem from="1671304136731" duration="28274000" />
+      <workItem from="1671463435458" duration="94010000" />
+      <workItem from="1671613652444" duration="33179000" />
+      <workItem from="1671660214171" duration="1082000" />
+      <workItem from="1671663406083" duration="6547000" />
+      <workItem from="1671671250093" duration="599000" />
+      <workItem from="1671673797604" duration="3153000" />
+      <workItem from="1671680786092" duration="21052000" />
+      <workItem from="1671724077775" duration="2367000" />
+      <workItem from="1671730060166" duration="12745000" />
+      <workItem from="1671835462112" duration="776000" />
+      <workItem from="1671847968086" duration="654000" />
+      <workItem from="1671848951724" duration="12118000" />
+      <workItem from="1671976416722" duration="2051000" />
+      <workItem from="1672063644461" duration="4781000" />
+      <workItem from="1672068821795" duration="5000" />
+      <workItem from="1672068835115" duration="958000" />
+      <workItem from="1672069800723" duration="86000" />
+      <workItem from="1672070048285" duration="2388000" />
+      <workItem from="1672084709724" duration="18050000" />
+      <workItem from="1672312694030" duration="110000" />
+      <workItem from="1672312901674" duration="17575000" />
+      <workItem from="1672430001151" duration="33558000" />
+      <workItem from="1672515203897" duration="20169000" />
+      <workItem from="1672633194447" duration="18661000" />
+      <workItem from="1672706443240" duration="10970000" />
+      <workItem from="1672725283948" duration="103598000" />
+      <workItem from="1673874064680" duration="607000" />
+      <workItem from="1673885505873" duration="20000" />
+      <workItem from="1673885572828" duration="2000" />
+      <workItem from="1673964929619" duration="18000" />
+      <workItem from="1674038587171" duration="621000" />
+      <workItem from="1675251240284" duration="17618000" />
+      <workItem from="1676050726935" duration="6217000" />
+      <workItem from="1676121696784" duration="2731000" />
+      <workItem from="1676313953576" duration="358000" />
+      <workItem from="1676314744704" duration="4000" />
+      <workItem from="1676317601925" duration="37000" />
+      <workItem from="1676318198601" duration="878000" />
+      <workItem from="1676480348091" duration="25226000" />
+      <workItem from="1676737681353" duration="20349000" />
+      <workItem from="1677442617682" duration="609000" />
+      <workItem from="1677526029597" duration="1000" />
+      <workItem from="1677925502459" duration="1000" />
+      <workItem from="1677926837941" duration="21326000" />
+      <workItem from="1678135508532" duration="28385000" />
+      <workItem from="1678195270888" duration="7081000" />
+      <workItem from="1678299389764" duration="32714000" />
+      <workItem from="1678351849893" duration="17511000" />
+      <workItem from="1678457777021" duration="17093000" />
+      <workItem from="1678499661180" duration="48198000" />
+      <workItem from="1678760489423" duration="13408000" />
+      <workItem from="1678776854951" duration="46587000" />
+      <workItem from="1678861512848" duration="20613000" />
+      <workItem from="1678945844386" duration="17984000" />
+      <workItem from="1679027943997" duration="5952000" />
+      <workItem from="1679051545959" duration="4375000" />
+      <workItem from="1679106672514" duration="963000" />
+      <workItem from="1679115338860" duration="7392000" />
+      <workItem from="1679135433225" duration="623000" />
+      <workItem from="1679147203633" duration="36780000" />
+      <workItem from="1679373513043" duration="26549000" />
+      <workItem from="1679556323558" duration="2139000" />
+      <workItem from="1679568688014" duration="3637000" />
+      <workItem from="1679596078282" duration="1956000" />
+      <workItem from="1679610162263" duration="662000" />
+      <workItem from="1679661264691" duration="762000" />
+      <workItem from="1679671251131" duration="3750000" />
+      <workItem from="1679775213149" duration="17411000" />
+      <workItem from="1680330883035" duration="5381000" />
+      <workItem from="1680413119713" duration="1320000" />
+      <workItem from="1680710029603" duration="12690000" />
+      <workItem from="1680962045942" duration="732000" />
+      <workItem from="1680963319978" duration="958000" />
+      <workItem from="1680967855713" duration="1281000" />
+      <workItem from="1680971082601" duration="7291000" />
+      <workItem from="1681285149944" duration="1000" />
+      <workItem from="1681486538747" duration="23960000" />
+      <workItem from="1681659066217" duration="1063000" />
+      <workItem from="1681661213001" duration="1000" />
+      <workItem from="1681662615687" duration="16640000" />
+      <workItem from="1681710719666" duration="1240000" />
+      <workItem from="1681712356425" duration="3210000" />
+      <workItem from="1681729193074" duration="9956000" />
+      <workItem from="1681754892697" duration="15530000" />
+      <workItem from="1681814717635" duration="5002000" />
+      <workItem from="1681820070728" duration="3119000" />
+      <workItem from="1681823569423" duration="14637000" />
+      <workItem from="1681880288766" duration="3116000" />
+      <workItem from="1681904836254" duration="11378000" />
+      <workItem from="1682168886132" duration="9000" />
+      <workItem from="1682168902192" duration="9641000" />
+      <workItem from="1682404018601" duration="1402000" />
+      <workItem from="1682510000669" duration="793000" />
+      <workItem from="1682514103404" duration="9963000" />
+      <workItem from="1682767690291" duration="560000" />
+      <workItem from="1682769149700" duration="14691000" />
+      <workItem from="1683051899310" duration="13295000" />
+      <workItem from="1683105953050" duration="1000" />
+      <workItem from="1683106027175" duration="854000" />
+      <workItem from="1683108144949" duration="17444000" />
+      <workItem from="1683322616617" duration="884000" />
+      <workItem from="1683347571955" duration="1000" />
+      <workItem from="1683347991502" duration="1000" />
+      <workItem from="1683348899158" duration="1209000" />
+      <workItem from="1683362108724" duration="55000" />
+      <workItem from="1683369777047" duration="1000" />
+      <workItem from="1683369796363" duration="199000" />
+      <workItem from="1683371794164" duration="75582000" />
+      <workItem from="1683940402394" duration="6277000" />
+      <workItem from="1683948221157" duration="2669000" />
+      <workItem from="1683951245391" duration="408000" />
+      <workItem from="1683951990349" duration="5115000" />
+      <workItem from="1683976014474" duration="1799000" />
+      <workItem from="1683977826192" duration="2037000" />
+      <workItem from="1683980032431" duration="58991000" />
+      <workItem from="1684136677528" duration="391000" />
+      <workItem from="1684137127024" duration="94868000" />
+      <workItem from="1684573143485" duration="30891000" />
+      <workItem from="1684787376419" duration="8217000" />
+      <workItem from="1685004655266" duration="1000" />
+      <workItem from="1685009894375" duration="28000" />
+      <workItem from="1685038176587" duration="168000" />
+      <workItem from="1685038513952" duration="623000" />
+      <workItem from="1685041983526" duration="1977000" />
+      <workItem from="1685044441431" duration="642000" />
+      <workItem from="1685045095036" duration="2243000" />
+      <workItem from="1685101864768" duration="2132000" />
+      <workItem from="1685130771737" duration="301000" />
+      <workItem from="1685132845911" duration="10738000" />
+      <workItem from="1685201394039" duration="35000" />
+      <workItem from="1685207170042" duration="1445000" />
+      <workItem from="1685256675043" duration="45778000" />
+      <workItem from="1685375103860" duration="17480000" />
+      <workItem from="1685474714142" duration="84127000" />
+      <workItem from="1685881394853" duration="166000" />
+      <workItem from="1685883854735" duration="11625000" />
+      <workItem from="1686076829036" duration="1040000" />
+      <workItem from="1686081754075" duration="1041000" />
+      <workItem from="1686083250368" duration="125000" />
+      <workItem from="1686083815065" duration="3441000" />
+      <workItem from="1686101543761" duration="7727000" />
+      <workItem from="1686114655314" duration="5045000" />
+      <workItem from="1686126832615" duration="729000" />
+      <workItem from="1686158002756" duration="7468000" />
+      <workItem from="1686165898375" duration="14467000" />
+      <workItem from="1686419195259" duration="8611000" />
+      <workItem from="1686427965430" duration="17404000" />
+      <workItem from="1686446828182" duration="1000" />
+      <workItem from="1686460910747" duration="19895000" />
+      <workItem from="1686512173239" duration="26867000" />
+      <workItem from="1687628227654" duration="1000" />
+      <workItem from="1687628399003" duration="16000" />
+      <workItem from="1687685480411" duration="7086000" />
+      <workItem from="1687815011875" duration="38000" />
+      <workItem from="1687815213548" duration="35000" />
+      <workItem from="1687815380762" duration="3146000" />
+      <workItem from="1688031308042" duration="2520000" />
+      <workItem from="1689200240249" duration="3069000" />
+      <workItem from="1689221061685" duration="4356000" />
+      <workItem from="1690002890802" duration="1000" />
+      <workItem from="1690003351680" duration="651000" />
+      <workItem from="1690004194853" duration="6467000" />
+      <workItem from="1690097767173" duration="1000" />
+      <workItem from="1690115838254" duration="81000" />
+      <workItem from="1690124782435" duration="723000" />
+      <workItem from="1690209987412" duration="833000" />
+      <workItem from="1690224297434" duration="689000" />
+      <workItem from="1690232034901" duration="1247000" />
+      <workItem from="1690234996252" duration="8661000" />
+      <workItem from="1690310751763" duration="1000" />
+      <workItem from="1690310797397" duration="1033000" />
+      <workItem from="1690313985902" duration="4000" />
+      <workItem from="1690402005604" duration="1000" />
+      <workItem from="1690604436037" duration="7000" />
+      <workItem from="1690618881242" duration="5000000" />
+      <workItem from="1690777001651" duration="1269000" />
+      <workItem from="1691075609787" duration="1922000" />
+      <workItem from="1691212577654" duration="4149000" />
+      <workItem from="1691318385193" duration="182000" />
+      <workItem from="1691319796213" duration="876000" />
+      <workItem from="1691755582047" duration="223000" />
+      <workItem from="1691864402682" duration="2528000" />
+      <workItem from="1691869483110" duration="32000" />
+      <workItem from="1692205596997" duration="32000" />
+      <workItem from="1692350300626" duration="1000" />
+      <workItem from="1692351278404" duration="39000" />
+      <workItem from="1692351541997" duration="1267000" />
+      <workItem from="1692355471761" duration="49000" />
+      <workItem from="1692357122107" duration="142000" />
+      <workItem from="1692357777048" duration="693000" />
+      <workItem from="1692365488372" duration="11000" />
+      <workItem from="1692365680441" duration="17000" />
+      <workItem from="1692531215154" duration="953000" />
+      <workItem from="1692532269860" duration="3662000" />
+      <workItem from="1692539211449" duration="8407000" />
+      <workItem from="1693045795414" duration="6817000" />
+      <workItem from="1693055553076" duration="3593000" />
+      <workItem from="1693059407403" duration="630000" />
+      <workItem from="1693060247489" duration="4785000" />
+      <workItem from="1693067899977" duration="1896000" />
+      <workItem from="1693137867774" duration="1231000" />
+      <workItem from="1693393820647" duration="1000" />
+      <workItem from="1693480471466" duration="9457000" />
+      <workItem from="1693498113324" duration="7260000" />
+      <workItem from="1693506358672" duration="1316000" />
+      <workItem from="1693508585517" duration="3753000" />
+      <workItem from="1693514100593" duration="485000" />
+      <workItem from="1693515089536" duration="3252000" />
+      <workItem from="1693519062265" duration="1000" />
+      <workItem from="1693566612373" duration="16286000" />
+      <workItem from="1693584771878" duration="4302000" />
+      <workItem from="1693589186071" duration="5159000" />
+      <workItem from="1693594854468" duration="15614000" />
+      <workItem from="1693640339897" duration="1903000" />
+      <workItem from="1693657882202" duration="12085000" />
+      <workItem from="1693755085812" duration="763000" />
+      <workItem from="1693756111245" duration="1223000" />
+      <workItem from="1693757592149" duration="360000" />
+      <workItem from="1693758207542" duration="1000" />
+      <workItem from="1693758492234" duration="1000" />
+      <workItem from="1693761082861" duration="15671000" />
+      <workItem from="1693778220835" duration="10223000" />
+      <workItem from="1693791070462" duration="152000" />
+      <workItem from="1693814099308" duration="5733000" />
+      <workItem from="1693859256141" duration="1419000" />
+      <workItem from="1693862831385" duration="17677000" />
+      <workItem from="1693941279012" duration="11204000" />
+      <workItem from="1693978536831" duration="1262000" />
+      <workItem from="1694001847277" duration="1107000" />
+      <workItem from="1694029282397" duration="27425000" />
+      <workItem from="1694197152152" duration="3381000" />
+      <workItem from="1694259699956" duration="18172000" />
+      <workItem from="1694446489065" duration="4609000" />
+      <workItem from="1694526544329" duration="529000" />
+      <workItem from="1694527080447" duration="15448000" />
+      <workItem from="1694552774910" duration="8436000" />
+      <workItem from="1694651428836" duration="617000" />
+      <workItem from="1694678535222" duration="622000" />
+      <workItem from="1694751667108" duration="2862000" />
+      <workItem from="1720283138325" duration="146000" />
+      <workItem from="1720363868087" duration="98850000" />
+      <workItem from="1721324388319" duration="37716000" />
+      <workItem from="1721537174738" duration="5950000" />
+      <workItem from="1721573619141" duration="5313000" />
+      <workItem from="1721581316590" duration="3856000" />
+      <workItem from="1721585990191" duration="3867000" />
+      <workItem from="1721625348599" duration="3724000" />
+      <workItem from="1721632301810" duration="38015000" />
+      <workItem from="1721926244130" duration="819000" />
+      <workItem from="1724593900500" duration="82752000" />
+      <workItem from="1725870329655" duration="27503000" />
+      <workItem from="1726084715375" duration="645000" />
+      <workItem from="1726091853109" duration="30000" />
+      <workItem from="1726092141638" duration="5000" />
+      <workItem from="1726092171080" duration="108000" />
+      <workItem from="1726092540141" duration="48000" />
+      <workItem from="1726251423338" duration="12768000" />
+      <workItem from="1728271652857" duration="9848000" />
+      <workItem from="1728358062918" duration="1716000" />
+      <workItem from="1728369083698" duration="10135000" />
+      <workItem from="1728535432070" duration="12661000" />
+      <workItem from="1732471989408" duration="1078000" />
+      <workItem from="1733363137684" duration="31983000" />
+      <workItem from="1733786870420" duration="23802000" />
+      <workItem from="1733920560856" duration="2114000" />
+      <workItem from="1733922745550" duration="20346000" />
+      <workItem from="1734017482100" duration="21407000" />
+      <workItem from="1734176957502" duration="744000" />
+      <workItem from="1734475299852" duration="60536000" />
+      <workItem from="1734643314986" duration="693000" />
+      <workItem from="1734644117865" duration="67000" />
+      <workItem from="1734644446738" duration="10159000" />
+      <workItem from="1734654887119" duration="4150000" />
+      <workItem from="1734662236430" duration="20858000" />
+      <workItem from="1734788909468" duration="75021000" />
+      <workItem from="1734933071762" duration="290238000" />
+      <workItem from="1738613694356" duration="23008000" />
+      <workItem from="1739029934950" duration="128000" />
+      <workItem from="1739030114115" duration="282000" />
+      <workItem from="1739030423131" duration="24864000" />
+      <workItem from="1739057353854" duration="6126000" />
+      <workItem from="1739198238896" duration="17298000" />
+      <workItem from="1739676753516" duration="338000" />
+      <workItem from="1739677097663" duration="1690000" />
+      <workItem from="1739695265940" duration="15198000" />
+      <workItem from="1739909128346" duration="22469000" />
+      <workItem from="1740421794317" duration="1623000" />
+      <workItem from="1740484284048" duration="40450000" />
+      <workItem from="1740667809824" duration="105000" />
+      <workItem from="1740668662675" duration="26000" />
+      <workItem from="1740685334420" duration="9312000" />
+      <workItem from="1740851559846" duration="21665000" />
+      <workItem from="1741105579956" duration="45082000" />
+      <workItem from="1741596276167" duration="3262000" />
+      <workItem from="1741940906213" duration="4110000" />
+      <workItem from="1741945980124" duration="2540000" />
+      <workItem from="1742674776389" duration="58240000" />
+      <workItem from="1746981091327" duration="10310000" />
+      <workItem from="1747589899632" duration="43081000" />
+      <workItem from="1748586046359" duration="1050000" />
+      <workItem from="1748596202452" duration="4950000" />
+      <workItem from="1748990185550" duration="34174000" />
+      <workItem from="1749128011452" duration="5000" />
+      <workItem from="1749128046416" duration="12414000" />
+      <workItem from="1749148387605" duration="2693000" />
+      <workItem from="1749375204956" duration="18690000" />
+      <workItem from="1749478356264" duration="16077000" />
     </task>
     <servers />
   </component>
@@ -886,6 +1341,11 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.cfg" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -901,56 +1361,12 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/image.c</url>
-          <line>1780</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1080</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1152</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1144</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1170</line>
+        <breakpoint enabled="true" log-message="true" log-stack="true" type="CidrExceptionBreakpoint">
+          <properties caught="ANY_EXCEPTION">
+            <option name="whenCaught" value="ANY_EXCEPTION" />
+          </properties>
           <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1178</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1196</line>
-          <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>1204</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/convolutional_layer.c</url>
-          <line>190</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/opencl.c</url>
-          <line>376</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
+        </breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
