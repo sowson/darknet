@@ -23,7 +23,7 @@ jobs:
         submodules: recursive
 
     - name: Install dependencies
-      run: brew install opencv clblas
+      run: brew install opencv clblas python
 
     - name: Configure LibChess
       run: cmake -B cmake/libchess/build -S cmake/libchess -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
