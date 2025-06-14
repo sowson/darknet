@@ -10,7 +10,10 @@
 #define MEM_TRACK
 
 #include "system.h"
+
+#ifndef WIN32
 #include <execinfo.h>
+#endif
 
 typedef struct allocation_node {
     void *pointer;
@@ -75,6 +78,7 @@ void check_for_leaks() {
             detected = 1;
             if (detected) {
                 void *buffer[1000];
+#ifndef WIN32
                 int size = backtrace(buffer, 1000);
                 char **symbols = backtrace_symbols(buffer, size);
                 if (symbols) {
@@ -86,6 +90,7 @@ void check_for_leaks() {
                 } else {
                     fprintf(stderr, "failed to retrieve call stack symbols!\n");
                 }
+#endif
             }
             fprintf(stderr, "  leak detected! pointer: %p, Size: %zu, allocated at %s:%d, time elapsed: %.0f seconds\n",
                     current->pointer, current->size, current->file, current->line, seconds_elapsed);
@@ -134,7 +139,9 @@ void tracked_free(void *ptr, const char *file, int line) {
     } else {
         fprintf(stderr, "attempt to free NULL pointer in %s:%d\n", file, line);
     }
+#ifndef WIN32
     check_for_leaks();
+#endif
 }
 
 #endif

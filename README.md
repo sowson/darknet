@@ -2,6 +2,8 @@
 
 📄 This work is described in the scientific paper: https://doi.org/10.1002/cpe.6936
 
+## Darknet v1.1 — new Feature - the iChess.io v7.27
+
 ![iChess Engine](images/chess/engine.png)
 
 ## 🚀 Overview of new example in Darknet v1.1
