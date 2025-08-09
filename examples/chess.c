@@ -329,7 +329,7 @@ void ch_init_game_history(char* sessionId) {
         }
     }
     if (start_board == NULL) {
-        start_board = ch_fen_to_board(start_fen);
+        start_board = ch_fen_to_board(start_fen, 0);
     }
     if (empty_item == NULL) {
         empty_item = (ch_learn_state*) CALLOC(1, sizeof(ch_learn_state));
@@ -440,7 +440,7 @@ float* ch_fen_to_board_with_history(char* sessionId, char* valid_fen, int n) {
     int count = ch_queue_count(q);
     ch_constant_memory_queue_peek_init(q);
 
-    float* valid_board = ch_fen_to_board(valid_fen);
+    float* valid_board = ch_fen_to_board(valid_fen, 1);
 
     for(int i = 0; i < n; ++i) {
         if (count < i) {
@@ -573,7 +573,7 @@ float *ch_move(char* sfen, float *board, int indext) {
         fprintf(stderr, "try (%i) on %s\n", indext, pfen);
         return NULL;
     }
-    float* mboard = ch_fen_to_board(mfen);
+    float* mboard = ch_fen_to_board(mfen, 1);
     FREE(mfen);
     FREE(pfen);
     return mboard;
@@ -601,7 +601,7 @@ void ch_self_study_after_pick_the_move(char* sessionId, network *net, int player
 void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, char *valid_move, network *net, int level, int idx, float pow, float value) {
     int player = strstr(valid_fen, " w ") ? 0 : 1;
     if (!valid_fen || valid_fen[0] == '\0' || !valid_move || valid_move[0] == '\0') return;
-    float *prev = ch_fen_to_board(valid_fen);
+    float *prev = ch_fen_to_board(valid_fen, 1);
     float *next = ch_move(sfen, prev, idx);
     if (next == NULL) {
         FREE(prev);
@@ -734,7 +734,7 @@ void ch_put_into_game_queue(char *sessionId, char *valid_fen, char* valid_move, 
     int player = strstr(valid_fen, " w ") ? 0 : 1;
     ch_constant_memory_queue *q = ch_dict_get(moves_history, sessionId);
     ch_learn_state* to_learn = (ch_learn_state *) CALLOC(1, sizeof(ch_learn_state));
-    float* fen_board = ch_fen_to_board(valid_fen);
+    float* fen_board = ch_fen_to_board(valid_fen, 1);
     memcpy(to_learn->board, fen_board, (1)*(BOARD_SIZE)*sizeof(float));
     FREE(fen_board);
     to_learn->index = indext;
@@ -804,7 +804,7 @@ float* ch_moves_similarity_ai(network* net, char** moves, int n, float *prev, ch
         float* y = ch_network_predict(net, x, player);
         similarities[idx*2] = y[0];
         similarities[idx*2+1] = y[1];
-        free(y);
+        FREE(y);
         FREE(x);
         FREE(next);
     }
@@ -917,8 +917,7 @@ ch_mcts_tree* ch_expansion_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network 
     ch_mcts_tree* current = leaf;
 
     while (current) {
-        int best_index = ch_select_mcts(leaf, root, net, cpuct, sfen, level);
-        if (best_index < 0 || best_index >= current->count) break;
+        int best_index = ch_select_mcts(current, root, net, cpuct, sfen, level);
 
         if (current->children[best_index] == NULL) {
 
@@ -1094,7 +1093,7 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
         return idx;
     }
 
-    float *board = ch_fen_to_board(valid_fen);
+    float *board = ch_fen_to_board(valid_fen, 1);
 
     ch_constant_memory_queue *q = ch_dict_get(moves_history, sessionId);
 
@@ -1128,7 +1127,7 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
     fprintf(stderr, "pick (%s): %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i) move: (%s) value: (%.8g)\n", *solver == 1 ? "ai" : "ml", net->nsteps, player == 0 ? "w" : "b", n, counter, *pow, idx, valid_moves[idx], *value);
 
     if (!ch_is_end(sfen, valid_fen, index)) {
-        float *nboard = ch_fen_to_board(valid_fen);
+        float *nboard = ch_fen_to_board(valid_fen, 1);
         float *moved = ch_move(sfen, nboard, idx);
         char *print = ch_board_to_fen(moved);
         ch_print_board(print);
@@ -1740,12 +1739,12 @@ void test_tchess(int argc, char **argv, char *cfgfile, char *weight_file) {
 
     if (0) {
         startpos = "rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
-        float* fboard = ch_fen_to_board(startpos);
+        float* fboard = ch_fen_to_board(startpos, 1);
         char* cfen = ch_board_to_fen(fboard);
         if (strcmp(cfen, startpos) != 0) {
             fprintf(stderr, "%s\n", startpos);
             ch_print_board(startpos);
-            float *board = ch_fen_to_board(startpos);
+            float *board = ch_fen_to_board(startpos, 1);
             char *fen = ch_board_to_fen(board);
             fprintf(stderr, "%s\n", fen);
             FREE(fen);
@@ -1788,7 +1787,7 @@ void test_tchess(int argc, char **argv, char *cfgfile, char *weight_file) {
             if (trivial_player != -1) trivial_player = trivial_player == 0 ? 1 : 0;
             goto one_more_time;
         }
-        float* board = ch_fen_to_board(valid_fen);
+        float* board = ch_fen_to_board(valid_fen, 1);
         float* next = ch_move(sfen, board, move_state.indext);
         char* next_fen = ch_board_to_fen(next);
         strcpy(move_state.fen, next_fen);
@@ -1816,7 +1815,7 @@ void ch_train_possible_checkmate(char *sessionId, ch_board_state move_state, cha
             for (int i = 0; i < valid_maybe_moves_count; ++i) {
                 if (ch_mate_move(sfen, valid_maybe_fen, i)) {
                     ch_learn_state *to_maybe_learn = (ch_learn_state *) CALLOC(1, sizeof(ch_learn_state));
-                    float *fen_maybe_board = ch_fen_to_board(valid_maybe_fen);
+                    float *fen_maybe_board = ch_fen_to_board(valid_maybe_fen, 1);
                     memcpy(to_maybe_learn->board, fen_maybe_board, (1)*(BOARD_SIZE)*sizeof(float));
                     to_maybe_learn->index = i;
                     to_maybe_learn->player = player;
@@ -1831,7 +1830,7 @@ void ch_train_possible_checkmate(char *sessionId, ch_board_state move_state, cha
                     strcpy(move_maybe_next_state.move, valid_maybe_moves[i]);
                     move_maybe_next_state.indext = i;
                     ch_learn_state *to_maybe_learn = (ch_learn_state *) CALLOC(1, sizeof(ch_learn_state));
-                    float *fen_maybe_board = ch_fen_to_board(valid_maybe_fen);
+                    float *fen_maybe_board = ch_fen_to_board(valid_maybe_fen, 1);
                     memcpy(to_maybe_learn->board, fen_maybe_board, (1)*(BOARD_SIZE)*sizeof(float));
                     to_maybe_learn->index = i;
                     to_maybe_learn->player = player == 0 ? 1 : 0;
@@ -1981,8 +1980,8 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                     ch_put_into_game_queue(sessionId, valid_fen_last, moves[count - 1], mfen_next_idx, net, sfen);
 
-                    float *board0 = ch_fen_to_board(valid_fen_last);
-                    float *board_next0 = ch_fen_to_board(mfen_next);
+                    float *board0 = ch_fen_to_board(valid_fen_last, 1);
+                    float *board_next0 = ch_fen_to_board(mfen_next, 1);
                     float pow0 = ch_eval_the_move(sfen, valid_fen_last, mfen_next);
                     float powW0 = 0;
                     float powB0 = 0;
@@ -2013,8 +2012,8 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                     if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
 
-                    float *board1 = ch_fen_to_board(valid_fen_next);
-                    float *board_next1 = ch_fen_to_board(mfen_next);
+                    float *board1 = ch_fen_to_board(valid_fen_next, 1);
+                    float *board_next1 = ch_fen_to_board(mfen_next, 1);
                     float pow1 = ch_eval_the_move(sfen, valid_fen_next, mfen_next);
                     float powW1 = 0;
                     float powB1 = 0;
@@ -2047,8 +2046,8 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                             if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
 
-                            float *board2 = ch_fen_to_board(valid_fen_next);
-                            float *board_next2 = ch_fen_to_board(mfen_next);
+                            float *board2 = ch_fen_to_board(valid_fen_next, 1);
+                            float *board_next2 = ch_fen_to_board(mfen_next, 1);
                             float pow2 = ch_eval_the_move(sfen, valid_fen_next, mfen_next);
                             float powW2 = 0;
                             float powB2 = 0;

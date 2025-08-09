@@ -99,15 +99,15 @@ public:
 #define BLACK_ROOK     (-0.50f)
 #define WHITE_QUEEN    (+0.90f)
 #define BLACK_QUEEN    (-0.90f)
-#define WHITE_KING     (+1.00f)
-#define BLACK_KING     (-1.00f)
+#define WHITE_KING     (+0.01f)
+#define BLACK_KING     (-0.01f)
 #define EMPTY          (0.000f)
 
 static int evaluate_board_prepared = 0;
 static std::map<libchess::Piece, float> weights;
 static std::map<libchess::Side, std::map<libchess::Piece, std::vector<std::vector<float>>>> pst;
 
-void evaluate_board_prepare_v0() {
+void evaluate_board_prepare_pst() {
     static std::map<libchess::Piece, std::vector<std::vector<float>>> pst_w;
     static std::map<libchess::Piece, std::vector<std::vector<float>>> pst_b;
 
@@ -210,8 +210,8 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
 
     if (game.is_checkmate() || game.is_draw()) {
         if (game.is_checkmate()) {
-            sumW += color == libchess::White ? +100.0 : 0.0;
-            sumB += color == libchess::Black ? +100.0 : 0.0;
+            sumW += color == libchess::White ? +10.0 : 0.0;
+            sumB += color == libchess::Black ? +10.0 : 0.0;
         }
         if (game.is_draw()) {
             sumW += color == libchess::White ? +1.000 : 0.0;
@@ -224,7 +224,7 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
         return (color == libchess::White ? sumW - sumB : sumB - sumW);
     }
 
-    if (evaluate_board_prepared == 0) evaluate_board_prepare_v0();
+    if (evaluate_board_prepared == 0) evaluate_board_prepare_pst();
 
     int pst960map[8] = {0,1,2,3,4,5,6,7};
 
@@ -277,13 +277,13 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
     sumW += (ptcW - attW) / (picW);
     sumB += (ptcB - attB) / (picB);
 
-    sumW /= 500.00;
-    sumB /= 500.00;
+    sumW /= 500.0f;
+    sumB /= 500.0f;
 
     if (powW != nullptr) *powW = sumW;
     if (powB != nullptr) *powB = sumB;
 
-    return (color == libchess::White ? sumW - sumB : sumB - sumW) / 100.0;
+    return (color == libchess::White ? sumW - sumB : sumB - sumW) / 100.0f;
 }
 
 std::random_device rd;
@@ -292,7 +292,9 @@ std::mt19937 generator(rd());
 float ch_min_max(const libchess::Position& sfen, libchess::Position& game, int depth, float alpha, float beta, bool is_max_p, libchess::Side color, int *counter) {
     *counter += 1;
 
-    if (!game.valid() || game.is_terminal()) return 0.f;
+    if (!game.valid() || game.is_terminal()) {
+        return game.is_checkmate() ? 10000000.f : 0.f;
+    }
 
     float best_move_max = -10000000.f;
     float best_move_min = +10000000.f;
@@ -480,7 +482,6 @@ std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libch
     // return pos.legal_moves();
     int n = 16;
     int d = 3;
-    int c = 0;
     return ch_calculate_top_n_moves(n, sfen, pos, d);
 }
 
@@ -909,15 +910,6 @@ int ch_is_queen_attacked_move(const char* sfen, const char *valid_fen, int idx) 
            (pos.square_attacked(move.from(), pos.turn()) && !pos.square_attacked(move.to(), pos.turn()));
 }
 
-int ch_is_check_move(const char* sfen, const char *valid_fen, int idx) {
-    const char *startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    libchess::Position start = sfen == nullptr || sfen[0] == '\0' ? libchess::Position(startfen) : libchess::Position(sfen);
-    libchess::Position pos = libchess::Position(valid_fen);
-    libchess::Move move = ch_legal_moves(start, pos)[idx];
-    pos.makemove(move);
-    return !pos.in_check() || pos.square_attacked(move.to(), pos.turn());
-}
-
 int ch_is_checkmate(const char *valid_fen) {
     libchess::Position pos = libchess::Position(valid_fen);
     return pos.is_checkmate();
@@ -1104,10 +1096,10 @@ char *ch_board_to_fen(const float *board) {
     return valid_fen;
 }
 
-float* ch_fen_to_board(char *valid_fen) {
+float* ch_fen_to_board(char *valid_fen, int classic = 0) {
     if (valid_fen == nullptr || valid_fen[0] == '\0') return nullptr;
 
-    float* board = (float *) CALLOC(8*8+8, sizeof(float));
+    float* board = classic ? (float *) calloc(8*8+8, sizeof(float)) : (float *) CALLOC(8*8+8, sizeof(float));
     memset(board, 0.f, (8*8+8)*sizeof(float));
 
     std::string fen = std::string(valid_fen);
@@ -1224,7 +1216,7 @@ float ch_eval_the_board(const char* sfen, float* board, float* powW, float* powB
     char* valid_fen = ch_board_to_fen(board);
     libchess::Position fen = libchess::Position(valid_fen);
     FREE(valid_fen);
-    return (float)ch_evaluate_board(start, fen, !fen.turn(), powW, powB);
+    return (float)ch_evaluate_board(start, fen, fen.turn(), powW, powB);
 }
 
 float* ch_eval_the_board_moves(const char* sfen, float* board, float *&best_values, int* best_value_index) {
