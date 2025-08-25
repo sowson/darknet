@@ -1,6 +1,12 @@
-# Darknet v1.1 — AI CNN Computer Vision Engine
+# Darknet v1.1.1 — AI CNN Computer Vision Engine
 
 📄 This work is described in the scientific paper: https://doi.org/10.1002/cpe.6936
+
+## Darknet v1.1.1 new Feature - the iChess.io v7.27 and Master Class Training
+
+![iChess Engine Master Class Training](images/chess/mclass.png)
+
+on macOS install: ```brew install stockfish``` and enjoy! :D
 
 ## Darknet v1.1 — new Feature - the iChess.io v7.27
 

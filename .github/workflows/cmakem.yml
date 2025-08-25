@@ -1,4 +1,4 @@
-name: CMakeMv2
+name: CMakeM
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         submodules: recursive
 
     - name: Install dependencies
-      run: brew install opencv clblas python
+      run: brew install opencv clblas
 
     - name: Configure LibChess
       run: cmake -B cmake/libchess/build -S cmake/libchess -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
@@ -45,14 +45,14 @@ jobs:
     - name: Bundle binary and dependencies
       run: |
         mkdir -p release
-        mv build/darknet release/Darknet.mac
+        mv build/darknet release/iChess.io.en.mac
         cp cmake/libchess/build/shared/libchess.* release/
 
     #  working-directory: ${{github.workspace}}/build
     #  run: ctest -C ${{env.BUILD_TYPE}}
 
     - name: Package release
-      run: zip -j release/Darknet.mac.zip release/*
+      run: zip -j release/iChess.io.en.mac.zip release/*
 
     - name: Upload GitHub Release
       if: github.ref == 'refs/heads/master'
@@ -60,37 +60,6 @@ jobs:
       with:
         name: iChess.io Release ${{ github.run_number }}
         tag_name: ichess-v${{ github.run_number }}
-        files: release/Darknet.mac.zip
+        files: release/iChess.io.en.mac.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Package release (TAR.GZ for Homebrew)
-      run: |
-        tar -czvf Darknet.mac.tar.gz -C release Darknet.mac
-        cp Darknet.mac.tar.gz release/
-        python3 .github/cmakem.py shasum -a 256 release/Darknet.mac.tar.gz | awk '{ print $1 }'
-
-    - name: Upload GitHub Release
-      if: github.ref == 'refs/heads/master'
-      uses: softprops/action-gh-release@v1
-      with:
-        name: Darknet Release ${{ github.run_number }}
-        tag_name: ichess-v${{ github.run_number }}
-        files: |
-          release/Darknet.mac.zip
-          release/Darknet.mac.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Push Formula to Homebrew Tap
-      if: github.ref == 'refs/heads/master'
-      run: |
-        git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/sowson/darknet.git tap
-        cp .github/darknet.rb tap/Formula/darknet.rb
-        cd tap
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add Formula/darknet.rb
-        git commit -m "Update formula to version ${{ github.run_number }}"
-        git push
-

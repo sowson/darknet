@@ -1,4 +1,4 @@
-name: ChessEU
+name: CMakeU
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
       run: cp ${{github.workspace}}/cmake/libchess/build/shared/libchess.* ${{github.workspace}}/3rdparty/libchess/
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDARKNET_ENG_CHESS=1
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -40,13 +40,11 @@ jobs:
     - name: Prepare Release Files
       run: |
         mkdir -p release
-        mv build/darknet release/iChess.io.en.ubuntu
+        mv build/darknet release/Darknet.ubuntu
         cp cmake/libchess/build/shared/libchess.so release/  # Adjust if necessary
-        cp cfg/chess.cfg release/
-        cp weights/chess.weights release/
 
     - name: Create .tar.gz Archive
-      run: tar -czvf iChess.io.en.ubuntu.tar.gz -C release .
+      run: tar -czvf Darknet.ubuntu.tar.gz -C release .
 
     - name: Upload GitHub Release
       if: github.ref == 'refs/heads/master'
@@ -54,10 +52,6 @@ jobs:
       with:
         name: iChess.io Linux Release ${{ github.run_number }}
         tag_name: ichess-linux-v${{ github.run_number }}
-        files: iChess.io.en.ubuntu.tar.gz
+        files: Darknet.ubuntu.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    #- name: Test
-    #  working-directory: ${{github.workspace}}/build
-    #  run: ctest -C ${{env.BUILD_TYPE}}
