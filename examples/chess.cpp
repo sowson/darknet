@@ -99,8 +99,8 @@ public:
 #define BLACK_ROOK     (-0.50f)
 #define WHITE_QUEEN    (+0.90f)
 #define BLACK_QUEEN    (-0.90f)
-#define WHITE_KING     (+0.01f)
-#define BLACK_KING     (-0.01f)
+#define WHITE_KING     (+1.00f)
+#define BLACK_KING     (-1.00f)
 #define EMPTY          (0.000f)
 
 static int evaluate_board_prepared = 0;
@@ -436,7 +436,7 @@ std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess
     }
 
     const int top_n = std::min(n, count);
-    std::string sfen_fen = sfen.get_fen();
+    std::string game_fen = game.get_fen();
 
     std::vector<std::pair<float, int>> scored_indices;
     scored_indices.reserve(count);
@@ -452,12 +452,12 @@ std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess
         std::string pos_fen = game.get_fen();
         float return_value;
 
-        if (recent_fens.exists(sfen_fen, pos_fen)) {
-            return_value = recent_fens.get(sfen_fen, pos_fen);
+        if (recent_fens.exists(game_fen, pos_fen)) {
+            return_value = recent_fens.get(game_fen, pos_fen);
         } else {
             int counter = 0;
             return_value = ch_min_max(sfen, game, depth, -10000001.f, +10000001.f, false, color, &counter);
-            recent_fens.insert(sfen_fen, pos_fen, return_value);
+            recent_fens.insert(game_fen, pos_fen, return_value);
         }
 
         game.undomove();
@@ -480,7 +480,7 @@ std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess
 
 std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libchess::Position& pos) {
     // return pos.legal_moves();
-    int n = 16;
+    int n = 64;
     int d = 3;
     return ch_calculate_top_n_moves(n, sfen, pos, d);
 }
@@ -1096,10 +1096,10 @@ char *ch_board_to_fen(const float *board) {
     return valid_fen;
 }
 
-float* ch_fen_to_board(char *valid_fen, int classic = 0) {
+float* ch_fen_to_board(char *valid_fen, int track_alloc = 0) {
     if (valid_fen == nullptr || valid_fen[0] == '\0') return nullptr;
 
-    float* board = classic ? (float *) calloc(8*8+8, sizeof(float)) : (float *) CALLOC(8*8+8, sizeof(float));
+    float* board = track_alloc == 0 ? ((float *) calloc(8 * 8 + 8, sizeof(float))) : ((float *) CALLOC(8 * 8 + 8, sizeof(float)));
     memset(board, 0.f, (8*8+8)*sizeof(float));
 
     std::string fen = std::string(valid_fen);
@@ -1242,6 +1242,17 @@ float* ch_eval_the_board_moves(const char* sfen, float* board, float *&best_valu
     }
     FREE(valid_fen);
     return evaluates;
+}
+
+int ch_moves_index(char *sfen, char* valid_fen, char* valid_fen_move) {
+    const char *startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    libchess::Position start = sfen == nullptr || sfen[0] == '\0' ? libchess::Position(startfen) : libchess::Position(sfen);
+    libchess::Position pos = libchess::Position(valid_fen);
+    auto moves = ch_legal_moves(start, pos);
+    for(int i = 0; i < moves.size(); ++i) {
+        if (std::string(moves[i]) == std::string(valid_fen_move)) return i;
+    }
+    return -1;
 }
 
 }

@@ -1145,9 +1145,8 @@ int ch_is_end(const char* sfen, char *valid_fen, int idx);
 int ch_is_checkmate_move(const char* sfen, char *valid_fen, int idx);
 int ch_is_queen_attacked_move(const char* sfen, char *valid_fen, int idx);
 int ch_is_take_move(const char* sfen, char *valid_fen, int idx);
-int ch_is_check_move(const char* sfen, char *valid_fen, int idx);
 int ch_board_after_move(const char* sfen, char* valid_fen, char* valid_move, char** valid_fen_next, int *valid_move_idx, int *valid_move_cnt);
-float* ch_fen_to_board(char *valid_fen);
+float* ch_fen_to_board(char *valid_fen, int track_alloc);
 char* ch_board_to_fen(float *board);
 char* ch_get_fen_960();
 int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level, float *best_move, float **best_moves, int *counter);
@@ -1159,8 +1158,9 @@ void ch_softmax_revert(const float* softmax_probs, size_t size, float z_max, flo
 void ch_softmax_scaled(const float *values, int size, float *output);
 void ch_soft_tanh(const float *values, int size, float *output);
 float ch_eval_the_board(const char* sfen, float* board, float* powW, float* powB);
+float ch_eval_the_board_nuee(const char* sfen, float* board, float* powW, float* powB);
 float* ch_eval_the_board_moves(const char* sfen, const float* board, float* best_value, int* best_value_index, int* counter);
-
+int ch_moves_index(char *sfen, char* valid_fen, char* valid_fen_move);
 #ifdef WIN32
 API void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 API void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);

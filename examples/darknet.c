@@ -10,6 +10,7 @@ extern void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char 
 extern void test_dchess(int argc, char **argv, char *cfgfile, char *weightfile, char *in_dir, char *out_dir);
 extern void test_tchess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
 extern void test_echess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
+extern void test_mchess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
 extern void run_yolo(int argc, char **argv);
 extern void run_yolo4(int argc, char **argv);
 extern void run_detector(int argc, char **argv);
@@ -422,7 +423,7 @@ int main()
 {
     int argc = 6;
     char ar0[] = "iChess.io.en";
-    char ar1[] = "echess";
+    char ar1[] = "mchess";
     char ar2[] = "chess.cfg";
     char ar3[] = "chess.weights";
     char ar4[] = "-i";
@@ -512,6 +513,8 @@ int main(int argc, char** argv)
         test_tchess(argc, argv, argv[2], argv[3], argv[4]);
     } else if (0 == strcmp(argv[1], "echess")){
         test_echess(argc, argv, argv[2], argv[3], argv[4]);
+    } else if (0 == strcmp(argv[1], "mchess")){
+        test_mchess(argc, argv, argv[2], argv[3], argv[4]);
     }
     else if (0 == strcmp(argv[1], "cifar")){
         run_cifar(argc, argv);

@@ -404,10 +404,10 @@ float* ch_network_predict(network *net, float *input, int player)
     memcpy(net->input, input, net->inputs*net->batch*sizeof(float));
     net->train = 0;
     forward_network(net);
-    float* resut = CALLOC(2, sizeof(float));
-    resut[0] = net->output[(0)];
-    resut[1] = net->output[(1)];
-    return resut;
+    float* results = CALLOC(2, sizeof(float));
+    results[0] = net->output[(0)];
+    results[1] = net->output[(1)];
+    return results;
 }
 
 typedef struct ch_position {
@@ -587,7 +587,7 @@ char *ch_move_fen(char* sfen, char* fen, int indext) {
     return mfen;
 }
 
-void ch_self_study_after_pick_the_move(char* sessionId, network *net, int player, int level, int idx, char* valid_move, float pow, float *x, float *y) {
+void ch_self_study_after_pick_the_move(char* sessionId, network *net, int player, int level, int idx, char* valid_move, float *x, float *y) {
     float loss = ch_train_network(net, x,y, player);
     fprintf(stderr, "train step %ld(%s): sub-step: (%i) step-level: (%i) train: (%i) rate: (%.8g) loss: (%.8g)\n",
             net->nsteps, player == 0 ? "w" : "b", ch_queue_count(ch_dict_get(moves_history, sessionId)) + 1, level, idx,
@@ -600,24 +600,34 @@ void ch_self_study_after_pick_the_move(char* sessionId, network *net, int player
 
 void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, char *valid_move, network *net, int level, int idx, float pow, float value) {
     int player = strstr(valid_fen, " w ") ? 0 : 1;
-    if (!valid_fen || valid_fen[0] == '\0' || !valid_move || valid_move[0] == '\0') return;
+    if (ch_is_checkmate(valid_fen)) return;
+    if (valid_fen[0] == '\0' || valid_move[0] == '\0') return;
     float *prev = ch_fen_to_board(valid_fen, 1);
     float *next = ch_move(sfen, prev, idx);
     if (next == NULL) {
         FREE(prev);
         return;
     }
-    float *x = (float *) CALLOC((0)+(2)*(BOARD_SIZE), sizeof(float));
+    float *x = (float *) CALLOC((2)*(BOARD_SIZE), sizeof(float));
     float *y = (float *) CALLOC((2), sizeof(float));
     for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
-        x[2 * i] = prev[i];
-        x[2 * i + 1] = next[i];
+        x[i] = prev[i];
     }
-    y[0] = pow; y[1] = value;
+    for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
+        x[(1)*(BOARD_SIZE) + i] = next[i];
+    }
+    float *pnext = ch_move(sfen, prev, 0);
+    float powW = 0;
+    float powB = 0;
+    float power = ch_eval_the_board(sfen, next, &powW, &powB);
+    float val = (player == 0 ? powW - powB : powB - powW);
+    y[0] = power < pow ? pow : power + net->learning_rate;
+    y[1] = value < val ? val : value + net->learning_rate;
     fprintf(stderr, "output[0]: %2.8f, output[1]: %2.8f\n", y[0], y[1]);
-    ch_self_study_after_pick_the_move(sessionId, net, player, level, idx, valid_move, pow, x, y);
+    ch_self_study_after_pick_the_move(sessionId, net, player, level, idx, valid_move, x, y);
     FREE(y);
     FREE(x);
+    FREE(pnext);
     FREE(next);
     FREE(prev);
 }
@@ -647,7 +657,7 @@ void ch_flip_board(float *board)
     board[8*8+5] = board[8*8+5] == 0 ? 0.f : (float)(64 - (int)board[8*8+5]);
     ch_swap(board, 8*8+6, 8*8+7);
 }
-
+// disabled!
 void ch_train_till_end_winner(char *sessionId, char* sfen, char *valid_move, network *net, int player) {
     return; // TODO !!
     fprintf(stderr, "train winner till move: %s\n", valid_move);
@@ -688,7 +698,7 @@ void ch_train_till_end_winner(char *sessionId, char* sfen, char *valid_move, net
         }
     }
 }
-
+// disabled!
 void ch_train_till_end_looser(char *sessionId, char* sfen, char *valid_move, network *net, int player) {
     return; // TODO !!
     fprintf(stderr, "train looser till move: %s\n", valid_move);
@@ -790,25 +800,27 @@ int ch_index(int player, int *a, int n) {
     return max_int_index(a, n);
 }
 
-float* ch_moves_similarity_ai(network* net, char** moves, int n, float *prev, char* sfen) {
-    int player = (int)prev[8*8] != 0 ? 1 : 0;
+float* ch_moves_similarity_ai(char* sessionId, char* sfen, network* net, char* valid_fen, char** moves, int n) {
+    int player = strstr(valid_fen, " w ") ? 0 : 1;
     float* similarities = (float *) CALLOC(n*2, sizeof(float));
-    char* fen = ch_board_to_fen(prev);
+    float *prev = ch_fen_to_board(valid_fen, 1);
+    float *x = (float *) CALLOC((2)*(BOARD_SIZE), sizeof(float));
+    for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
+        x[i] = prev[i];
+    }
     for (int idx = 0; idx < n; ++idx) {
         float *next = ch_move(sfen, prev, idx);
-        float *x = (float *) CALLOC((0)+(2)*(BOARD_SIZE), sizeof(float));
         for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
-            x[2 * i] = prev[i];
-            x[2 * i + 1] = next[i];
+            x[(1)*(BOARD_SIZE) + i] = next[i];
         }
         float* y = ch_network_predict(net, x, player);
-        similarities[idx*2] = y[0];
+        similarities[idx*2+0] = y[0];
         similarities[idx*2+1] = y[1];
         FREE(y);
-        FREE(x);
         FREE(next);
     }
-    FREE(fen);
+    FREE(x);
+    FREE(prev);
     return similarities;
 }
 
@@ -827,7 +839,7 @@ float* ch_moves_similarity(network* net, char** moves, int n, float *board, char
     return similarities;
 }
 
-ch_mcts_tree *ch_expand_mcts(ch_mcts_tree *parent, float *board, network *net, char* sfen, int level)
+ch_mcts_tree *ch_expand_mcts(char *sessionId, ch_mcts_tree *parent, float *board, network *net, char* sfen, int level)
 {
     int player = (int)board[8*8] != 0 ? 1 : 0;
     char *fen = ch_board_to_fen(board);
@@ -850,8 +862,8 @@ ch_mcts_tree *ch_expand_mcts(ch_mcts_tree *parent, float *board, network *net, c
         root->visit_count = (int *) CALLOC(root->count, sizeof(int));
         root->moves = (char **) CALLOC(root->count, sizeof(char *));
         for (int i = 0; i < root->count; ++i) { root->moves[i] = strdup(valid_moves[i]); }
-        float *similar = ch_moves_similarity_ai(net, valid_moves, root->count, root->board, sfen);
-        for (int i = 0; i < root->count; ++i) { root->ucb[i] = 0; root->power[i] = similar[i*2]; root->value[i] = similar[i*2+1]; root->visit_count[i] = 1; }
+        float *similar = ch_moves_similarity_ai(sessionId, sfen, net, valid_fen, valid_moves, valid_moves_count);
+        for (int i = 0; i < root->count; ++i) { root->ucb[i] = 0; root->power[i] = similar[i*2+0]; root->value[i] = similar[i*2+1]; root->visit_count[i] = 1; }
         FREE(similar);
         for (int i = 0; i < root->count; ++i) FREE(valid_moves[i]);
         FREE(valid_moves);
@@ -869,9 +881,7 @@ int ch_select_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float c
     root->total_count++;
 
     int best_child = -1;
-    int unvisited_child = -1;
     float best_ucb = -FLT_MAX;
-    float best_unvisited_ucb = FLT_MAX;
 
     current->total_count = 0;
     for (int i = 0; i < current->count; i++) {
@@ -888,19 +898,10 @@ int ch_select_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float c
 
         current->ucb[i] = ucb;
 
-        if (n <= 4 && ucb < best_unvisited_ucb) {
-            best_unvisited_ucb = ucb;
-            unvisited_child = i;
-        }
-
         if (ucb > best_ucb) {
             best_ucb = ucb;
             best_child = i;
         }
-    }
-
-    if (unvisited_child != -1) {
-        best_child = unvisited_child;
     }
 
     if (best_child == -1) {
@@ -913,7 +914,7 @@ int ch_select_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float c
     return best_child;
 }
 
-ch_mcts_tree* ch_expansion_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network *net, float cpuct, char* sfen, int level) {
+ch_mcts_tree* ch_expansion_mcts(char* sessionId, ch_mcts_tree* leaf, ch_mcts_tree* root, network *net, float cpuct, char* sfen, int level) {
     ch_mcts_tree* current = leaf;
 
     while (current) {
@@ -924,7 +925,7 @@ ch_mcts_tree* ch_expansion_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network 
             float *next_board = ch_move(sfen, current->board, best_index);
             if (next_board == NULL) return current;
 
-            ch_mcts_tree *child = ch_expand_mcts(current, next_board, net, sfen, level);
+            ch_mcts_tree *child = ch_expand_mcts(sessionId, current, next_board, net, sfen, level);
             FREE(next_board);
 
             if (child) {
@@ -942,7 +943,7 @@ ch_mcts_tree* ch_expansion_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network 
     return current;
 }
 
-ch_mcts_tree* ch_backpropagate_mcts(ch_mcts_tree* leaf, float result) {
+ch_mcts_tree* ch_backpropagate_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, float result) {
     ch_mcts_tree* current = leaf;
 
     while (current && current->parent) {
@@ -951,11 +952,10 @@ ch_mcts_tree* ch_backpropagate_mcts(ch_mcts_tree* leaf, float result) {
 
         if (index >= 0 && index < parent->count) {
             parent->visit_count[index]++;
-            parent->value[index] -= (parent->parents % 2 == 0 ? result : -result) / (float)(parent->parents + 1);
+            parent->value[index] += (root->player == leaf->player ? result : -result) / (float)(parent->parents + 1);
         }
 
         parent->total_count++;
-        result = -result;
         current = parent;
     }
 
@@ -973,11 +973,11 @@ float ch_simulate_heuristic_ai(ch_mcts_tree* leaf, ch_mcts_tree* root, network* 
     return 0.f;
 }
 
-ch_mcts_tree* ch_search_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float cpuct, char* sfen, int level, int player) {
+ch_mcts_tree* ch_search_mcts(char* sessionId, ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float cpuct, char* sfen, int level, int player) {
     //int index = ch_select_mcts(leaf, root, net, cpuct, sfen, level);
-    leaf = ch_expansion_mcts(leaf, root, net, cpuct, sfen, level);
+    leaf = ch_expansion_mcts(sessionId, leaf, root, net, cpuct, sfen, level);
     float result = ch_simulate_heuristic_ai(leaf, root, net, sfen, player);
-    leaf = ch_backpropagate_mcts(leaf, result);
+    leaf = ch_backpropagate_mcts(leaf, root, result);
     return leaf;
 }
 
@@ -1019,7 +1019,7 @@ void ch_run_mcts(char* sessionId, network *net, char* valid_fen, char** valid_mo
     double t = what_time_is_it_now();
     int player = (int)board[8*8] != 0 ? 1 : 0;
     ch_constant_memory_queue *q = ch_dict_get(moves_history, sessionId);
-    if (q->tree == NULL) q->tree = ch_expand_mcts(NULL, board, net, sfen, level);
+    if (q->tree == NULL) q->tree = ch_expand_mcts(sessionId, NULL, board, net, sfen, level);
     if (q->tree == NULL) {
         q->index = 0;
         q->value = 1;
@@ -1037,7 +1037,7 @@ void ch_run_mcts(char* sessionId, network *net, char* valid_fen, char** valid_mo
     for (int i = 0; i < n; ++i) {
         if (root->total_count >= n) break;
         if (secs > 0 && (what_time_is_it_now() - t) >= secs) break;
-        leaf = ch_search_mcts(leaf, root, net, cpuct, sfen, level, player);
+        leaf = ch_search_mcts(sessionId, leaf, root, net, cpuct, sfen, level, player);
         q->index = get_best_move_index(root);
         if (q->index != -1) {
             q->power = root->power[q->index];
@@ -1046,7 +1046,7 @@ void ch_run_mcts(char* sessionId, network *net, char* valid_fen, char** valid_mo
             if (idx != q->index && q->index >= 0 && q->index < root->count && val < q->value) {
                 idx = q->index;
                 val = q->value;
-                fprintf(stderr, "maybe move: %s checked(%i) value(%f) ucb(%f)\n", valid_moves[q->index], q->total_count, q->value, root->ucb[q->index]);
+                fprintf(stderr, "maybe move: %s checked(%i) value(%f) ucb(%f) power(%f)\n", valid_moves[q->index], q->total_count, root->value[q->index], root->ucb[q->index], root->power[q->index]);
 #ifdef CH_ENGINE
                 fprintf(stdout, "info depth %i pv %s\n", ++counter, valid_moves[q->index]);
 #endif
@@ -1059,9 +1059,9 @@ void ch_run_mcts(char* sessionId, network *net, char* valid_fen, char** valid_mo
         //ch_print_mcts_tree(root, 0, 10);
         //ch_print_matrix(root, "ucb", root->ucb);
         //ch_print_matrix(root, "value", root->value);
-        fprintf(stderr, "   move    ucb           value         visits\n");
+        fprintf(stderr, "   move    ucb           value         power        visits\n");
         for (int i = 0; i < root->count; ++i) {
-            fprintf(stderr, "%2i:[%s]  [%.8f]  [%.8f]  [%i]\n", i, valid_moves[i], root->ucb[i], root->value[i], root->visit_count[i]);
+            fprintf(stderr, "%2i:[%s]  [%.8f]  [%.8f]  [%.8f]  [%i]\n", i, valid_moves[i], root->ucb[i], root->value[i], root->power[i], root->visit_count[i]);
         }
     }
     q->tree = ch_free_mcts(q->tree); q->tree = NULL;
@@ -1090,7 +1090,7 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
                     valid_moves[idx], *value);
         }
         if (pows) FREE(pows);
-        return idx;
+        return idx != -1 ? idx : 0;
     }
 
     float *board = ch_fen_to_board(valid_fen, 1);
@@ -1099,7 +1099,7 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
 
 #ifdef CH_ENGINE
     int lvn = (level+1) * 20000000;
-    ch_run_mcts(sessionId, net, valid_fen, valid_moves, board, lvn, 1.42f, (float) (level+1) * 0.4f, sfen, level);
+    ch_run_mcts(sessionId, net, valid_fen, valid_moves, board, lvn, 1.42f, (float) (level+1) * 0.2f, sfen, level);
 #else
     int lvn = (level+1) * 20000000;
     ch_run_mcts(sessionId, net, valid_fen, valid_moves, board, lvn, 1.42f, (float) (level+1) * 1.0f, sfen, level);
@@ -1136,7 +1136,7 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
         FREE(nboard);
     }
 
-    return idx;
+    return idx != -1 ? idx : 0;
 }
 
 static char *ch_lin_in_dir;
@@ -1762,7 +1762,7 @@ void test_tchess(int argc, char **argv, char *cfgfile, char *weight_file) {
     }
 
     int player = 0;
-    trivial_player = 1;
+    trivial_player = 0;
     one_more_time:
     player = 0;
     ch_clean_history(sessionId, 1);
@@ -1890,7 +1890,6 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
     strcpy(valid_fen, startpos);
     strcpy(valid_fen_move, "");
-    //ch_get_fen_960(valid_fen);
     strcpy(sfen, valid_fen);
 
     int player = 0;
@@ -2128,6 +2127,335 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
     free_network(net);
 
     ch_clean_history(sessionId, 1);
+
+    if (print) fclose(log);
+}
+
+void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
+    char valid_fen[128];
+    char valid_fen_move[8];
+    char sfen[128];
+    char valid_fen_next[128];
+    char valid_fen_last[128];
+
+    ch_board_state move_state = {0};
+
+    int print = 0;
+
+    char* startpos = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+    int level = 4;
+
+    network *net;
+    char *ch_weight_file = weight_file;
+
+    if (!exists(weight_file)) {
+        net = parse_network_cfg(cfgfile);
+        net->nsteps = 0;
+        save_weights(net, weight_file);
+    }
+
+    char* sessionId = "13a25e80-ece3-4a4b-9347-e6df74386d02";
+    ch_init_game_history(sessionId);
+
+    if (exists(weight_file)) {
+        net = load_network(cfgfile, weight_file, 0);
+    } else {
+        net = parse_network_cfg(cfgfile);
+        net->nsteps = 0;
+        save_weights(net, weight_file);
+    }
+    set_batch_network(net, 1);
+
+    FILE* log = NULL;
+    if (print) log = fopen("log.txt", "a+");
+
+    fprintf(stdout, "iChess.io by Piotr Sowa v7.27\n");
+
+    strcpy(valid_fen, startpos);
+    strcpy(valid_fen_move, "");
+    strcpy(sfen, valid_fen);
+
+    int player = 0;
+    ch_clean_history(sessionId, 1);
+
+    FILE *sf = popen("/usr/local/Cellar/stockfish/17.1/bin/stockfish", "r+");
+    if (!sf) {
+        fprintf(stderr, "Failed to start Stockfish\n");
+        exit(1);
+    }
+
+    fprintf(sf, "uci\n"); fflush(sf);
+
+    char *buff = NULL;
+    size_t len = 0;
+    size_t nread = 0;
+    while ((nread = getline(&buff, &len, stdin)) > 0) {
+        buff[strcspn(buff, "\r\n")] = 0;
+
+        if (print) {
+            fprintf(log, "%s\n", buff);
+            fflush(log);
+        }
+
+        if (strncmp(buff, "ucinewgame", 10) == 0) {
+            strcpy(move_state.fen, valid_fen);
+            strcpy(move_state.move, valid_fen_move);
+            strcpy(valid_fen, sfen[0] != '\0' ? sfen : startpos);
+            strcpy(valid_fen_move, "");
+            strcpy(sfen, "");
+            player = 0;
+            ch_clean_history(sessionId, 1);
+            fprintf(stdout, "%s\n", "uciok");
+            fflush(stdout);
+            fprintf(sf, "%s\n", buff); fflush(sf);
+        }
+        else if (strncmp(buff, "uci", 3) == 0) {
+            strcpy(valid_fen, startpos);
+            strcpy(valid_fen_move, "");
+            fprintf(stdout, "%s\n", "id name iChess.io 7.27");
+            fprintf(stdout, "%s\n", "id author Piotr Sowa");
+            fprintf(stdout, "%s\n", "option name UCI_Chess960 type check default false");
+            fprintf(stdout, "%s\n", "option name BackendOptions type string default");
+            fprintf(stdout, "%s\n", "option name Ponder type check default false");
+            fprintf(stdout, "%s\n", "option name MultiPV type spin default 1 min 1 max 500");
+            fprintf(stdout, "%s\n", "uciok");
+            fflush(stdout);
+            fprintf(sf, "%s\n", buff); fflush(sf);
+        }
+        else if (strncmp(buff, "isready", 7) == 0) {
+            fprintf(stdout,"readyok\n");
+            fflush(stdout);
+            fprintf(sf, "%s\n", buff); fflush(sf);
+        }
+        else if (strncmp(buff, "stop", 4) == 0) {
+            // ;-)
+            fprintf(sf, "%s\n", buff); fflush(sf);
+        }
+        else if (strncmp(buff, "quit", 4) == 0) {
+            fprintf(sf, "%s\n", buff); fflush(sf);
+            break;
+        }
+        else if (strncmp(buff, "position ", 9) == 0){
+            fprintf(sf, "%s\n", buff); fflush(sf);
+
+            char** moves = NULL;
+            char* move = NULL;
+            char* sfenn = NULL;
+            char* mfenn = NULL;
+
+            int count = 0;
+            char* fen = ch_analyze_pos(sfen, buff, &sfenn, &mfenn, &moves, &move, &count);
+
+            strcpy(sfen, sfenn != NULL ? sfenn : "");
+            strcpy(valid_fen, fen != NULL ? fen : "");
+            strcpy(valid_fen_move, move != NULL ? move : "");
+            strcpy(valid_fen_next, sfenn != NULL ? sfenn : "");
+            strcpy(valid_fen_last, mfenn != NULL ? mfenn : "");
+
+            char *mfen_next = NULL;
+            int mfen_next_idx = 0;
+            int mfen_next_cnt = 0;
+
+            int qcount = ch_queue_count(ch_dict_get(moves_history,sessionId));
+            int exists = qcount > 1;
+
+            player = qcount % 2 == 0 ? 1 : 0;
+
+            int addon = (exists ? count : qcount);
+
+            if (exists) {
+
+                if (ch_board_after_move(sfen, valid_fen_last, moves[count - 1], &mfen_next, &mfen_next_idx, &mfen_next_cnt)) {
+
+                    strcpy(move_state.fen, valid_fen_last);
+                    strcpy(move_state.move, moves[count - 1]);
+                    move_state.indext = mfen_next_idx;
+
+                    ch_put_into_game_queue(sessionId, valid_fen_last, moves[count - 1], mfen_next_idx, net, sfen);
+
+                    float *board0 = ch_fen_to_board(valid_fen_last, 1);
+                    float *board_next0 = ch_fen_to_board(mfen_next, 1);
+                    float pow0 = ch_eval_the_move(sfen, valid_fen_last, mfen_next);
+                    float powW0 = 0;
+                    float powB0 = 0;
+                    ch_eval_the_board(sfen, board0, &powW0, &powB0);
+                    float value0 = player == 0 ? powW0 : powB0;
+
+                    fprintf(stderr,
+                            "pick: step %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i)\n",
+                            net->nsteps, player == 0 ? "w" : "b", mfen_next_cnt, 1, pow0, mfen_next_idx);
+
+                    ch_self_study_train_self_step(sessionId, sfen, valid_fen_last, moves[count - 1], net, level, mfen_next_idx, pow0, value0);
+
+                    FREE(board0);
+                    FREE(board_next0);
+
+                    FREE(mfen_next);
+                }
+            }
+            else if (count > 0) {
+
+                if (ch_board_after_move(sfen, valid_fen_next, moves[addon - 1], &mfen_next, &mfen_next_idx, &mfen_next_cnt)) {
+
+                    strcpy(move_state.fen, valid_fen_next);
+                    strcpy(move_state.move, moves[addon - 1]);
+                    move_state.indext = mfen_next_idx;
+
+                    ch_put_into_game_queue(sessionId, valid_fen_next, moves[addon - 1], mfen_next_idx, net, sfen);
+
+                    if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
+
+                    float *board1 = ch_fen_to_board(valid_fen_next, 1);
+                    float *board_next1 = ch_fen_to_board(mfen_next, 1);
+                    float pow1 = ch_eval_the_move(sfen, valid_fen_next, mfen_next);
+                    float powW1 = 0;
+                    float powB1 = 0;
+                    ch_eval_the_board(sfen, board1, &powW1, &powB1);
+                    float value1 = player == 0 ? powW1 : powB1;
+
+                    fprintf(stderr,
+                            "pick: step %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i)\n",
+                            net->nsteps, player == 0 ? "w" : "b", mfen_next_cnt, 1, pow1, mfen_next_idx);
+
+                    ch_self_study_train_self_step(sessionId, sfen, valid_fen_next, moves[addon - 1], net, level, mfen_next_idx, pow1, value1);
+
+                    strcpy(valid_fen_next, mfen_next);
+                    strcpy(valid_fen_last, mfen_next);
+
+                    strcpy(valid_fen, valid_fen_next);
+                    strcpy(valid_fen_move, moves[addon - 1]);
+
+                    addon = (exists ? count : ch_queue_count(ch_dict_get(moves_history, sessionId)));
+
+                    for (int i = addon - 1; i < count; ++i) {
+
+                        if (ch_board_after_move(sfen, valid_fen_next, moves[addon - 1], &mfen_next, &mfen_next_idx, &mfen_next_cnt)) {
+
+                            strcpy(move_state.fen, valid_fen_next);
+                            strcpy(move_state.move, moves[addon - 1]);
+                            move_state.indext = mfen_next_idx;
+
+                            ch_put_into_game_queue(sessionId, valid_fen_next, moves[addon - 1], mfen_next_idx, net , sfen);
+
+                            if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
+
+                            float *board2 = ch_fen_to_board(valid_fen_next, 1);
+                            float *board_next2 = ch_fen_to_board(mfen_next, 1);
+                            float pow2 = ch_eval_the_move(sfen, valid_fen_next, mfen_next);
+                            float powW2 = 0;
+                            float powB2 = 0;
+                            ch_eval_the_board(sfen, board2, &powW2, &powB2);
+                            float value2 = player == 0 ? powW2 : powB2;
+
+                            fprintf(stderr,
+                                    "pick: step %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i)\n",
+                                    net->nsteps, player == 0 ? "w" : "b", mfen_next_cnt, 1, pow2, mfen_next_idx);
+
+                            ch_self_study_train_self_step(sessionId, sfen, valid_fen_next, moves[addon - 1], net, level,mfen_next_idx, pow2, value2);
+
+                            strcpy(valid_fen_next, mfen_next);
+                            strcpy(valid_fen_last, mfen_next);
+
+                            strcpy(valid_fen, valid_fen_next);
+                            strcpy(valid_fen_move, moves[addon - 1]);
+
+                            addon = (exists ? count : ch_queue_count(ch_dict_get(moves_history, sessionId)));
+
+                            player = player == 0 ? 1 : 0;
+
+                            FREE(board2);
+                            FREE(board_next2);
+                        }
+                    }
+
+                    FREE(board1);
+                    FREE(board_next1);
+                    FREE(mfen_next);
+                }
+            }
+
+            ch_train_possible_checkmate(sessionId, move_state, sfen, net, level, 2);
+
+            if (sfenn != NULL) FREE(sfenn);
+            if (mfenn != NULL) FREE(mfenn);
+            if (moves != NULL) FREE(moves);
+            if (move != NULL) FREE(move);
+            if (fen != NULL) FREE(fen);
+            if (print) ch_print_board(valid_fen);
+        }
+        else if (strncmp(buff, "go", 2) == 0 || strncmp(buff, "go infinite", 11) == 0) {
+            fprintf(sf, "%s\n", buff); fflush(sf);
+
+            char sf_line[256];
+            char sf_move[16] = "";
+            while (fgets(sf_line, sizeof(sf_line), sf)) {
+                if (strncmp(sf_line, "bestmove", 8) == 0) {
+                    sscanf(sf_line, "bestmove %s", sf_move);
+                    break;
+                }
+            }
+
+            if (strcmp(sf_move, "") != 0) {
+                strcpy(valid_fen_move, sf_move);
+            }
+
+            int qcount = ch_queue_count(ch_dict_get(moves_history,sessionId));
+
+            player = qcount % 2 == 0 ? 0 : 1;
+
+            strcpy(move_state.fen, valid_fen);
+            strcpy(move_state.move, valid_fen_move);
+
+            // ch_train_possible_checkmate(sessionId, move_state, sfen, net, level, 2);
+            float *board0 = ch_fen_to_board(valid_fen_last, 1);
+            float *board_next0 = ch_fen_to_board(valid_fen, 1);
+            float pow0 = ch_eval_the_move(sfen, valid_fen_last, valid_fen);
+            float powW0 = 0;
+            float powB0 = 0;
+            ch_eval_the_board(sfen, board0, &powW0, &powB0);
+            float value0 = player == 0 ? powW0 : powB0;
+
+            int indext = ch_moves_index(sfen, valid_fen, valid_fen_move);
+
+            fprintf(stderr,
+                    "pick: step %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i)\n",
+                    net->nsteps, player == 0 ? "w" : "b", 0, 1, pow0, indext);
+
+            ch_self_study_train_self_step(sessionId, sfen, valid_fen_last, valid_fen_move, net, level, indext, pow0, value0);
+
+            if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
+
+            strcpy(valid_fen, move_state.fen);
+            strcpy(valid_fen_move, move_state.move);
+
+            fprintf(stdout, "info depth %i pv %s\n", 1, valid_fen_move);
+
+            if (strcmp(valid_fen_move, "") == 0) {
+                fprintf(stdout, "bestmove\n");
+            } else {
+                fprintf(stdout, "bestmove %s ponder %s\n", valid_fen_move, valid_fen_move);
+            }
+
+            fflush(stdout);
+            if (print) ch_print_board(valid_fen);
+
+        }
+        else if (strncmp(buff, "register", 8) == 0) {
+            fprintf(sf, "%s\n", buff); fflush(sf);
+
+            fprintf(stdout,"registration ok\n");
+            fflush(stdout);
+        }
+    }
+
+    save_weights(net, ch_weight_file);
+
+    free_network(net);
+
+    ch_clean_history(sessionId, 1);
+
+    pclose(sf);
 
     if (print) fclose(log);
 }

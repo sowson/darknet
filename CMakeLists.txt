@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 option(DARKNET_CPU "Enable CPU support" OFF)
 option(DARKNET_OPENCV "Enable OpenCV support" ON)
-option(DARKNET_OPENMP "Enable OpenMP support" OFF)
+option(DARKNET_OPENMP "Enable OpenMP support" ON)
 option(DARKNET_GPU "Enable OpenCL support" ON)
 option(DARKNET_GPU_FAST "Enable OpenCL fast kernels support" ON)
 option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" ON)
@@ -58,7 +58,7 @@ else()
     set(CMAKE_C_STANDARD 23)
     set(CMAKE_C_COMPILER "clang")
     set(CMAKE_CXX_COMPILER "clang++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mfma")
     include(GNUInstallDirs)
 endif()
 
@@ -359,6 +359,8 @@ endif()
 set (DARKNET_SOURCES_CXX
     "src/image_opencv.cpp"
     "examples/chess.cpp"
+    "examples/uciw.hpp"
+    "examples/uciw.cpp"
 )
 
 if (DARKNET_CPU)
