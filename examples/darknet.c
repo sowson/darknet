@@ -423,7 +423,7 @@ int main()
 {
     int argc = 6;
     char ar0[] = "iChess.io.en";
-    char ar1[] = "mchess";
+    char ar1[] = "echess";
     char ar2[] = "chess.cfg";
     char ar3[] = "chess.weights";
     char ar4[] = "-i";

@@ -67,7 +67,7 @@ float linear_activate_kernel(float x){return x;}
 float logistic_activate_kernel(float x){return 1.f/(1.f + exp(-x));}
 float loggy_activate_kernel(float x){return 2.f/(1.f + exp(-x)) - 1;}
 float relu_activate_kernel(float x){return x*(x>0);}
-float relu10_activate_kernel(float x){return x < -1.f ? -1.f : x > 1.f ? 1.f : x;}
+float relu10_activate_kernel(float x){return x <= -1.f ? -1.f : x >= 1.f ? 1.f : x;}
 float lelu_activate_kernel(float x){return 10.f*tanh(x);}
 float elu_activate_kernel(float x){return (x >= 0)*x + (x < 0)*(exp(x)-1);}
 float selu_activate_kernel(float x){return (x >= 0)*1.0507f*x + (x < 0)*1.0507f*1.6732f*(exp(x)-1);}

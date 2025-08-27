@@ -559,7 +559,7 @@ float ch_train_network_datum(network *net, int player)
 float ch_train_network(network *net, float* input, float* truth, int player)
 {
     memcpy(net->input, input, net->inputs*net->batch*sizeof(float));
-    memcpy(net->truth, truth, net->truths*net->batch*sizeof(float));
+    memcpy(net->output, truth, net->outputs*net->batch*sizeof(float));
     float loss = ch_train_network_datum(net, player);
     return loss;
 }
@@ -1906,7 +1906,6 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fprintf(log, "%s\n", buff);
             fflush(log);
         }
-
         if (strncmp(buff, "ucinewgame", 10) == 0) {
             strcpy(move_state.fen, valid_fen);
             strcpy(move_state.move, valid_fen_move);
@@ -1915,6 +1914,7 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
             strcpy(sfen, "");
             player = 0;
             ch_clean_history(sessionId, 1);
+			save_weights(net, ch_weight_file);
             fprintf(stdout, "%s\n", "uciok");
             fflush(stdout);
 
@@ -1996,8 +1996,8 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
                     FREE(board0);
                     FREE(board_next0);
 
-                    FREE(mfen_next);
                 }
+				FREE(mfen_next);
             }
             else if (count > 0) {
 
@@ -2076,8 +2076,8 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                     FREE(board1);
                     FREE(board_next1);
-                    FREE(mfen_next);
                 }
+				FREE(mfen_next);
             }
 
             ch_train_possible_checkmate(sessionId, move_state, sfen, net, level, 2);
@@ -2114,12 +2114,14 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
             fflush(stdout);
             if (print) ch_print_board(valid_fen);
-
         }
         else if (strncmp(buff, "register", 8) == 0) {
             fprintf(stdout,"registration ok\n");
             fflush(stdout);
         }
+
+        free(buff);
+        buff = NULL;
     }
 
     save_weights(net, ch_weight_file);
@@ -2197,7 +2199,6 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fprintf(log, "%s\n", buff);
             fflush(log);
         }
-
         if (strncmp(buff, "ucinewgame", 10) == 0) {
             strcpy(move_state.fen, valid_fen);
             strcpy(move_state.move, valid_fen_move);
@@ -2206,6 +2207,7 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             strcpy(sfen, "");
             player = 0;
             ch_clean_history(sessionId, 1);
+            save_weights(net, ch_weight_file);
             fprintf(stdout, "%s\n", "uciok");
             fflush(stdout);
             fprintf(sf, "%s\n", buff); fflush(sf);
@@ -2229,7 +2231,6 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fprintf(sf, "%s\n", buff); fflush(sf);
         }
         else if (strncmp(buff, "stop", 4) == 0) {
-            // ;-)
             fprintf(sf, "%s\n", buff); fflush(sf);
         }
         else if (strncmp(buff, "quit", 4) == 0) {
@@ -2290,9 +2291,8 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                     FREE(board0);
                     FREE(board_next0);
-
-                    FREE(mfen_next);
                 }
+                FREE(mfen_next);
             }
             else if (count > 0) {
 
@@ -2371,8 +2371,8 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
                     FREE(board1);
                     FREE(board_next1);
-                    FREE(mfen_next);
                 }
+                FREE(mfen_next);
             }
 
             ch_train_possible_checkmate(sessionId, move_state, sfen, net, level, 2);
@@ -2407,7 +2407,6 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             strcpy(move_state.fen, valid_fen);
             strcpy(move_state.move, valid_fen_move);
 
-            // ch_train_possible_checkmate(sessionId, move_state, sfen, net, level, 2);
             float *board0 = ch_fen_to_board(valid_fen_last, 1);
             float *board_next0 = ch_fen_to_board(valid_fen, 1);
             float pow0 = ch_eval_the_move(sfen, valid_fen_last, valid_fen);
@@ -2440,6 +2439,8 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fflush(stdout);
             if (print) ch_print_board(valid_fen);
 
+            FREE(board0);
+            FREE(board_next0);
         }
         else if (strncmp(buff, "register", 8) == 0) {
             fprintf(sf, "%s\n", buff); fflush(sf);
@@ -2447,6 +2448,9 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fprintf(stdout,"registration ok\n");
             fflush(stdout);
         }
+
+        free(buff);
+        buff = NULL;
     }
 
     save_weights(net, ch_weight_file);
