@@ -172,7 +172,7 @@ int find_arg(int argc, char* argv[], char *arg)
     return 0;
 }
 
-int read_arg(int argc, char* argv[], char *arg)
+int read_arg(int argc, char **argv, char *arg)
 {
     int i;
     for(i = 0; i < argc; ++i) {
@@ -772,6 +772,20 @@ int max_index(float *a, int n)
         }
     }
     return max_i;
+}
+
+int min_index(float *a, int n)
+{
+    if(n <= 0) return -1;
+    int i, min_i = 0;
+    float min = a[0];
+    for(i = 1; i < n; ++i){
+        if(a[i] < min){
+            min = a[i];
+            min_i = i;
+        }
+    }
+    return min_i;
 }
 
 int int_index(int *a, int val, int n)

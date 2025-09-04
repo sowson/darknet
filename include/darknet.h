@@ -47,7 +47,7 @@ typedef struct{
 tree *read_tree(char *filename);
 
 typedef enum {
-    LOGISTIC, RELU, RELIE, LINEAR, RAMP, TANH, PLSE, LEAKY, ELU, LOGGY, STAIR, HARDTAN, LHTAN, SELU, MISH
+    LOGISTIC, RELU, RELU10, LELU, RELIE, LINEAR, RAMP, TANH, PLSE, LEAKY, ELU, LOGGY, STAIR, HARDTAN, LHTAN, SELU, MISH, BILEAKY
 }ACTIVATION;
 
 typedef enum {
@@ -113,7 +113,7 @@ typedef enum {
 } LAYER_TYPE;
 
 typedef enum{
-    SSE, MASKED, L1, SEG, SMOOTH,WGAN
+    SSE, MASKED, L1, SEG, SMOOTH, WGAN
 } COST_TYPE;
 
 typedef struct{
@@ -144,7 +144,7 @@ typedef struct layer layer;
 
 struct layer {
     LAYER_TYPE type;
-    ACTIVATION activation;    
+    ACTIVATION activation;
     COST_TYPE cost_type;
     void (*forward)   (struct layer, struct network);
     void (*backward)  (struct layer, struct network);
@@ -598,6 +598,7 @@ typedef struct network{
     int n;
     int batch;
     size_t *seen;
+    size_t nsteps;
     int *cur_iteration;
     float loss_scale;
     int *t;
@@ -627,7 +628,7 @@ typedef struct network{
     int train_images_num;
     float *seq_scales;
     float *scales;
-    int   *steps;
+    int *steps;
     int num_steps;
     int burn_in;
     int cudnn_half;
@@ -1032,7 +1033,6 @@ box_label *read_boxes(char *filename, int *n);
 box float_to_box_y4(float *f);
 detection *avg_predictions(network *net, int *nboxes);
 
-#ifdef OPENCV
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1040,7 +1040,6 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 void draw_ddetections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps, int blur_and_save, const char* fname, int margin);
 #ifdef __cplusplus
 }
-#endif
 #endif
 
 void draw_detections_y4(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, float fps);
@@ -1109,6 +1108,7 @@ void top_k(float *a, int n, int k, int *index);
 int *read_map(char *filename);
 void error(const char *s);
 int max_index(float *a, int n);
+int min_index(float *a, int n);
 int max_int_index(int *a, int n);
 int sample_array(float *a, int n);
 int *random_index_order(int min, int max);
@@ -1132,10 +1132,41 @@ int make_directory(char *path, int mode);
 unsigned long custom_hash(char *str);
 void diounms_sort_y4(detection *dets, int total, int classes, float thresh, NMS_KIND nms_kind, float beta1);
 
+int ch_process_file(char *file_name);
+int ch_fopen(char* jsonf, char** sessionId, char** pgn, char** move, char** level, char** sfen);
+int ch_fsave(char* jsonf, char* sessionId, char* pgn, char* move, char* level, char* sfen, int solver);
+int ch_cmp_move(char* m1, char* m2);
+int ch_get_all_valid_moves(const char* sfen, char *pgn, char **valid_fen, char ***valid_moves, int *valid_moves_count);
+int ch_get_all_valid_moves_after(const char* sfen, char *pgn, char *move, char **valid_fen, char ***valid_moves, int *valid_moves_count);
+char *ch_analyze_pos(char* sfen, char* positions, char **pos_move_sfen, char **pos_move_fen, char ***pos_moves, char **pos_move, int *pos_moves_count);
+int ch_print_board(char *valid_fen);
+int ch_is_checkmate(char *valid_fen);
+int ch_is_end(const char* sfen, char *valid_fen, int idx);
+int ch_is_checkmate_move(const char* sfen, char *valid_fen, int idx);
+int ch_is_queen_attacked_move(const char* sfen, char *valid_fen, int idx);
+int ch_is_take_move(const char* sfen, char *valid_fen, int idx);
+int ch_board_after_move(const char* sfen, char* valid_fen, char* valid_move, char** valid_fen_next, int *valid_move_idx, int *valid_move_cnt);
+float* ch_fen_to_board(char *valid_fen, int track_alloc);
+char* ch_board_to_fen(float *board);
+char* ch_get_fen_960();
+int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level, float *best_move, float **best_moves, int *counter);
+float ch_eval_the_move(const char* sfen, const char* valid_prev_fen, const char* valid_fen);
+int ch_is_legal(char* sfen, char* fen, int indext);
+char* ch_do_legal(char* sfen, char* fen, int indext);
+void ch_softmax(float *input, int n, float temp, int stride, float *output);
+void ch_softmax_revert(const float* softmax_probs, size_t size, float z_max, float* logits);
+void ch_softmax_scaled(const float *values, int size, float *output);
+void ch_soft_tanh(const float *values, int size, float *output);
+float ch_eval_the_board(const char* sfen, float* board, float* powW, float* powB);
+float ch_eval_the_board_nuee(const char* sfen, float* board, float* powW, float* powB);
+float* ch_eval_the_board_moves(const char* sfen, const float* board, float* best_value, int* best_value_index, int* counter);
+int ch_moves_index(char *sfen, char* valid_fen, char* valid_fen_move);
 #ifdef WIN32
 API void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 API void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);
 API void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir);
+API void test_dchess(int argc, char **argv, char *cfgfile_w, char *cfgfile_b, char *weightfile_w, char *weightfile_b, char *in_dir, char *out_dir);
+API void test_tchess(int argc, char **argv, char *cfgfile_w, char *cfgfile_b, char *weightfile_w, char *weightfile_b);
 API float validate_detector_map(char *datacfg, char *cfgfile, char *weightfile, float thresh_calc_avg_iou, const float iou_thresh, const int map_points, int letter_box, network *existing_net);
 API void run_yolo(int argc, char **argv);
 API void run_yolo4(int argc, char **argv);

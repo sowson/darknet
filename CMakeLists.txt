@@ -1,26 +1,28 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 option(DARKNET_CPU "Enable CPU support" OFF)
 option(DARKNET_OPENCV "Enable OpenCV support" ON)
-option(DARKNET_OPENMP "Enable OpenMP support" OFF)
+option(DARKNET_OPENMP "Enable OpenMP support" ON)
 option(DARKNET_GPU "Enable OpenCL support" ON)
 option(DARKNET_GPU_FAST "Enable OpenCL fast kernels support" ON)
-option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" OFF)
+option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" ON)
 option(DARKNET_ARM "Enable ARM support" OFF)
+option(DARKNET_LIBCHESS "Enable LibChess support" ON)
+option(DARKNET_ENG_CHESS "Enable Chess Engine support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
 option(DARKNET_TESTING "Build the unit tests" OFF)
 option(DARKNET_DEBUG "Enable debug mode" ON)
-option(DARKNET_STATIC "Build static library" ON)
-option(DARKNET_SHARED "Build shared library" ON)
+option(DARKNET_STATIC "Build static library" OFF)
+option(DARKNET_SHARED "Build shared library" OFF)
 option(DARKNET_NO_BINARY "Do not build binary" OFF)
 
 if (WIN32)
     cmake_policy(SET CMP0074 OLD)
     set(PROJECTNAME_ARCHITECTURE x64)
     set(CMAKE_SYSTEM_PROCESSOR x64)
-    set(CMAKE_CXX_STANDARD 14)
-    set(CMAKE_C_STANDARD 99)
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_C_STANDARD 23)
     include(cmake/cable/bootstrap.cmake)
     include(CableBuildInfo)
     include(CableBuildType)
@@ -39,7 +41,7 @@ if (WIN32)
     if (${PROJECT_SOURCE_DIR} MATCHES "")
         set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
-    #set(HUNTER_BUILD_SHARED_LIBS YES)
+   #set(HUNTER_BUILD_SHARED_LIBS YES)
     set(HUNTER_ROOT "${CMAKE_SOURCE_DIR}/3rdparty")
     set(CMAKE_INSTALL_LIBDIR "${PROJECT_SOURCE_DIR}/3rdparty")
     set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/3rdparty")
@@ -52,11 +54,11 @@ if (WIN32)
 else()
     project(darknet LANGUAGES C CXX)
     set(PROJECT_VERSION 1.0.0)
-    set(CMAKE_CXX_STANDARD 11)
-    #set(CMAKE_C_STANDARD 99)
-    set(CMAKE_C_COMPILER "gcc")
-    set(CMAKE_CXX_COMPILER "g++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_C_STANDARD 23)
+    set(CMAKE_C_COMPILER "clang")
+    set(CMAKE_CXX_COMPILER "clang++")
+ #!#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mfma")
     include(GNUInstallDirs)
 endif()
 
@@ -84,12 +86,14 @@ if (DARKNET_DEBUG OR DARKNET_TESTING)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         list (APPEND DARKNET_DEFINITIONS "WIN32")
     else ()
+       #list (APPEND DARKNET_CFLAGS "-fsanitize=address")
         list (APPEND DARKNET_CFLAGS "-g")
     endif()
 endif()
 
 if (DARKNET_OPENMP)
     list (APPEND DARKNET_CFLAGS "-openmp")
+    list (APPEND DARKNET_CXXFLAGS "-openmp")
 endif()
 
 if (WIN32)
@@ -108,12 +112,15 @@ if (WIN32)
     set_property(TARGET clblas PROPERTY INTERFACE_LINK_DIRECTORIES "${PROJECT_SOURCE_DIR}/3rdparty/clBLAS")
     set_property(TARGET clblas PROPERTY INTERFACE_LINK_LIBRARIES "clBLAS.lib")
 else()
-    list (APPEND DARKNET_CFLAGS "-O3")
-    list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
+    list (APPEND DARKNET_CFLAGS "-O2")
+    #list (APPEND DARKNET_CFLAGS "-Wfatal-errors")
     list (APPEND DARKNET_CFLAGS "-Wno-unused-variable")
     list (APPEND DARKNET_CFLAGS "-Wno-unused-result")
     list (APPEND DARKNET_CFLAGS "-Wno-unknown-pragmas")
     list (APPEND DARKNET_CFLAGS "-Wno-deprecated-declarations")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        list (APPEND DARKNET_CFLAGS "-Wno-typedef-redefinition")
+    endif()
 endif()
 
 if (DARKNET_GPU)
@@ -181,6 +188,11 @@ endif()
 # Multi-GPU Training
 if (DARKNET_GPU_MULTI)
 	list (APPEND DARKNET_DEFINITIONS GPU_MULTI)
+endif()
+
+# Chess Engine
+IF (DARKNET_ENG_CHESS)
+    list (APPEND DARKNET_DEFINITIONS CH_ENGINE)
 endif()
 
 # Benchmark Stats
@@ -273,6 +285,7 @@ set (DARKNET_SOURCES
     "src/upsample_layer.c"
     "src/logistic_layer.c"
     "src/l2norm_layer.c"
+    "examples/chess.c"
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -336,6 +349,7 @@ set (DARKNET_PUBLIC_HEADERS
 
 set (DARKNET_MAIN_SOURCE
     "examples/darknet.c"
+        src/cpu.c
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -344,12 +358,15 @@ endif()
 
 set (DARKNET_SOURCES_CXX
     "src/image_opencv.cpp"
+    "examples/chess.cpp"
+    "examples/uciw.hpp"
+    "examples/uciw.cpp"
 )
 
 if (DARKNET_CPU)
-	set (DARKNET_CPU_SOURCES
-			"src/cpu.c"
-		)
+    set (DARKNET_CPU_SOURCES
+        "src/cpu.c"
+)
     if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         set_source_files_properties(${DARKNET_CPU} PROPERTIES LANGUAGE "CXX")
     endif()
@@ -427,17 +444,39 @@ function (ConfigureBinary target)
     endif()
 
     if (DARKNET_OPENMP)
-        find_package(OpenMP)
+        #!#find_package(OpenMP)
         #!#target_link_libraries(${target} OpenMP)
+    endif()
+
+    if (DARKNET_LIBCHESS)
+        if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.dll")
+        endif()
+        if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.so")
+        endif()
+        if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.so")
+        endif()
+        if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.dylib")
+        endif()
+
+        target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libchess/libchess>)
+        target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/json>)
     endif()
 
 #    if (DARKNET_TESTING)
 #        target_link_libraries(${target} catch)
 #    endif()
 
-    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR "Linux")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR "Windows")
         target_link_libraries(${target} "m" "pthread")
     endif()
+    if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+        target_link_libraries(${target} "m" "pthread" "execinfo")
+    endif()
+
 endfunction()
 
 function (ConfigureLibrary target)
@@ -451,14 +490,14 @@ function (ConfigureLibrary target)
         RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if (DARKNET_OPENMP)
-       find_package(OpenMP)
-       #!#target_link_libraries(${target} OpenMP)
+        find_package(OpenMP)
+        target_link_libraries(${target} OpenMP)
     endif()
 endfunction()
 
 if (DARKNET_SHARED)
     add_library(${DARKNET_LIBRARY} SHARED ${DARKNET_SOURCES} ${DARKNET_CPU_SOURCES}
-	   ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX} ${DARKNET_PUBLIC_HEADERS})
+	    ${DARKNET_GPU_SOURCES} ${DARKNET_WINDOWS_SOURCES} ${DARKNET_SOURCES_CXX} ${DARKNET_PUBLIC_HEADERS})
     if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         set_target_properties(${DARKNET_LIBRARY} PROPERTIES OUTPUT_NAME "darknet_d")
     endif()
@@ -488,7 +527,9 @@ endif()
 
 install(FILES ${DARKNET_PUBLIC_HEADERS} ${DARKNET_WINDOWS_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${CMAKE_PROJECT_NAME})
 
-install(EXPORT ${CMAKE_PROJECT_NAME} DESTINATION share/${CMAKE_PROJECT_NAME}/cmake)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    install(EXPORT ${CMAKE_PROJECT_NAME} DESTINATION share/${CMAKE_PROJECT_NAME}/cmake)
+endif()
 
 if (DARKNET_SHARED)
     export(TARGETS ${DARKNET_LIBRARY} FILE darknetConfig.cmake)

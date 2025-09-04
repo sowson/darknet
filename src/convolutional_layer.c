@@ -115,12 +115,13 @@ convolutional_layer make_convolutional_layer(int batch, int h, int w, int c, int
 	l.nweights = c/groups*n*size*size;
 	l.nbiases = n;
 
-	// float scale = 1./sqrt(size*size*c);
+    //float scale = 1.727f/sqrtf(size*size*c);
 	float scale = (float) sqrt(2. / (size * size * c / l.groups));
 	//printf("convscale %f\n", scale);
-	//scale = .02;
-	//for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_uniform(-1, 1);
-	for(i = 0; i < l.nweights; ++i) l.weights[i] = scale*rand_normal();
+	//float scale = .04f;
+	for(i = 0; i < c*n*size*size; ++i) l.weights[i] = scale*rand_uniform(-1.f, 1.f);
+	//for(i = 0; i < l.nweights; ++i) l.weights[i] = scale*rand_normal();
+    //for(i = 0; i < l.nweights; ++i) l.weights[i] = scale*rand_uniform(-1.f, 1.f);
 	int out_w = convolutional_out_width(l);
 	int out_h = convolutional_out_height(l);
 	l.out_h = out_h;

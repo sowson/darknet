@@ -442,8 +442,9 @@ float train_network_datum_cgan(network *net, data d, data o, int i)
 
     assert(net->inputs == net->outputs);
     get_next_batch(p, batch, i*batch, net->output, 0);
+#ifdef GPU
     opencl_push_array(net->output_gpu, net->output, lout.outputs*lout.batch);
-
+#endif
     backward_network(net);
 
     error += *net->cost;
@@ -686,7 +687,7 @@ void top_predictions(network *net, int k, int *index)
 float *network_predict(network *net, float *input)
 {
 	network orig = *net;
-	//net->input = input;
+  //net->input = input;
     memcpy(net->input, input, net->inputs * net->batch * sizeof(float));
 	net->truth = 0;
 	net->train = 0;
@@ -1271,8 +1272,7 @@ void backward_network_gpu(network *netp)
 		printf("BW %s\t%d\n", layerName[(int)l.type], (int)time_taken);
 #endif
 	}
-
-        // clFlush(opencl_queues[opencl_device_id_t]);
+    // clFlush(opencl_queues[opencl_device_id_t]);
 }
 
 void update_network_gpu(network *netp)

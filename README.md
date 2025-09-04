@@ -1,75 +1,113 @@
-# THE LAST COMMIT, ALL THE BEST FOR YOU!
+# Darknet v1.1.1 — AI CNN Computer Vision Engine
 
-# Project Status: Freeze!
+📄 This work is described in the scientific paper: https://doi.org/10.1002/cpe.6936
 
-From now on, I will not push anymore my commits to this repository, however, I will be open to your pull requests to approve those and increase the contributors' list, Enjoy! ;-). I think OpenCL has a bright future, I am leaving some open issues, and I hope community will be able to solve them if needed. Thank you! ;-).
+## Darknet v1.1.1 new Feature - the iChess.io v7.27 and Master Class Training Results
 
-# Build on macOS or Ubuntu 20.04
+![iChess Engine Master Class Training Results](images/chess/results.png)
 
-Step by step in command prompt guide: https://iblog.isowa.io/2018/05/26/darknet-training
+## Darknet v1.1.1 new Feature - the iChess.io v7.27 and Master Class Training
 
-# Build on Windows 10 or 11 x64
+![iChess Engine Master Class Training](images/chess/mclass.png)
 
-Step by step experimental guide: https://iblog.isowa.io/2021/11/20/darknet-on-opencl-on-windows-11-x64
+on macOS install: ```brew install stockfish``` and enjoy! :D
 
-# Take a look 4 x GPUs on macOS (click to see video)
+## Darknet v1.1 — new Feature - the iChess.io v7.27
 
-[![4 x AMD Radeon RX 6900 XT on macOS 11.5.2](https://iblog.isowa.io/wp-content/uploads/2021/08/moria-scaled.jpeg)](https://www.youtube.com/watch?v=W6VOLjgwKNI)
+![iChess Engine](images/chess/engine.png)
 
-# CLBlast instead of clBLAS for GEMM
+## 🚀 Overview of new example in Darknet v1.1
 
+**iChess.io v7.27** is a high-performance **Convolutional Neural Network (CNN)** based Chess & Chess960 engine for play at https://iChess.io, built on top of the Darknet framework. This versatile engine supports multiple AI/ML use cases, such as:
+
+- Chess & Chess960 UCI Engine (AI gameplay)
+- Object detection (YOLOv1–v4 on OpenCL)
+- Multi-GPU inference and training
+- Embedded system deployment (e.g., BeagleBoard AI)
+
+It is fully portable, GPU-accelerated, and compatible with **OpenCL**, and **CPU**.
+
+## 💡 Example Use Cases
+
+- ✅ **Chess AI (UCI) Integration** — play chess with AI trained via CNNs
+- 🎯 **YOLOv2 OpenCL** — real-time object detection on multi-GPU setups
+- 🔬 **Research & Education** — train and evaluate CNN models in RAMDisk environments
+- 🧠 **Computer Vision on Embedded Devices** — accelerated inference on edge hardware
+
+## 🧰 Build Instructions (macOS / Ubuntu 20.04)
+
+```bash
+# Clone and prepare
+mkdir iChess.io.en && cd iChess.io.en
+git clone --recursive https://github.com/sowson/darknet
+
+# Build libchess (used in the chess example)
+cd darknet/cmake/libchess && mkdir build && cd build
+cmake .. && make -j
+cp shared/libchess.* ../../../3rdparty/libchess/
+
+# Build engine with chess example enabled
+cd ../../../.. && mkdir darknet/build && cd darknet/build
+cmake -DDARKNET_ENG_CHESS=1 .. && make -j
+
+# Copy example config and weights
+cp ../cfg/chess.cfg ../../ && cp ../weights/chess.weights ../../
+```
+
+## 🧪 Sample Execution (Chess UCI Mode)
+
+```bash
+./iChess.io.en
+iChess.io by Piotr Sowa v7.27
+
+position startpos moves e2e4 b8c6 d2d4
+go
+
+info depth 1 pv e7e5
+bestmove e7e5 ponder e7e5
+```
+
+## ⚙️ Dependencies
+
+- [nlohmann/json](https://github.com/nlohmann/json)
+- [libchess](https://github.com/sowson/libchess) (used for chess demo)
+
+## 📦 Platform Support
+
+- ✅ macOS (Intel / Apple Silicon)
+- ✅ Ubuntu Linux 20.04+
+- ⚠️ Windows 10/11 (experimental OpenCL build)
+
+### Windows Build Guide:
+https://iblog.isowa.io/2021/11/20/darknet-on-opencl-on-windows-11-x64
+
+## 🧠 Training & Optimization Tips
+
+- Run from **RAMDisk** to reduce disk wear and speed up training/inference:
+    - Linux: `sudo mount -t tmpfs -o size=4096M tmpfs /your/ramdisk`
+    - macOS: `diskutil erasevolume HFS+ "ramdisk" $(hdiutil attach -nomount ram://8388608)`
+
+- Replace clBLAS with **CLBlast** for improved GEMM performance:
+```bash
 git apply patches/clblast.patch
+```
 
-# Darknet-vNext (Improved CUDA DarkNet)
+## 🔗 Related Projects
 
-[DarkNet-vNext Link](https://github.com/sowson/darknet-vNext) If you are looking for engine that has all the same functions, but it is FASTER!
+- [Darknet-vNext](https://github.com/sowson/darknet-vNext) — CUDA-enhanced variant
+- [YOLO on OpenCL](https://iblog.isowa.io/2020/07/02/the-multi-gpu-set-idea)
 
-# OpenCV 4
+## 📽️ Demos & Videos
 
-This engine runs on OpenCV v4! But, OpenCV v3 is also fine!
+- [4 x AMD Radeon RX 6900 XT Demo (macOS)](https://www.youtube.com/watch?v=W6VOLjgwKNI)
+- [YOLO2 Multi-GPU Result](https://www.youtube.com/watch?v=o-PV3vmfP-0)
+- [YOLO Training](https://www.youtube.com/watch?v=Mxw7XkFBFPc)
 
-# YOLO4 on OpenCL
+## 🙏 Acknowledgements
 
-YOLO4 elements are supported, remember in CFG file to use [yolo4] instead of [yolo] to make it work!
+Created by **Piotr Sowa** — AI researcher, GPU software engineer, and creator of [iChess.io](https://iChess.io).
+More information and tutorials at [iBlog.isowa.io](https://iblog.isowa.io).
 
-# YOLO1, YOLO2, YOLO3 on OpenCL
+---
 
-[![OpenCL YOLO2 Training Multi-GPU-SET](https://iblog.isowa.io/wp-content/uploads/2020/07/gitbug-img.jpg)](https://www.youtube.com/watch?v=o-PV3vmfP-0)
-
-https://iblog.isowa.io/2020/07/02/the-multi-gpu-set-idea
-
-[![OpenCL YOLO2 Training Result](https://iblog.isowa.io/wp-content/uploads/2020/06/gitbug-image.jpg)](https://www.youtube.com/watch?v=_dNYNYHXHHo)
-
-https://iblog.isowa.io/2020/06/22/gpu-opencl-fine-tuning-problem-solution
-
-https://iblog.isowa.io/2020/05/31/ph-d-hanna-hackintosh-is-ready
-
-[![PhD Progress from May 27th 2020 Update Keynote](https://iblog.isowa.io/wp-content/uploads/2020/05/gitbug-image.jpg)](https://www.youtube.com/watch?v=qfCWYVnJrjQ)
-
-https://iblog.isowa.io/2020/04/29/darknet-in-opencl-on-beagleboard-ai
-
-[![PhD Progress from March 8th 2020 Update Keynote](https://iblog.isowa.io/wp-content/uploads/2020/03/gitbug-image.jpg)](https://www.youtube.com/watch?v=exuPfFtbwgU)
-
-https://iblog.isowa.io/2020/03/03/is-opencl-beats-cuda
-
-https://iblog.isowa.io/2020/03/02/hania-pc-well-it-needs-macos
-
-https://iblog.isowa.io/2020/02/08/pc-for-phd-studies
-
-https://iblog.isowa.io/2020/01/04/gpu-opencl-fine-tuning-problem
-
-https://iblog.isowa.io/2019/12/29/darknet-cuda-vs-opencl-and-cpu-vs-nvidia-vs-amd
-
-https://iblog.isowa.io/2019/11/05/gpu-computing-on-opencl
-
-https://iblog.isowa.io/2019/08/18/the-fastest-darknet-in-opencl-on-the-planet
-
-https://iblog.isowa.io/2019/02/02/darknet-in-opencl-on-asus-thinker-board-s
-
-[![DarkNet Training](https://img.youtube.com/vi/Mxw7XkFBFPc/0.jpg)](https://www.youtube.com/watch?v=Mxw7XkFBFPc)
-
-https://iblog.isowa.io/2018/08/01/darknet-in-opencl
-
-https://iblog.isowa.io/2018/05/26/darknet-training 
-
-Thanks!
+For citations, academic usage, or collaboration inquiries, feel free to reach out via GitHub or LinkedIn.

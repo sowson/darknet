@@ -24,7 +24,6 @@ using namespace cv;
 
 extern "C" {
 
-
 image cv_copy_image(image p) {
     image copy;
     copy.data = (float *) calloc(p.h * p.w * p.c, sizeof(float));
@@ -399,7 +398,7 @@ image load_image_cv(char *filename, int channels) {
     if (src.empty()) {
         fprintf(stderr, "Cannot load image \"%s\"\n", filename);
 
-        char buff[1024];
+        char buff[1025];
 
         // Check the length of the buffer
         if (strlen(filename) > 1024) {

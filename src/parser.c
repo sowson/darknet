@@ -383,7 +383,7 @@ float *get_classes_multipliers_y4(char *cpc, const int classes, const float max_
             if (counters_per_class[i] < 1) counters_per_class[i] = 1;
             if (max_counter < counters_per_class[i]) max_counter = counters_per_class[i];
         }
-        classes_multipliers = (float *)calloc(classes_counters, sizeof(float));
+        classes_multipliers = (float *)calloc((unsigned int)classes_counters, sizeof(float));
         for (i = 0; i < classes_counters; ++i) {
             classes_multipliers[i] = max_counter / counters_per_class[i];
             if(classes_multipliers[i] > max_delta) classes_multipliers[i] = max_delta;
@@ -412,7 +412,7 @@ float *get_classes_multipliers(char *cpc, const int classes, const float max_del
             if (counters_per_class[i] < 1) counters_per_class[i] = 1;
             if (max_counter < counters_per_class[i]) max_counter = counters_per_class[i];
         }
-        classes_multipliers = (float *)calloc(classes_counters, sizeof(float));
+        classes_multipliers = (float *)calloc((unsigned int)classes_counters, sizeof(float));
         for (i = 0; i < classes_counters; ++i) {
             classes_multipliers[i] = max_counter / counters_per_class[i];
             if(classes_multipliers[i] > max_delta) classes_multipliers[i] = max_delta;
@@ -967,6 +967,7 @@ void parse_net_options(list *options, network *net)
                 if (l[i] == ',') ++n;
             }
             int* steps = (int*)calloc(n, sizeof(int));
+            size_t nsteps = 0;
             float* scales = (float*)calloc(n, sizeof(float));
             float* seq_scales = (float*)calloc(n, sizeof(float));
             for (i = 0; i < n; ++i) {
@@ -990,6 +991,7 @@ void parse_net_options(list *options, network *net)
             net->steps = steps;
             net->seq_scales = seq_scales;
             net->num_steps = n;
+            net->nsteps = nsteps;
         }
     } else if (net->policy == EXP){
         net->gamma = option_find_float(options, "gamma", 1);
@@ -1742,6 +1744,11 @@ void save_weights_upto(network *net, char *filename, int cutoff)
             fwrite(l.weights, sizeof(float), size, fp);
         }
     }
+#ifdef ARM
+    fwrite((unsigned long long)net->nsteps, sizeof(unsigned long long), 1, fp); // 64-bit on ILP32 and LP64.
+#else
+    fwrite(&net->nsteps, sizeof(size_t), 1, fp);
+#endif
     fclose(fp);
 }
 void save_weights(network *net, char *filename)
@@ -1972,6 +1979,11 @@ void load_weights_upto(network *net, char *filename, int start, int cutoff)
 #endif
         }
     }
+#ifdef ARM
+    fread(&net->nsteps, sizeof(unsigned long long), 1, fp); // 64-bit on ILP32 and LP64.
+#else
+    fread(&net->nsteps, sizeof(size_t), 1, fp);
+#endif
     fprintf(stderr, "done!\n");
     fclose(fp);
 }

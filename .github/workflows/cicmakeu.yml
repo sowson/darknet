@@ -1,0 +1,57 @@
+name: CMakeU-Darknet
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: apt
+     #run: sudo apt install libopencv-dev pocl-opencl-icd libclblas-dev libomp-dev
+      run: sudo apt install libopencv-dev pocl-opencl-icd libclblas-dev
+      
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Configure LibChess CMake
+      run: cd cmake/libchess && cmake -B ${{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} && cd ../..
+
+    - name: Build LibChess
+      run: cd cmake/libchess && cmake --build ${{github.workspace}}/cmake/libchess/build --config ${{env.BUILD_TYPE}} && cd ../..
+
+    - name: Update LibChess 3rdParty
+      run: cp ${{github.workspace}}/cmake/libchess/build/shared/libchess.* ${{github.workspace}}/3rdparty/libchess/
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Prepare Release Files
+      run: |
+        mkdir -p release
+        mv build/darknet release/Darknet.ubuntu
+        cp cmake/libchess/build/shared/libchess.so release/  # Adjust if necessary
+
+    - name: Create .tar.gz Archive
+      run: tar -czvf Darknet.ubuntu.tar.gz -C release .
+
+    - name: Upload GitHub Release
+      if: github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Darknet Linux Release ${{ github.run_number }}
+        tag_name: darknet-linux-v${{ github.run_number }}
+        files: Darknet.ubuntu.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
