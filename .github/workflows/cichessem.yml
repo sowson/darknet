@@ -46,7 +46,9 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/iChess.io.en.mac
-        cp cmake/libchess/build/shared/libchess.* release/
+        cp cmake/libchess/build/shared/libchess.dylib release/
+        cp cfg/chess.cfg release/
+        cp weights/chess.weights release/
 
     #  working-directory: ${{github.workspace}}/build
     #  run: ctest -C ${{env.BUILD_TYPE}}

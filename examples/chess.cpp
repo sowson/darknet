@@ -479,8 +479,8 @@ std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess
 }
 
 std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libchess::Position& pos) {
-    // return pos.legal_moves();
-    int n = 64;
+    //return pos.legal_moves();
+    int n = 256;
     int d = 2;
     return ch_calculate_top_n_moves(n, sfen, pos, d);
 }

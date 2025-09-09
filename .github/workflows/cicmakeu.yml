@@ -41,7 +41,7 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/Darknet.ubuntu
-        cp cmake/libchess/build/shared/libchess.so release/  # Adjust if necessary
+        cp cmake/libchess/build/shared/libchess.so release/
 
     - name: Create .tar.gz Archive
       run: tar -czvf Darknet.ubuntu.tar.gz -C release .

@@ -41,7 +41,7 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/iChess.io.en.ubuntu
-        cp cmake/libchess/build/shared/libchess.so release/  # Adjust if necessary
+        cp cmake/libchess/build/shared/libchess.so release/
         cp cfg/chess.cfg release/
         cp weights/chess.weights release/
 

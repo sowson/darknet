@@ -46,7 +46,7 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/darknet.mac
-        cp cmake/libchess/build/shared/libchess.* release/
+        cp cmake/libchess/build/shared/libchess.dylib release/
 
     #  working-directory: ${{github.workspace}}/build
     #  run: ctest -C ${{env.BUILD_TYPE}}

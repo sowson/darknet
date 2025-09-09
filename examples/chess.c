@@ -361,10 +361,10 @@ int trivial_player = -1;
 
 void ch_clean_history(char* sessionId, int init) {
     ch_constant_memory_queue *q1 = ch_dict_get(moves_history, sessionId);
-    ch_clean_constant_memory_queue(q1);
+    ch_destroy_constant_memory_queue(q1);
     ch_dict_del(&moves_history, sessionId);
     ch_constant_memory_queue *q2 = ch_dict_get(moves_history_positions, sessionId);
-    ch_clean_constant_memory_queue(q2);
+    ch_destroy_constant_memory_queue(q2);
     ch_dict_del(&moves_history_positions, sessionId);
     if (init) {
         ch_learn_state *to_learn = (ch_learn_state *) CALLOC(1, sizeof(ch_learn_state));
@@ -531,10 +531,11 @@ int ch_is_three_fold_repetition(char* sessionId, char* fen) {
 
 int ch_end_move(char* sessionId, char *sfen, char *fen, char* move, int idx)
 {
+    if (idx == -1) return 0;
     if (fen == NULL || move == NULL) return 0;
     if (fen[0] == '\0' || move[0] == '\0') return 0;
     int is_draw_in_c = ch_is_three_fold_repetition(sessionId, fen);
-    return ch_is_end(sfen, fen, idx) || is_draw_in_c;
+    return is_draw_in_c || ch_is_end(sfen, fen, idx);
 }
 
 int ch_mate_move(char* sfen, char *ko, int idx)
@@ -1258,10 +1259,10 @@ int ch_process_file(char *file_name) {
                 }
             }
 
-            if (indext != -1 && ch_end_move(sessionId, sfen, fen, valid_moves[indext], indext)) {
+            if (ch_end_move(sessionId, sfen, fen, valid_moves[indext], indext)) {
                 ch_put_into_game_queue(sessionId, valid_fen, valid_moves[indext], indext, net, sfen);
                 ch_fsave(ffoname, sessionId, valid_fen, "", level, sfen, solver);
-                ch_clean_history(sessionId, 0);
+                ch_clean_history(sessionId, 1);
                 for (int j = 0; j < valid_moves_count; ++j) FREE(valid_moves[j]);
                 FREE(valid_moves);
                 FREE(valid_fen);
@@ -1482,10 +1483,10 @@ int ch_process_file(char *file_name) {
                 }
             }
 
-            if (indext != -1 && ch_end_move(sfen, sessionId, fen, valid_moves[indext], indext)) {
+            if (ch_end_move(sfen, sessionId, fen, valid_moves[indext], indext)) {
                 ch_put_into_game_queue(sessionId, valid_fen, valid_moves[indext], indext, net, sfen);
                 ch_fsave(ffoname, sessionId, valid_fen, "", level, sfen, solver);
-                ch_clean_history(sessionId, 0);
+                ch_clean_history(sessionId, 1);
                 for (int j = 0; j < valid_moves_count; ++j) FREE(valid_moves[j]);
                 FREE(valid_moves);
                 FREE(valid_fen);
@@ -1638,7 +1639,7 @@ ch_board_state ch_self_learn_step(char* sessionId, char* sfen, int level, networ
             }
         }
 
-        if (indext != -1 && ch_end_move(sessionId, sfen, fen, valid_moves[indext], indext)) {
+        if (ch_end_move(sessionId, sfen, fen, valid_moves[indext], indext)) {
             ch_put_into_game_queue(sessionId, fen, valid_moves[indext], indext, net, sfen);
             strcpy(return_value.fen, valid_fen);
             strcpy(return_value.move, valid_moves[indext]);
@@ -1930,7 +1931,7 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
             strcpy(valid_fen_move, "");
             strcpy(sfen, "");
             player = 0;
-            ch_clean_history(sessionId, 0);
+            ch_clean_history(sessionId, 1);
 			save_weights(net, ch_weight_file);
             fprintf(stdout, "%s\n", "uciok");
             fflush(stdout);
@@ -2144,7 +2145,7 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
     free_network(net);
 
-    ch_clean_history(sessionId, 0);
+    ch_clean_history(sessionId, 1);
 
     if (print) fclose(log);
 }
@@ -2222,7 +2223,7 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             strcpy(valid_fen_move, "");
             strcpy(sfen, "");
             player = 0;
-            ch_clean_history(sessionId, 0);
+            ch_clean_history(sessionId, 1);
             save_weights(net, ch_weight_file);
             fprintf(stdout, "%s\n", "uciok");
             fflush(stdout);
@@ -2471,7 +2472,7 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
 
     free_network(net);
 
-    ch_clean_history(sessionId, 0);
+    ch_clean_history(sessionId, 1);
 
     pclose(sf);
 
