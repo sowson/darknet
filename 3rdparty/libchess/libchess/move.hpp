@@ -49,7 +49,7 @@ class Move {
 
 #ifndef NDEBUG
         assert(piece() != Piece::None);
-        //assert(to() != from()); // castling!
+        assert(to() != from());
         assert(_t == type());
         assert(_fr == from());
         assert(_to == to());
