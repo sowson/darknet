@@ -1216,6 +1216,12 @@ int ch_process_file(char *file_name) {
 
     if (ch_fopen(ffiname, &sessionId, &fen, &fen_move, &level, &sfen)) {
 
+        if (fen == NULL || fen[0] == '\0') {
+            if (fen) FREE(fen);
+            fen = CALLOC(strlen(sfen) + 1, sizeof(char));
+            strcpy(fen, sfen);
+        }
+
         fprintf(stderr, "sessionId: %s\n", sessionId);
         fprintf(stderr, "level: %s\n", level);
         fprintf(stderr, "sfen: %s\n", sfen);
@@ -1435,6 +1441,13 @@ int ch_process_file(char *file_name) {
     int solver = 0;
 
     if (ch_fopen(ffiname, &sessionId, &fen, &fen_move, &level, &sfen)) {
+
+        if (fen == NULL || fen[0] == '\0') {
+            if (fen) FREE(fen);
+            fen = CALLOC(strlen(sfen) + 1, sizeof(char));
+            strcpy(fen, sfen);
+        }
+
         fprintf(stderr, "sessionId: %s\n", sessionId);
         fprintf(stderr, "level: %s\n", level);
         fprintf(stderr, "sfen: %s\n", sfen);
