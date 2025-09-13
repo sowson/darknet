@@ -113,11 +113,11 @@ void evaluate_board_prepare_pst() {
 
     weights[libchess::None]   =   0;
     weights[libchess::Pawn]   =  10;
-    weights[libchess::Bishop] =  32;
-    weights[libchess::Knight] =  33;
-    weights[libchess::Rook]   =  45;
+    weights[libchess::Bishop] =  30;
+    weights[libchess::Knight] =  30;
+    weights[libchess::Rook]   =  50;
     weights[libchess::Queen]  =  90;
-    weights[libchess::King]   =   1;
+    weights[libchess::King]   =   2;
 
     pst_w[libchess::Pawn] = {
             {+6.5, +6.5, +6.5, +6.5, +6.5, +6.5, +6.5, +6.5},
@@ -274,8 +274,8 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
         }
     }
 
-    sumW += (ptcW - attW) / (picW);
-    sumB += (ptcB - attB) / (picB);
+    sumW += (attW - ptcW) / (picW) + 2.0;
+    sumB += (attB - ptcB) / (picB) + 2.0;
 
     sumW /= 500.0f;
     sumB /= 500.0f;
@@ -1066,10 +1066,10 @@ char *ch_board_to_fen(const float *board) {
     std::string castlingSymbolsU = "KQABCDEFGH";
     std::string castlingSymbolsL = "kqabcdefgh";
 
-    if (board[8*8+1] > 0.f) fen += castlingSymbolsU[(int)(board[8*8+1]) - 1];
-    if (board[8*8+2] > 0.f) fen += castlingSymbolsU[(int)(board[8*8+2]) - 1];
-    if (board[8*8+3] > 0.f) fen += castlingSymbolsL[(int)(board[8*8+3]) - 1];
-    if (board[8*8+4] > 0.f) fen += castlingSymbolsL[(int)(board[8*8+4]) - 1];
+    if (board[8*8+1] > 0.f) fen += castlingSymbolsU[(int)(board[8*8+1] * 10.f) - 1];
+    if (board[8*8+2] > 0.f) fen += castlingSymbolsU[(int)(board[8*8+2] * 10.f) - 1];
+    if (board[8*8+3] > 0.f) fen += castlingSymbolsL[(int)(board[8*8+3] * 10.f) - 1];
+    if (board[8*8+4] > 0.f) fen += castlingSymbolsL[(int)(board[8*8+4] * 10.f) - 1];
 
     if (board[8*8+1] > 0.f || board[8*8+2] > 0.f || board[8*8+3] > 0.f || board[8*8+4] > 0.f) {
         fen += " ";
@@ -1078,8 +1078,8 @@ char *ch_board_to_fen(const float *board) {
         fen += "- ";
     }
     
-    std::string ep = std::to_string((int)board[8*8+5]);
-    int epi = ep == "-" ? 0 : ((int)atoi(ep.c_str()) * 100);
+    std::string ep = std::to_string((int)(board[8*8+5] * 100.f));
+    int epi = ep == "-" ? 0 : ((int)atoi(ep.c_str()));
     if (epi != 0) {
         std::string eps = "a1 ";
         eps[0] += (char)(epi / 8);
@@ -1166,14 +1166,14 @@ float* ch_fen_to_board(char *valid_fen, int track_alloc = 0) {
 
         const char *posU = strchr(castlingSymbolsU, c);
         if (posU) {
-            if (sK == 0.f) sK = (float)(posU - castlingSymbolsU + 1);
-            else if (sQ == 0.f) sQ = (float)(posU - castlingSymbolsU + 1);
+            if (sK == 0.f) sK = (float)(posU - castlingSymbolsU + 1) / 10.f;
+            else if (sQ == 0.f) sQ = (float)(posU - castlingSymbolsU + 1) / 10.f;
         }
 
         const char *posL = strchr(castlingSymbolsL, c);
         if (posL) {
-            if (sk == 0.f) sk = (float)(posL - castlingSymbolsL + 1);
-            else if (sq == 0.f) sq = (float)(posL - castlingSymbolsL + 1);
+            if (sk == 0.f) sk = (float)(posL - castlingSymbolsL + 1) / 10.f;
+            else if (sq == 0.f) sq = (float)(posL - castlingSymbolsL + 1) / 10.f;
         }
     }
 

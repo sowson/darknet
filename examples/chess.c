@@ -627,8 +627,8 @@ void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, 
     float powB = 0;
     float power = ch_eval_the_board(sfen, next, &powW, &powB);
     float val = (player == 0 ? powW : powB);
-    y[0] = power < pow ? pow : power * (net->learning_rate * 10.f);
-    y[1] = value < val ? val : value * (net->learning_rate * 10.f);
+    y[0] = power < pow ? pow : power * 1.27f;
+    y[1] = value < val ? val : value * 1.27f;
     fprintf(stderr, "output[0]: %2.8f, output[1]: %2.8f\n", y[0], y[1]);
     ch_self_study_after_pick_the_move(sessionId, net, player, level, idx, valid_move, x, y);
     FREE(y);
@@ -1756,6 +1756,24 @@ void test_tchess(int argc, char **argv, char *cfgfile, char *weight_file) {
 
     if (0) {
         startpos = "rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+        float* fboard = ch_fen_to_board(startpos, 1);
+        char* cfen = ch_board_to_fen(fboard);
+        if (strcmp(cfen, startpos) != 0) {
+            fprintf(stderr, "%s\n", startpos);
+            ch_print_board(startpos);
+            float *board = ch_fen_to_board(startpos, 1);
+            char *fen = ch_board_to_fen(board);
+            fprintf(stderr, "%s\n", fen);
+            FREE(fen);
+            FREE(board);
+            exit(1);
+        }
+        FREE(cfen);
+        FREE(fboard);
+    }
+
+    if (0) {
+        startpos = "rnbqkbnr/pp2pppp/8/2ppP3/8/8/PPPP1PPP/RNBQKBNR w HAha d6 0 3";
         float* fboard = ch_fen_to_board(startpos, 1);
         char* cfen = ch_board_to_fen(fboard);
         if (strcmp(cfen, startpos) != 0) {
