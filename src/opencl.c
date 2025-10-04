@@ -552,7 +552,7 @@ void opencl_init(int *gpus, int ngpus) {
         gemm_kernel_init();
         avgpool_kernel_init();
 #ifndef ARM
-        crop_kernel_init();
+        //crop_kernel_init();
 #endif
         dropout_kernel_init();
     }
@@ -582,7 +582,7 @@ void opencl_deinit(int *gpus, int ngpus)
         gemm_kernel_release();
         avgpool_kernel_release();
 #ifndef ARM
-        crop_kernel_release();
+        //crop_kernel_release();
 #endif
         dropout_kernel_release();
 

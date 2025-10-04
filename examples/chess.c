@@ -1155,6 +1155,8 @@ int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid
         FREE(nboard);
     }
 
+    FREE(board);
+
     return idx != -1 ? idx : 0;
 }
 

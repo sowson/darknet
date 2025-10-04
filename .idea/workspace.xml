@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="BackendCodeEditorMiscSettings">
-    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
-    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
-    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexRemoved" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
   </component>
   <component name="CMakePresetLoader">{
   &quot;useNewFormat&quot;: true
@@ -30,22 +29,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c1f2602-dc6e-4bd5-b03e-d07ee3b8a66f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../ai.ichess/aiChess.io/.idea/.idea.aiChess.io/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai.ichess/aiChess.io/Controllers/ChessController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../ai.ichess/aiChess.io/Controllers/ChessController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai.ichess/aiChess.io/wwwroot/js/ichess.io.js" beforeDir="false" afterPath="$PROJECT_DIR$/../ai.ichess/aiChess.io/wwwroot/js/ichess.io.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/cichessem.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/cichessem.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/3rdparty/libchess/libchess.dylib" beforeDir="false" afterPath="$PROJECT_DIR$/3rdparty/libchess/libchess.dylib" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/chess.c" beforeDir="false" afterPath="$PROJECT_DIR$/examples/chess.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/chess.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/examples/chess.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/darknet.c" beforeDir="false" afterPath="$PROJECT_DIR$/examples/darknet.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/weights/chess.weights" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/3d.aiChess.io/Controllers/ChessController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/3d.aiChess.io/Controllers/ChessController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/3d.aiChess.io/wwwroot/js/ichess.io.js" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/3d.aiChess.io/wwwroot/js/ichess.io.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/Controllers/ChessController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/Controllers/ChessController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/css/site.css" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/css/site.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/js/ichess.io.js" beforeDir="false" afterPath="$PROJECT_DIR$/../ichess/aiChess.io/wwwroot/js/ichess.io.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,12 +44,12 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Users/piotr/github/sowson/isowa.io/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/piotr/github/sowson/isowa.io/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/piotr/github/sowson/isowa.io/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/piotr/github/sowson/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/piotr/github/sowson/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/piotr/github/sowson/darknet/examples/chess.c" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -366,45 +352,44 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="1SYpmm00EtxGNgVFxYjyIi0e8EC" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;CMake Application.bindarknet (Yv2).executor&quot;: &quot;Run&quot;,
-    &quot;CMake Application.bindarknet (Yv3).executor&quot;: &quot;Debug&quot;,
-    &quot;CMake Application.bindarknet (dchess)  (local).executor&quot;: &quot;Debug&quot;,
-    &quot;CMake Application.bindarknet (dchess) .executor&quot;: &quot;Debug&quot;,
-    &quot;CMake Application.bindarknet (echess) (local).executor&quot;: &quot;Debug&quot;,
-    &quot;CMake Application.bindarknet (tchess) (local).executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.west.config.association.type.startup.service&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;cmake.loaded.for.project&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/piotr/github/sowson/isowa.io/darknet&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;CPPToolchains&quot;,
-    &quot;structure.view.defaults.are.configured&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/CLion.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "CMake Application.bindarknet (Yv2).executor": "Run",
+    "CMake Application.bindarknet (Yv3).executor": "Debug",
+    "CMake Application.bindarknet (dchess)  (local).executor": "Debug",
+    "CMake Application.bindarknet (dchess) .executor": "Debug",
+    "CMake Application.bindarknet (echess) (local).executor": "Debug",
+    "CMake Application.bindarknet (tchess) (local).executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "cmake.loaded.for.project": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/piotr/github/sowson/darknet",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "CPPToolchains",
+    "structure.view.defaults.are.configured": "true",
+    "ts.external.directory.path": "/Applications/CLion.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/cfg" />
@@ -428,6 +413,11 @@
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
     <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet" EXPLICIT_BUILD_TARGET_NAME="all">
@@ -655,12 +645,12 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights /Users/piotr/github/sowson/isowa.io/yolo4In -out  /Users/piotr/github/sowson/isowa.io/yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights /Users/piotr/github/sowson/yolo4In -out  /Users/piotr/github/sowson/yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights /Users/piotr/github/sowson/isowa.io/yolo4In -out  /Users/piotr/github/sowson/isowa.io/yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (Yv4Demo) (odir)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ddetect cfg/coco.data cfg/yolov4.cfg ../../../weights/yolov4.weights /Users/piotr/github/sowson/yolo4In -out  /Users/piotr/github/sowson/yolo4Out -i 0 -thresh .25 -margin 2" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -885,12 +875,12 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (dchess) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg /Users/piotr/v1.ram/io.isowa.darknet.weights/chess.weights -in  /Users/piotr/v1.ram/io.isowa.web.api.darknet/chessIn -out /Users/piotr/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (dchess) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg /home/piotr/v1.ram/io.isowa.darknet.weights/chess.weights -in  /home/piotr/v1.ram/io.isowa.web.api.darknet/chessIn -out /home/piotr/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="bindarknet (dchess) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg $USER_HOME$/v1.ram/io.isowa.darknet.weights/chess.weights -in  $USER_HOME$/v1.ram/io.isowa.web.api.darknet/chessIn -out $USER_HOME$/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
+    <configuration name="bindarknet (dchess) " type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="dchess cfg/chess.cfg /Users/piotr/v1.ram/io.isowa.darknet.weights/chess.weights -in  /Users/piotr/v1.ram/io.isowa.web.api.darknet/chessIn -out /Users/piotr/v1.ram/io.isowa.web.api.darknet/chessOut -i 0" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="darknet" TARGET_NAME="darknet" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="darknet" RUN_TARGET_NAME="darknet">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -2101,6 +2091,7 @@
       <workItem from="1756806847813" duration="1896000" />
       <workItem from="1756996697391" duration="37199000" />
       <workItem from="1757329290165" duration="5778000" />
+      <workItem from="1759585681088" duration="317000" />
     </task>
     <servers />
   </component>
