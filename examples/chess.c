@@ -1,4 +1,5 @@
 #include "darknet.h"
+#include "ch_mcts.h"
 #include "system.h"
 #include "image.h"
 #include "time.h"
@@ -52,49 +53,9 @@ typedef struct {
     int n;
 } ch_moves;
 
-typedef struct ch_mcts_tree {
-    struct ch_mcts_tree **children;
-    struct ch_mcts_tree *parent;
-    float *board;
-    float *power;
-    float *value;
-    float *ucb;
-    int *visit_count;
-    int parents;
-    int player;
-    int total_count;
-    int count;
-    int best_index;
-    char** moves;
-} ch_mcts_tree;
-
-ch_mcts_tree* ch_free_mcts(ch_mcts_tree* root) {
-    if (root == NULL) return NULL;
-
-    for (int i = 0; i < root->count; ++i) {
-        if (root->children[i] != NULL)
-        {
-            root->children[i] = ch_free_mcts(root->children[i]);
-            if (root->moves && root->moves[i]) FREE(root->moves[i]);
-        }
-    }
-
-    if (root->visit_count) { FREE(root->visit_count); root->visit_count = NULL; }
-    if (root->power) { FREE(root->power); root->power = NULL; }
-    if (root->value) { FREE(root->value); root->value = NULL; }
-    if (root->board) { FREE(root->board); root->board = NULL; }
-    if (root->ucb) { FREE(root->ucb); root->ucb = NULL; }
-
-    if (root->children) { FREE(root->children); root->children = NULL; }
-
-    FREE(root);
-
-    return NULL;
-}
-
 typedef struct ch_constant_memory_queue {
     void** data;
-    ch_mcts_tree *tree;
+    void *tree;
     int capacity;
     int count;
     int put_id;
@@ -194,9 +155,7 @@ void ch_destroy_constant_memory_queue(ch_constant_memory_queue* queue) {
     queue->get_id = -1;
     queue->put_id = -1;
     FREE(queue->data);
-    queue->data = NULL;
-    ch_free_mcts(queue->tree);
-    queue->tree = NULL;
+    queue->data = NULL;queue->tree = NULL;
     FREE(queue);
     queue = NULL;
 }
@@ -405,8 +364,8 @@ float* ch_network_predict(network *net, float *input, int player)
     net->train = 0;
     forward_network(net);
     float* results = CALLOC(2, sizeof(float));
-    results[0] = net->truth[(0)];
-    results[1] = net->output[(0)];
+    results[0] = net->output[(0)];
+    results[1] = net->output[(1)];
     return results;
 }
 
@@ -558,20 +517,21 @@ float ch_train_network_datum(network *net, int player)
     return error;
 }
 
-float ch_train_network(network *net, float* input, float* truth, int player)
+float ch_train_network(network *net, float* truth, float* input, int player)
 {
     memcpy(net->input, input, net->inputs*net->batch*sizeof(float));
     //memcpy(net->truth, truth, net->truths*net->batch*sizeof(float));
     //memcpy(net->output, truth, net->outputs*net->batch*sizeof(float));
     net->truth[0] = truth[0];
-    net->output[0] = truth[1];
+    net->truth[1] = truth[1];
+    //net->output[0] = truth[0];
+    //net->output[1] = truth[1];
     float loss = ch_train_network_datum(net, player);
     return loss;
 }
 
 float *ch_move(char* sfen, float *board, int indext) {
     char* pfen = ch_board_to_fen(board);
-    int mcounter = 0;
     char* mfen = ch_do_legal(sfen, pfen, indext);
     if (mfen == NULL) {
         FREE(pfen);
@@ -603,7 +563,7 @@ void ch_self_study_after_pick_the_move(char* sessionId, network *net, int player
     }
 }
 
-void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, char *valid_move, network *net, int level, int idx, float pow, float value) {
+void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, char *valid_move, network *net, int level, int idx, float pow, float val) {
     int player = strstr(valid_fen, " w ") ? 0 : 1;
     if (ch_is_checkmate(valid_fen)) return;
     if (valid_fen == NULL || valid_move == NULL) return;
@@ -625,15 +585,15 @@ void ch_self_study_train_self_step(char*sessionId, char *sfen, char *valid_fen, 
     float *pnext = ch_move(sfen, prev, idx);
     float powW = 0;
     float powB = 0;
-    float power = ch_eval_the_board(sfen, next, &powW, &powB);
-    float val = (player == 0 ? powW : powB);
-    y[0] = power < pow ? pow : power * 1.27f;
-    y[1] = value < val ? val : value * 1.27f;
+    float power = ch_eval_the_board(sfen, pnext, &powW, &powB);
+    float value = (player == 0 ? powW - powB : powB - powW);
+    y[0] = power < pow ? pow : power;
+    y[1] = value < val ? val : value;
+    FREE(pnext);
     fprintf(stderr, "output[0]: %2.8f, output[1]: %2.8f\n", y[0], y[1]);
     ch_self_study_after_pick_the_move(sessionId, net, player, level, idx, valid_move, x, y);
     FREE(y);
     FREE(x);
-    FREE(pnext);
     FREE(next);
     FREE(prev);
 }
@@ -758,406 +718,124 @@ void ch_put_into_game_queue(char *sessionId, char *valid_fen, char* valid_move, 
     ch_put_back(sessionId, to_learn);
 }
 
-void ch_print_matrix(ch_mcts_tree *tree, char *name, float* matrix) {
-    fprintf(stderr, "%s[%i] ", name, tree->count);
-    for (int i = 0; i < tree->count; ++i) {
-        fprintf(stderr, "%i:[%.4f] ", i, matrix[i]);
+#define BOARD_SIZE (8*8+8)
+
+typedef struct {
+    network* net;
+    char* sfen;
+} ch_adapter_ctx;
+
+static ch_adapter_ctx gctx;
+
+static int api_gen_legal(const ch_board* board, ch_mv* moves, int max_moves) {
+    char* valid_fen = NULL;
+    char** valid_moves = NULL;
+    int cnt = 0;
+    int ok = ch_get_all_valid_moves(gctx.sfen, (char*)board->fen, &valid_fen, &valid_moves, &cnt);
+    if (!ok || cnt <= 0) {
+        if (valid_moves) { for (int i = 0; i < cnt; ++i) FREE(valid_moves[i]); FREE(valid_moves); }
+        if (valid_fen) FREE(valid_fen);
+        return 0;
     }
-    fprintf(stderr, "\n");
+    int n = cnt < max_moves ? cnt : max_moves;
+    for (int i = 0; i < n; ++i) moves[i] = (ch_mv)i;
+    for (int i = 0; i < cnt; ++i) FREE(valid_moves[i]);
+    FREE(valid_moves);
+    FREE(valid_fen);
+    return n;
 }
 
-void ch_print_int_matrix(ch_mcts_tree *tree, char *name, int* matrix) {
-    fprintf(stderr, "%s[%i] ", name, tree->count);
-    for (int i = 0; i < tree->count; ++i) {
-        fprintf(stderr, "%i:[%i] ", i, matrix[i]);
-    }
-    fprintf(stderr, "\n");
+static int api_apply_move(const ch_board* board, ch_mv mv, ch_board* out) {
+    char* mfen = ch_move_fen(gctx.sfen, (char*)board->fen, (int)mv);
+    if (!mfen) return -1;
+    strncpy(out->fen, mfen, sizeof(out->fen)-1);
+    out->fen[sizeof(out->fen)-1] = '\0';
+    FREE(mfen);
+    return 0;
 }
 
-int ch_max_index(const float *a, int n)
-{
-    if(n <= 0) return -1;
-    int i, max_i = 0;
-    float max = -FLT_MAX;
-    for(i = 0; i < n; ++i){
-        if(a[i] > max) {
-            max = a[i];
-            max_i = i;
-        }
-    }
-    return max_i;
+static int api_terminal_result(const ch_board* board) {
+    if (ch_is_checkmate((char*)board->fen)) return -1;
+    return 2;
 }
 
-int ch_min_index(const float *a, int n)
-{
-    if(n <= 0) return -1;
-    int i, max_i = 0;
-    float max = FLT_MAX;
-    for(i = 0; i < n; ++i){
-        if(a[i] < max) {
-            max = a[i];
-            max_i = i;
-        }
-    }
-    return max_i;
-}
-
-int ch_index(int player, int *a, int n) {
-    return max_int_index(a, n);
-}
-
-float* ch_moves_similarity_ai(char* sessionId, char* sfen, network* net, char* valid_fen, char** moves, int n) {
-    int player = strstr(valid_fen, " w ") ? 0 : 1;
-    float* similarities = (float *) CALLOC(n*2, sizeof(float));
-    float *prev = ch_fen_to_board(valid_fen, 1);
-    float *x = (float *) CALLOC((2)*(BOARD_SIZE), sizeof(float));
-    for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
-        x[i] = prev[i];
-    }
-    for (int idx = 0; idx < n; ++idx) {
-        float *next = ch_move(sfen, prev, idx);
-        for (int i = 0; i < (1)*(BOARD_SIZE); ++i) {
-            x[(1)*(BOARD_SIZE) + i] = next[i];
-        }
+static int api_nn_eval(network* net, const ch_board* board, const ch_mv* moves, int moves_count, float* out_policy, float* out_value) {
+    float* prev = ch_fen_to_board((char*)board->fen, 1);
+    int player = strstr((char*)board->fen, " w ") ? 0 : 1;
+    float* x = (float*)calloc((2)*(BOARD_SIZE), sizeof(float));
+    for (int i = 0; i < (BOARD_SIZE); ++i) x[i] = prev[i];
+    float sumP = 0.f;
+    float maxP = 0.f;
+    for (int i = 0; i < moves_count; ++i) {
+        char* mfen = ch_move_fen(gctx.sfen, (char*)board->fen, (int)moves[i]);
+        float* next = ch_fen_to_board(mfen, 1);
+        for (int k = 0; k < (1)*(BOARD_SIZE); ++k) x[(1)*(BOARD_SIZE) + k] = next[k];
         float* y = ch_network_predict(net, x, player);
-        similarities[idx*2+0] = y[0];
-        similarities[idx*2+1] = y[1];
+        out_policy[i] = fmaxf(0.f, y[0]);
+        if (out_policy[i] > maxP) maxP = out_policy[i];
+        sumP += out_policy[i];
         FREE(y);
         FREE(next);
+        FREE(mfen);
     }
+    if (sumP <= 0.f) {
+        for (int i = 0; i < moves_count; ++i) out_policy[i] = 1.f / (float)moves_count;
+    } else {
+        float inv = 1.f / sumP;
+        for (int i = 0; i < moves_count; ++i) out_policy[i] *= inv;
+    }
+    float powW = 0.f, powB = 0.f;
+    float v = ch_eval_the_board(gctx.sfen, prev, &powW, &powB);
+    if (player == 0) *out_value = powW - powB; else *out_value = powB - powW;
     FREE(x);
     FREE(prev);
-    return similarities;
+    return 0;
 }
 
-float* ch_moves_similarity(network* net, char** moves, int n, float *board, char* sfen) {
-    char* valid_fen = ch_board_to_fen(board);
-    float pow = 0;
-    float* pows = NULL;
-    int index = ch_eval_best_trivial_move(sfen, valid_fen, 3, &pow, &pows, &n);
-    int player = (int)board[8*8] != 0 ? 1 : 0;
-    float* similarities = (float *) CALLOC(n, sizeof(float));
-    for (int i = 0; i < n; ++i) {
-        similarities[i] = pows[i];
-    }
-    FREE(pows);
-    FREE(valid_fen);
-    return similarities;
+static ch_api make_api() {
+    ch_api api;
+    api.gen_legal = (int(*)(const ch_board*, ch_mv*, int))api_gen_legal;
+    api.apply_move = (int(*)(const ch_board*, ch_mv, ch_board*))api_apply_move;
+    api.terminal_result = (int(*)(const ch_board*))api_terminal_result;
+    api.nn_eval = (int(*)(network*, const ch_board*, const ch_mv*, int, float*, float*))api_nn_eval;
+    return api;
 }
 
-ch_mcts_tree *ch_expand_mcts(char *sessionId, ch_mcts_tree *parent, float *board, network *net, char* sfen, int level)
+int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid_moves, ch_moves ch_m, network *net, int n, int level, int *solver, float *pow, float *val)
 {
-    int player = (int)board[8*8] != 0 ? 1 : 0;
-    char *fen = ch_board_to_fen(board);
-    char *valid_fen = NULL;
-    char **valid_moves = NULL;
-    int valid_moves_count = 0;
-    if (ch_get_all_valid_moves(sfen, fen, &valid_fen, &valid_moves, &valid_moves_count)) {
-        ch_mcts_tree *root = (ch_mcts_tree *) CALLOC(1, sizeof(ch_mcts_tree));
-        root->parent = parent;
-        root->parents = parent == NULL ? 0 : parent->parents + 1;
-        root->count = valid_moves_count;
-        root->player = player;
-        root->best_index = -1;
-        root->total_count = 1;
-        root->board = ch_copy_board(board);
-        root->children = (ch_mcts_tree **) CALLOC(root->count, sizeof(ch_mcts_tree *));
-        root->power = (float *) CALLOC(root->count, sizeof(float));
-        root->value = (float *) CALLOC(root->count, sizeof(float));
-        root->ucb = (float *) CALLOC(root->count, sizeof(float));
-        root->visit_count = (int *) CALLOC(root->count, sizeof(int));
-        root->moves = (char **) CALLOC(root->count, sizeof(char *));
-        for (int i = 0; i < root->count; ++i) { root->moves[i] = strdup(valid_moves[i]); }
-        float *similar = ch_moves_similarity_ai(sessionId, sfen, net, valid_fen, valid_moves, valid_moves_count);
-        for (int i = 0; i < root->count; ++i) { root->ucb[i] = 0; root->power[i] = similar[i*2+0]; root->value[i] = similar[i*2+1]; root->visit_count[i] = 1; }
-        FREE(similar);
-        for (int i = 0; i < root->count; ++i) FREE(valid_moves[i]);
-        FREE(valid_moves);
-        FREE(valid_fen);
-        FREE(fen);
-        return root;
-    }
-    FREE(fen);
-    return NULL;
-}
-
-int ch_select_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float cpuct, char* sfen, int level) {
-    ch_mcts_tree* current = leaf;
-
-    root->total_count++;
-
-    int best_child = -1;
-    float best_ucb = -FLT_MAX;
-
-    current->total_count = 0;
-    for (int i = 0; i < current->count; i++) {
-        current->total_count += current->visit_count[i];
-    }
-
-    for (int i = 0; i < current->count; i++) {
-        float n = fmaxf((float)abs(current->visit_count[i]), 1);
-        float N = fmaxf((float)abs(current->total_count), 1);
-
-        float Q = current->value[i];
-
-        float ucb = Q + cpuct * sqrtf(logf(N + 1.0f) / (n + 1.0f));
-
-        current->ucb[i] = ucb;
-
-        if (ucb > best_ucb) {
-            best_ucb = ucb;
-            best_child = i;
-        }
-    }
-
-    if (best_child == -1) {
-        best_child = (int)random() % current->count;
-    }
-
-    current->best_index = best_child;
-    current->visit_count[best_child]++;
-
-    return best_child;
-}
-
-ch_mcts_tree* ch_expansion_mcts(char* sessionId, ch_mcts_tree* leaf, ch_mcts_tree* root, network *net, float cpuct, char* sfen, int level) {
-    ch_mcts_tree* current = leaf;
-
-    while (current) {
-        int best_index = ch_select_mcts(current, root, net, cpuct, sfen, level);
-
-        if (current->children[best_index] == NULL) {
-
-            float *next_board = ch_move(sfen, current->board, best_index);
-            if (next_board == NULL) return current;
-
-            ch_mcts_tree *child = ch_expand_mcts(sessionId, current, next_board, net, sfen, level);
-            FREE(next_board);
-
-            if (child) {
-                child->best_index = ch_select_mcts(child, root, net, cpuct, sfen, level);
-                current->children[best_index] = child;
-                return child;
-            } else {
-                return current;
-            }
-        }
-
-        current = current->children[best_index];
-    }
-
-    return current;
-}
-
-ch_mcts_tree* ch_backpropagate_mcts(ch_mcts_tree* leaf, ch_mcts_tree* root, float result) {
-    ch_mcts_tree* current = leaf;
-
-    result /= 100.f;
-
-    while (current && current->parent) {
-        int index = current->best_index;
-        ch_mcts_tree* parent = current->parent;
-
-        if (index >= 0 && index < parent->count) {
-            parent->visit_count[index]++;
-            parent->value[index] += (root->player == leaf->player ? -result : result) / (float)(parent->parents + 1);
-        }
-
-        parent->total_count++;
-        current = parent;
-    }
-
-    return current;
-}
-
-float ch_simulate_heuristic_ai(ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, char* sfen, int player) {
-    ch_mcts_tree* current = leaf;
-    if (current) {
-        int best_index = current->best_index;
-        if (best_index >= 0 && best_index < current->count) {
-            return current->power[best_index];
-        }
-    }
-    return 0.f;
-}
-
-ch_mcts_tree* ch_search_mcts(char* sessionId, ch_mcts_tree* leaf, ch_mcts_tree* root, network* net, float cpuct, char* sfen, int level, int player) {
-    //int index = ch_select_mcts(leaf, root, net, cpuct, sfen, level);
-    leaf = ch_expansion_mcts(sessionId, leaf, root, net, cpuct, sfen, level);
-    float result = ch_simulate_heuristic_ai(leaf, root, net, sfen, player);
-    leaf = ch_backpropagate_mcts(leaf, root, result);
-    return leaf;
-}
-
-int get_best_move_index(ch_mcts_tree* root) {
-    int best_move = -1;
-    int max_visits = -1;
-
-    for (int i = 0; i < root->count; i++) {
-        int visits = root->visit_count[i];
-        if (max_visits < visits) {
-            max_visits = visits;
-            best_move = i;
-        }
-    }
-
-    float max_ucbv = -FLT_MAX;
-
-    for (int i = 0; i < root->count; i++) {
-        int visits = root->visit_count[i];
-        if (max_visits == visits) {
-            if (max_ucbv < root->ucb[i]) {
-                max_ucbv = root->ucb[i];
-                best_move = i;
-            }
-        }
-    }
-
-    return best_move;
-}
-
-void ch_print_mcts_tree(ch_mcts_tree* node, int depth, int max_depth) {
-    if (!node || depth > max_depth) return;
-
-    for (int i = 0; i < fmin(node->count, 3); i++) {
-        for (int d = 0; d < depth; d++) printf("  ");
-
-        printf("├─ [%d] %s | UCB: %.10f | Value: %.6f | Visits: %d\n",
-               i,
-               node->moves ? node->moves[i] : "?",
-               node->ucb[i],
-               node->value[i],
-               node->visit_count[i]);
-
-        ch_print_mcts_tree(node->children[i], depth + 1, max_depth);
-    }
-}
-
-void ch_run_mcts(char* sessionId, network *net, char* valid_fen, char** valid_moves,  float *board, int n, float cpuct, float secs, char* sfen, int level)
-{
-    srandom(time(0));
-    double t = what_time_is_it_now();
-    int player = (int)board[8*8] != 0 ? 1 : 0;
-    ch_constant_memory_queue *q = ch_dict_get(moves_history, sessionId);
-    if (q->tree == NULL) q->tree = ch_expand_mcts(sessionId, NULL, board, net, sfen, level);
-    if (q->tree == NULL) {
-        q->index = 0;
-        q->value = 1;
-        q->total_count = 1;
-        return;
-    }
-    ch_mcts_tree *root = q->tree;
-    q->index = -1;
-    q->value = -FLT_MAX;
-    q->total_count = 0;
-    int idx =  0;
-    float val = -FLT_MAX;
-    int counter = 0;
-    ch_mcts_tree *leaf = root;
-    for (int i = 0; i < n; ++i) {
-        if (root->total_count >= n) break;
-        if (secs > 0 && (what_time_is_it_now() - t) >= secs) break;
-        leaf = ch_search_mcts(sessionId, leaf, root, net, cpuct, sfen, level, player);
-        q->index = get_best_move_index(root);
-        if (q->index != -1) {
-            q->power = root->power[q->index];
-            q->value = root->value[q->index];
-            q->total_count = root->total_count;
-            if (idx != q->index && q->index >= 0 && q->index < root->count && val < q->value) {
-                idx = q->index;
-                val = q->value;
-                fprintf(stderr, "maybe move: %s checked(%i) value(%f) ucb(%f) power(%f)\n", valid_moves[q->index], q->total_count, root->value[q->index], root->ucb[q->index], root->power[q->index]);
-#ifdef CH_ENGINE
-                fprintf(stdout, "info depth %i pv %s\n", ++counter, valid_moves[q->index]);
-#endif
-            }
-        }
-    }
-    idx = q->index;
-    fprintf(stderr, "ucb: %f value: %f\n", root->ucb[idx], root->value[idx]);
-    if (1) {
-        //ch_print_mcts_tree(root, 0, 10);
-        //ch_print_matrix(root, "ucb", root->ucb);
-        //ch_print_matrix(root, "value", root->value);
-        fprintf(stderr, "   move    ucb           value         power        visits\n");
-        for (int i = 0; i < root->count; ++i) {
-            fprintf(stderr, "%2i:[%s]  [%.8f]  [%.8f]  [%.8f]  [%i]\n", i, valid_moves[i], root->ucb[i], root->value[i], root->power[i], root->visit_count[i]);
-        }
-    }
-    q->tree = ch_free_mcts(q->tree); q->tree = NULL;
-}
-
-int ch_pick_move_mcts(char* sessionId, char* sfen, char* valid_fen, char** valid_moves, ch_moves ch_m, network *net, int n, int level, int *solver, float *pow, float *value)
-{
-    int player = strstr(valid_fen, " w ") ? 0 : 1;
-
-    int counter = 0;
-
-    if (level < 0) level = 0;
-    if (level > 6) level = 6;
-
-    if (level <= 0 || trivial_player == player) {
-        *solver = 2; // ML
-        if (valid_moves == NULL) return 0;
-        float *pows = NULL;
-        int idx = n == 1 ? 0 : ch_eval_best_trivial_move(sfen, valid_fen, level, pow, &pows, &counter);
-        if (idx != -1) {
-            *value = pows[idx];
-            fprintf(stderr,
-                    "pick (%s): %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i) move: (%s) value: (%.8g)\n",
-                    *solver == 1 ? "ai" : "ml", net->nsteps, player == 0 ? "w" : "b", n, counter, *pow, idx,
-                    valid_moves[idx], *value);
-        }
-        if (pows) FREE(pows);
-        return idx != -1 ? idx : 0;
-    }
-
-    float *board = ch_fen_to_board(valid_fen, 1);
-
-    ch_constant_memory_queue *q = ch_dict_get(moves_history, sessionId);
-
-#ifdef CH_ENGINE
-    int lvn = (level+1) * 20000000;
-    ch_run_mcts(sessionId, net, valid_fen, valid_moves, board, lvn, 1.42f, (float) (level+1) * 0.2f, sfen, level);
-#else
-    int lvn = (level+1) * 20000000;
-    ch_run_mcts(sessionId, net, valid_fen, valid_moves, board, lvn, 0.27f, (float) (level+1) * 1.0f, sfen, level);
-#endif
-
-    int index = q->index;
-
-    int idx = -1;
-
-    if (index >= 0 && index < n) {
-        idx = index;
-        counter = q->total_count;
-        *pow = q->power;
-        *value = q->value;
-        *solver = 2; // ML
-    }
-
-    if (idx == -1) {
-        float *pows = NULL;
-        idx = ch_eval_best_trivial_move(sfen, valid_fen, level, pow, &pows, &counter);
-        *solver = 1; // AI;
-        FREE(pows);
-    }
-
-    fprintf(stderr, "pick (%s): %ld(%s): count: (%i) checked: (%i) power: (%.7f) index: (%i) move: (%s) value: (%.8g)\n", *solver == 1 ? "ai" : "ml", net->nsteps, player == 0 ? "w" : "b", n, counter, *pow, idx, valid_moves[idx], *value);
-
-    if (!ch_is_end(sfen, valid_fen, index)) {
-        float *nboard = ch_fen_to_board(valid_fen, 1);
-        float *moved = ch_move(sfen, nboard, idx);
-        char *print = ch_board_to_fen(moved);
-        ch_print_board(print);
-        FREE(print);
-        FREE(moved);
-        FREE(nboard);
-    }
-
-    FREE(board);
-
-    return idx != -1 ? idx : 0;
+    gctx.net = net;
+    gctx.sfen = sfen;
+    ch_mcts_config cfg;
+    cfg.cpuct = 0.72f;
+    cfg.dirichlet_alpha = 0.3f;
+    cfg.root_noise_frac = 0.25f;
+    cfg.max_children = 32;
+    cfg.use_virtual_loss = 0;
+    cfg.virtual_loss = 1.0f;
+    static unsigned char arena[8 * 1024 * 1024];
+    ch_mcts m;
+    ch_api api = make_api();
+    ch_mcts_init(&m, api, cfg, net, arena, sizeof(arena));
+    ch_board rootb;
+    strncpy(rootb.fen, valid_fen, sizeof(rootb.fen)-1);
+    rootb.fen[sizeof(rootb.fen)-1] = '\0';
+    int to_move = strstr(valid_fen, " w ") ? +1 : -1;
+    ch_mcts_node* root = ch_mcts_create_root(&m, &rootb, to_move);
+    int sims = (level < 0 ? 0 : level) + 1;
+    ch_print_board(valid_fen);
+    ch_mcts_play_and_log(&m, root, level + 1, valid_moves);
+    ch_mv mv = ch_mcts_pick_move(&m, root, 0.0f);
+    int idx = (int)mv;
+    if (idx < 0 || idx >= n) idx = 0;
+    *solver = 2;
+    float* prev = ch_fen_to_board(valid_fen, 1);
+    float* next = ch_move(sfen, prev, idx);
+    float powW=0.f, powB=0.f;
+    ch_eval_the_board(sfen, next, &powW, &powB);
+    if (strstr(valid_fen, " w ")) { *pow = powW; *val = powW - powB; } else { *pow = powB; *val = powB - powW; }
+    FREE(next);
+    FREE(prev);
+    return idx;
 }
 
 static char *ch_lin_in_dir;
@@ -1629,7 +1307,6 @@ typedef struct ch_board_state {
     int indext;
 } ch_board_state;
 
-
 ch_board_state ch_self_learn_step(char* sessionId, char* sfen, int level, network *net, char *fen, char *fen_move, int learn) {
 
     int player = strstr(fen, " w ") ? 0 : 1;
@@ -1839,9 +1516,11 @@ void test_tchess(int argc, char **argv, char *cfgfile, char *weight_file) {
         }
         float* board = ch_fen_to_board(valid_fen, 1);
         float* next = ch_move(sfen, board, move_state.indext);
-        char* next_fen = ch_board_to_fen(next);
-        strcpy(move_state.fen, next_fen);
-        FREE(next_fen);
+        if (next) {
+            char* next_fen = ch_board_to_fen(next);
+            strcpy(move_state.fen, next_fen);
+            FREE(next_fen);
+        }
         FREE(next);
         FREE(board);
         if (++net->nsteps % 10000 == 0) save_weights(net, ch_weight_file);
@@ -1950,7 +1629,7 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
     size_t len = 0;
     size_t nread = 0;
     while ((nread = getline(&buff, &len, stdin)) > 0) {
-
+        if (buff == NULL) continue;
         buff[strcspn(buff, "\r\n")] = 0;
 
         if (print) {
@@ -2170,7 +1849,7 @@ void test_echess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fflush(stdout);
         }
 
-        free(buff);
+        FREE(buff);
         buff = NULL;
     }
 
@@ -2243,6 +1922,7 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
     size_t len = 0;
     size_t nread = 0;
     while ((nread = getline(&buff, &len, stdin)) > 0) {
+        if (buff == NULL) continue;
         buff[strcspn(buff, "\r\n")] = 0;
 
         if (print) {
@@ -2497,7 +2177,7 @@ void test_mchess(int argc, char** argv, char *cfgfile, char *weight_file) {
             fflush(stdout);
         }
 
-        free(buff);
+        FREE(buff);
         buff = NULL;
     }
 

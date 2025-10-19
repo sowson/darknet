@@ -285,6 +285,7 @@ set (DARKNET_SOURCES
     "src/upsample_layer.c"
     "src/logistic_layer.c"
     "src/l2norm_layer.c"
+    "examples/ch_mcts.c"
     "examples/chess.c"
 )
 
@@ -294,6 +295,7 @@ endif()
 
 set (DARKNET_PUBLIC_HEADERS
     "include/darknet.h"
+    "include/ch_mcts.h"
     "src/activation_layer.h"
     "src/activations.h"
     "src/avgpool_layer.h"

@@ -63,6 +63,15 @@ struct FenPairHash {
 
 class FenCache {
 private:
+    // Reserve sizes to reduce rehashing
+    static constexpr size_t INITIAL_RESERVE = 327680;
+public:
+    FenCache() {
+        order = std::deque<FenPair>();
+        cache.reserve(INITIAL_RESERVE);
+    }
+
+private:
     std::deque<FenPair> order;
     std::unordered_map<FenPair, float, FenPairHash> cache;
 
@@ -208,14 +217,14 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
     float sumW = 0;
     float sumB = 0;
 
-    if (game.is_checkmate() || game.is_draw()) {
+    if (game.valid() && (game.is_checkmate() || game.is_draw())) {
         if (game.is_checkmate()) {
-            sumW += color == libchess::White ? +10.0 : 0.0;
-            sumB += color == libchess::Black ? +10.0 : 0.0;
+            sumW += color == libchess::White ? +100.0 : 0.0;
+            sumB += color == libchess::Black ? +100.0 : 0.0;
         }
         if (game.is_draw()) {
-            sumW += color == libchess::White ? +1.000 : 0.0;
-            sumB += color == libchess::Black ? +1.000 : 0.0;
+            sumW += color == libchess::White ? +0.001 : 0.0;
+            sumB += color == libchess::Black ? +0.001 : 0.0;
         }
 
         if (powW != nullptr) *powW = sumW;
@@ -277,8 +286,8 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
     sumW += (attW - ptcW) / (picW) + 2.0;
     sumB += (attB - ptcB) / (picB) + 2.0;
 
-    sumW /= 500.0f;
-    sumB /= 500.0f;
+    sumW /= 100.0f;
+    sumB /= 100.0f;
 
     if (powW != nullptr) *powW = sumW;
     if (powB != nullptr) *powB = sumB;
@@ -289,11 +298,13 @@ float ch_evaluate_board(const libchess::Position& sfen, const libchess::Position
 std::random_device rd;
 std::mt19937 generator(rd());
 
+struct MoveGuard { libchess::Position &game; libchess::Move mv; MoveGuard(libchess::Position &g, const libchess::Move &m): game(g), mv(m) { game.makemove(mv); } ~MoveGuard() { game.undomove(); } };
+
 float ch_min_max(const libchess::Position& sfen, libchess::Position& game, int depth, float alpha, float beta, bool is_max_p, libchess::Side color, int *counter) {
     *counter += 1;
 
     if (!game.valid() || game.is_terminal()) {
-        return game.is_checkmate() ? 10000000.f : 0.f;
+        return game.is_checkmate() ? 1.f : 0.f;
     }
 
     float best_move_max = -10000000.f;
@@ -312,9 +323,10 @@ float ch_min_max(const libchess::Position& sfen, libchess::Position& game, int d
 
     if (is_max_p) {
         for (int i = 0; i < num_possible_moves_count; i++) {
-            game.makemove(possible_next_moves[i]);
-            best_move_max = std::max(best_move_max, ch_min_max(sfen, game, depth - step, alpha, beta, !is_max_p, color, counter));
-            game.undomove();
+            {
+                MoveGuard _mg(game, possible_next_moves[i]);
+                best_move_max = std::max(best_move_max, ch_min_max(sfen, game, depth - step, alpha, beta, !is_max_p, color, counter));
+            }
             alpha = std::max(alpha, best_move_max);
             if (alpha >= beta) {
                 return best_move_max;
@@ -323,9 +335,10 @@ float ch_min_max(const libchess::Position& sfen, libchess::Position& game, int d
         return best_move_max;
     } else {
         for (int i = 0; i < num_possible_moves_count; i++) {
-            game.makemove(possible_next_moves[i]);
-            best_move_min = std::min(best_move_min, ch_min_max(sfen, game, depth - step, alpha, beta, !is_max_p, color, counter));
-            game.undomove();
+            {
+                MoveGuard _mg(game, possible_next_moves[i]);
+                best_move_min = std::min(best_move_min, ch_min_max(sfen, game, depth - step, alpha, beta, !is_max_p, color, counter));
+            }
             beta = std::min(beta, best_move_min);
             if (alpha >= beta) {
                 return best_move_min;
@@ -334,6 +347,150 @@ float ch_min_max(const libchess::Position& sfen, libchess::Position& game, int d
         return best_move_min;
     }
 }
+
+static FenCache recent_fens;
+
+std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess::Position& sfen, libchess::Position& game, int depth) {
+    if (game.is_terminal() || !game.valid()) {
+        return {};
+    }
+
+    auto color = game.turn();
+
+    std::vector<libchess::Move> moves = game.legal_moves();
+    int count = moves.size();
+
+    if (count == 0) {
+        return {};
+    }
+
+    const int top_n = std::min(n, count);
+    std::string game_fen = game.get_fen();
+
+    std::vector<std::pair<float, int>> scored_indices;
+    scored_indices.reserve(count);
+
+    for (int i = 0; i < count; ++i) {
+        game.makemove(moves[i]);
+
+        if (game.valid() && game.is_checkmate()) {
+            count = 1;
+            return {moves[i]};
+        }
+
+        std::string pos_fen = game.get_fen();
+        float return_value;
+
+        if (recent_fens.exists(game_fen, pos_fen)) {
+            return_value = recent_fens.get(game_fen, pos_fen);
+        } else {
+            int counter = 0;
+            return_value = ch_min_max(sfen, game, depth, -10000001.f, +10000001.f, false, color, &counter);
+            recent_fens.insert(game_fen, pos_fen, return_value);
+        }
+
+        game.undomove();
+        scored_indices.emplace_back(return_value, i);
+    }
+
+    std::sort(
+            scored_indices.begin(),
+            scored_indices.end(),
+            [](const auto& a, const auto& b) { return a.first > b.first; } // TODO!!
+    );
+
+    std::vector<libchess::Move> top_moves;
+    for (int i = 0; i < top_n; ++i) {
+        top_moves.emplace_back(moves[scored_indices[i].second]);
+    }
+
+    return top_moves;
+}
+
+std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libchess::Position& pos) {
+    return pos.legal_moves();
+    int n = 384;
+    int d = 2;
+    return ch_calculate_top_n_moves(n, sfen, pos, d);
+}
+
+int ch_calculate_best_move(const libchess::Position& sfen, libchess::Position& game, int depth, float &best_move, float *&best_move_values, int *counter) {
+    std::vector<libchess::Move> moves = ch_legal_moves(sfen, game);
+    *counter = moves.size();
+
+    float best_move_max = -10000000.f;
+    int best_move_idx = -1;
+    auto color = game.turn();
+    std::string game_fen = game.get_fen();
+
+    best_move_values = (float*)CALLOC(moves.size(), sizeof(float));
+
+    for (int i = 0; i < moves.size(); ++i) {
+        game.makemove(moves[i]);
+        std::string pos_fen = game.get_fen();
+        float return_value;
+        if (recent_fens.exists(game_fen, pos_fen)) {
+            return_value = recent_fens.get(game_fen, pos_fen);
+        } else {
+            int counter = 0;
+            return_value = ch_min_max(sfen, game, depth, -10000001.f, +10000001.f, false, color, &counter);
+            recent_fens.insert(game_fen, pos_fen, return_value);
+        }
+        game.undomove();
+        if (return_value > best_move_max) {
+            best_move_max = return_value;
+            best_move_values[i] = return_value;
+            best_move = return_value;
+            best_move_idx = i;
+        }
+    }
+
+    return best_move_idx;
+}
+
+std::string ch_generate_deterministic_960(int seed) {
+    std::array<char, 8> pieces = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+    int bishopIndex1 = (seed % 4) * 2;
+    int bishopIndex2 = (seed / 4 % 4) * 2 + 1;
+    pieces[bishopIndex1] = 'B';
+    pieces[bishopIndex2] = 'B';
+
+    int queenIndex = (seed / 16) % 6, count = 0;
+    for (int i = 0; i < 8; i++) {
+        if (pieces[i] == ' ') {
+            if (count == queenIndex) {
+                pieces[i] = 'Q';
+                break;
+            }
+            count++;
+        }
+    }
+
+    std::vector<int> availableSquares;
+    for (int i = 0; i < 8; i++)
+        if (pieces[i] == ' ') availableSquares.push_back(i);
+
+    int knightIndex1 = availableSquares[(seed / 96) % 5];
+    std::vector<int> validKnightSquares;
+    for (int i : availableSquares)
+        if (i % 2 != knightIndex1 % 2) validKnightSquares.push_back(i);
+
+    int knightIndex2 = validKnightSquares[(seed / 480) % validKnightSquares.size()];
+    pieces[knightIndex1] = 'N';
+    pieces[knightIndex2] = 'N';
+
+    std::vector<int> emptyIndices;
+    for (int i = 0; i < 8; i++)
+        if (pieces[i] == ' ') emptyIndices.push_back(i);
+
+    pieces[emptyIndices[0]] = 'R';
+    pieces[emptyIndices[1]] = 'K';
+    pieces[emptyIndices[2]] = 'R';
+
+    return std::string(pieces.begin(), pieces.end());
+}
+
+extern "C" {
 
 float ch_softmax(float *input, int n, float temp, int stride, float *output) {
     int i;
@@ -419,141 +576,6 @@ void ch_soft_tanh(const float *values, int size, float *output) {
     }
 }
 
-static FenCache recent_fens;
-
-std::vector<libchess::Move> ch_calculate_top_n_moves(const int n, const libchess::Position& sfen, libchess::Position& game, int depth) {
-    if (game.is_terminal() || !game.valid()) {
-        return {};
-    }
-
-    auto color = game.turn();
-
-    std::vector<libchess::Move> moves = game.legal_moves();
-    int count = moves.size();
-
-    if (count == 0) {
-        return {};
-    }
-
-    const int top_n = std::min(n, count);
-    std::string game_fen = game.get_fen();
-
-    std::vector<std::pair<float, int>> scored_indices;
-    scored_indices.reserve(count);
-
-    for (int i = 0; i < count; ++i) {
-        game.makemove(moves[i]);
-
-        if (game.is_checkmate()) {
-            count = 1;
-            return {moves[i]};
-        }
-
-        std::string pos_fen = game.get_fen();
-        float return_value;
-
-        if (recent_fens.exists(game_fen, pos_fen)) {
-            return_value = recent_fens.get(game_fen, pos_fen);
-        } else {
-            int counter = 0;
-            return_value = ch_min_max(sfen, game, depth, -10000001.f, +10000001.f, false, color, &counter);
-            recent_fens.insert(game_fen, pos_fen, return_value);
-        }
-
-        game.undomove();
-        scored_indices.emplace_back(return_value, i);
-    }
-
-    std::sort(
-            scored_indices.begin(),
-            scored_indices.end(),
-            [](const auto& a, const auto& b) { return a.first > b.first; } // TODO!!
-    );
-
-    std::vector<libchess::Move> top_moves;
-    for (int i = 0; i < top_n; ++i) {
-        top_moves.emplace_back(moves[scored_indices[i].second]);
-    }
-
-    return top_moves;
-}
-
-std::vector<libchess::Move> ch_legal_moves(const libchess::Position& sfen, libchess::Position& pos) {
-    //return pos.legal_moves();
-    int n = 256;
-    int d = 2;
-    return ch_calculate_top_n_moves(n, sfen, pos, d);
-}
-
-int ch_calculate_best_move(const libchess::Position& sfen, libchess::Position& game, int depth, float &best_move, float *&best_move_values, int *counter) {
-    std::vector<libchess::Move> moves = ch_legal_moves(sfen, game);
-    *counter = moves.size();
-
-    float best_move_max = -10000000.f;
-    int best_move_idx = -1;
-    auto color = game.turn();
-
-    best_move_values = (float*)CALLOC(moves.size(), sizeof(float));
-
-    for (int i = 0; i < moves.size(); ++i) {
-        game.makemove(moves[i]);
-        float return_value = ch_min_max(sfen, game, depth, -10000001.f, +10000001.f, false, color, counter);
-        game.undomove();
-        if (return_value > best_move_max) {
-            best_move_max = return_value;
-            best_move_values[i] = return_value;
-            best_move = return_value;
-            best_move_idx = i;
-        }
-    }
-
-    return best_move_idx;
-}
-
-std::string ch_generate_deterministic_960(int seed) {
-    std::array<char, 8> pieces = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-    int bishopIndex1 = (seed % 4) * 2;
-    int bishopIndex2 = (seed / 4 % 4) * 2 + 1;
-    pieces[bishopIndex1] = 'B';
-    pieces[bishopIndex2] = 'B';
-
-    int queenIndex = (seed / 16) % 6, count = 0;
-    for (int i = 0; i < 8; i++) {
-        if (pieces[i] == ' ') {
-            if (count == queenIndex) {
-                pieces[i] = 'Q';
-                break;
-            }
-            count++;
-        }
-    }
-
-    std::vector<int> availableSquares;
-    for (int i = 0; i < 8; i++)
-        if (pieces[i] == ' ') availableSquares.push_back(i);
-
-    int knightIndex1 = availableSquares[(seed / 96) % 5];
-    std::vector<int> validKnightSquares;
-    for (int i : availableSquares)
-        if (i % 2 != knightIndex1 % 2) validKnightSquares.push_back(i);
-
-    int knightIndex2 = validKnightSquares[(seed / 480) % validKnightSquares.size()];
-    pieces[knightIndex1] = 'N';
-    pieces[knightIndex2] = 'N';
-
-    std::vector<int> emptyIndices;
-    for (int i = 0; i < 8; i++)
-        if (pieces[i] == ' ') emptyIndices.push_back(i);
-
-    pieces[emptyIndices[0]] = 'R';
-    pieces[emptyIndices[1]] = 'K';
-    pieces[emptyIndices[2]] = 'R';
-
-    return std::string(pieces.begin(), pieces.end());
-}
-
-extern "C" {
-
 int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level, float &best_move, float *&best_moves, int *counter) {
     const char* startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     libchess::Position fen = libchess::Position(valid_fen);
@@ -582,7 +604,6 @@ char* ch_do_legal(const char* sfen, const char* fen, int indext) {
     const char *startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     libchess::Position start = sfen == nullptr || sfen[0] == '\0' ? libchess::Position(startfen) : libchess::Position(sfen);
     libchess::Position pos = libchess::Position(fen);
-    if (pos.is_terminal() || !pos.valid()) return nullptr;
     auto moves = ch_legal_moves(start, pos);
     if (moves.size() == 0) return nullptr;
     pos.makemove(moves[indext]);
@@ -1014,6 +1035,7 @@ bool is_in_range(float p, float exact, float diff) {
 }
 
 char *ch_board_to_fen(const float *board) {
+    if(board == nullptr) return nullptr;
     const float radius = 0.001f;
     std::string fen;
     int emptyCount = 0;
@@ -1218,8 +1240,9 @@ float ch_eval_the_board(const char* sfen, float* board, float* powW, float* powB
     libchess::Position start = sfen == nullptr || sfen[0] == '\0' ? libchess::Position(startfen) : libchess::Position(sfen);
     char* valid_fen = ch_board_to_fen(board);
     libchess::Position fen = libchess::Position(valid_fen);
+    float eval = (float)ch_evaluate_board(start, fen, fen.turn(), powW, powB);
     FREE(valid_fen);
-    return (float)ch_evaluate_board(start, fen, fen.turn(), powW, powB);
+    return eval;
 }
 
 float* ch_eval_the_board_moves(const char* sfen, float* board, float *&best_values, int* best_value_index) {

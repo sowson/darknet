@@ -1153,7 +1153,7 @@ int ch_eval_best_trivial_move(const char* sfen, const char* valid_fen, int level
 float ch_eval_the_move(const char* sfen, const char* valid_prev_fen, const char* valid_fen);
 int ch_is_legal(char* sfen, char* fen, int indext);
 char* ch_do_legal(char* sfen, char* fen, int indext);
-void ch_softmax(float *input, int n, float temp, int stride, float *output);
+float ch_softmax(float *input, int n, float temp, int stride, float *output);
 void ch_softmax_revert(const float* softmax_probs, size_t size, float z_max, float* logits);
 void ch_softmax_scaled(const float *values, int size, float *output);
 void ch_soft_tanh(const float *values, int size, float *output);
