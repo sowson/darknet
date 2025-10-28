@@ -7,10 +7,6 @@
 extern void predict_classifier(char *datacfg, char *cfgfile, char *weightfile, char *filename, int top);
 extern void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen);
 extern void test_ddetector(char *datacfg, char *cfgfile, char *weightfile, char *in_dir, float thresh, float hier_thresh, char *out_dir, int margin);
-extern void test_dchess(int argc, char **argv, char *cfgfile, char *weightfile, char *in_dir, char *out_dir);
-extern void test_tchess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
-extern void test_echess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
-extern void test_mchess(int argc, char **argv, char *cfgfile, char *weightfile, char *weightfile_b);
 extern void run_yolo(int argc, char **argv);
 extern void run_yolo4(int argc, char **argv);
 extern void run_detector(int argc, char **argv);
@@ -417,26 +413,8 @@ void visualize(char *cfgfile, char *weightfile)
     visualize_network(net);
 }
 
-// cmake -DDARKNET_ENG_CHESS=1 ..
-#ifdef CH_ENGINE
-int main()
-{
-    int argc = 6;
-    char ar0[] = "iChess.io.en";
-    char ar1[] = "echess";
-    char ar2[] = "chess.cfg";
-    char ar3[] = "chess.weights";
-    char ar4[] = "-i";
-    char ar5[] = "0";
-    char* argv[8] = { &ar0[0], &ar1[0], &ar2[0], &ar3[0], &ar4[0], &ar5[0] };
-    freopen("iChess.io.en.log.txt", "w+", stderr); // could be "/dev/null" as well
-    setvbuf(stdin, NULL, _IONBF, 0);
-    setvbuf(stdout, NULL, _IONBF, 0);
-    setvbuf(stderr, NULL, _IONBF, 0);
-#else
 int main(int argc, char** argv)
 {
-#endif
     //test_resize("data/bad.jpg");
     //test_box();
     //test_convolutional_layer();
@@ -505,16 +483,6 @@ int main(int argc, char** argv)
         int fullscreen = find_arg(argc, argv, "-fullscreen");
         int margin = find_arg(argc, argv, "-margin");
         test_ddetector(argv[2], argv[3], argv[4], in_dir, thresh, .5, out_dir, margin);
-    } else if (0 == strcmp(argv[1], "dchess")){
-        char *in_dir = find_char_arg(argc, argv, "-in", 0);
-        char *out_dir = find_char_arg(argc, argv, "-out", 0);
-        test_dchess(argc, argv, argv[2], argv[3], in_dir, out_dir);
-    } else if (0 == strcmp(argv[1], "tchess")){
-        test_tchess(argc, argv, argv[2], argv[3], argv[4]);
-    } else if (0 == strcmp(argv[1], "echess")){
-        test_echess(argc, argv, argv[2], argv[3], argv[4]);
-    } else if (0 == strcmp(argv[1], "mchess")){
-        test_mchess(argc, argv, argv[2], argv[3], argv[4]);
     }
     else if (0 == strcmp(argv[1], "cifar")){
         run_cifar(argc, argv);

@@ -7,8 +7,6 @@ option(DARKNET_GPU "Enable OpenCL support" ON)
 option(DARKNET_GPU_FAST "Enable OpenCL fast kernels support" ON)
 option(DARKNET_GPU_MULTI "Enable OpenCL multi-GPU support" ON)
 option(DARKNET_ARM "Enable ARM support" OFF)
-option(DARKNET_LIBCHESS "Enable LibChess support" ON)
-option(DARKNET_ENG_CHESS "Enable Chess Engine support" OFF)
 option(DARKNET_BENCHMARK "Some Benchmark Stats" OFF)
 option(DARKNET_LOSS_ONLY "Loss Only Stats" OFF)
 option(DARKNET_TESTING "Build the unit tests" OFF)
@@ -190,11 +188,6 @@ if (DARKNET_GPU_MULTI)
 	list (APPEND DARKNET_DEFINITIONS GPU_MULTI)
 endif()
 
-# Chess Engine
-IF (DARKNET_ENG_CHESS)
-    list (APPEND DARKNET_DEFINITIONS CH_ENGINE)
-endif()
-
 # Benchmark Stats
 if (DARKNET_BENCHMARK)
 	list (APPEND DARKNET_DEFINITIONS BENCHMARK)
@@ -285,8 +278,6 @@ set (DARKNET_SOURCES
     "src/upsample_layer.c"
     "src/logistic_layer.c"
     "src/l2norm_layer.c"
-    "examples/ch_mcts.c"
-    "examples/chess.c"
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -295,7 +286,6 @@ endif()
 
 set (DARKNET_PUBLIC_HEADERS
     "include/darknet.h"
-    "include/ch_mcts.h"
     "src/activation_layer.h"
     "src/activations.h"
     "src/avgpool_layer.h"
@@ -360,9 +350,6 @@ endif()
 
 set (DARKNET_SOURCES_CXX
     "src/image_opencv.cpp"
-    "examples/chess.cpp"
-    "examples/uciw.hpp"
-    "examples/uciw.cpp"
 )
 
 if (DARKNET_CPU)
@@ -448,24 +435,6 @@ function (ConfigureBinary target)
     if (DARKNET_OPENMP)
         #!#find_package(OpenMP)
         #!#target_link_libraries(${target} OpenMP)
-    endif()
-
-    if (DARKNET_LIBCHESS)
-        if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.dll")
-        endif()
-        if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.so")
-        endif()
-        if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.so")
-        endif()
-        if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-            target_link_libraries(${target} "${PROJECT_SOURCE_DIR}/3rdparty/libchess/libchess.dylib")
-        endif()
-
-        target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/libchess/libchess>)
-        target_include_directories(${target} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/json>)
     endif()
 
 #    if (DARKNET_TESTING)
