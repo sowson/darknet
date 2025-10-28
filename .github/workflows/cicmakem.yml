@@ -25,17 +25,6 @@ jobs:
     - name: Install dependencies
       run: brew install opencv clblas
 
-    - name: Configure LibChess
-      run: cmake -B cmake/libchess/build -S cmake/libchess -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-
-    - name: Build LibChess
-      run: cmake --build cmake/libchess/build --config ${{env.BUILD_TYPE}}
-
-    - name: Copy LibChess shared library
-      run: |
-        mkdir -p 3rdparty/libchess
-        cp cmake/libchess/build/shared/libchess.* 3rdparty/libchess/
-
     - name: Configure Project
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
@@ -46,7 +35,6 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/darknet.mac
-        cp cmake/libchess/build/shared/libchess.dylib release/
 
     #  working-directory: ${{github.workspace}}/build
     #  run: ctest -C ${{env.BUILD_TYPE}}

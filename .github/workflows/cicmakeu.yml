@@ -22,15 +22,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Configure LibChess CMake
-      run: cd cmake/libchess && cmake -B ${{github.workspace}}/cmake/libchess/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} && cd ../..
-
-    - name: Build LibChess
-      run: cd cmake/libchess && cmake --build ${{github.workspace}}/cmake/libchess/build --config ${{env.BUILD_TYPE}} && cd ../..
-
-    - name: Update LibChess 3rdParty
-      run: cp ${{github.workspace}}/cmake/libchess/build/shared/libchess.* ${{github.workspace}}/3rdparty/libchess/
-
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
@@ -41,7 +32,6 @@ jobs:
       run: |
         mkdir -p release
         mv build/darknet release/Darknet.ubuntu
-        cp cmake/libchess/build/shared/libchess.so release/
 
     - name: Create .tar.gz Archive
       run: tar -czvf Darknet.ubuntu.tar.gz -C release .
